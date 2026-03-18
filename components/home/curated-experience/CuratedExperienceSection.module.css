@@ -1,0 +1,141 @@
+.section {
+  position: relative;
+  width: 100%;
+  min-height: 560px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px;
+  isolation: isolate;
+}
+
+.backgroundLayer {
+  position: absolute;
+  inset: 0;
+  background-image: url("https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1800&q=80");
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.02);
+  z-index: -2;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(73, 56, 34, 0.38),
+    rgba(84, 67, 45, 0.28),
+    rgba(87, 68, 45, 0.34)
+  );
+  z-index: -1;
+}
+
+.content {
+  max-width: 980px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.title {
+  margin: 0 0 18px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  max-width: 980px;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 34px;
+  min-width: 278px;
+  padding: 16px 26px;
+  border: 1.5px solid #2d2419;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e1a16;
+  text-decoration: none;
+  font-size: 0.98rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.button:hover {
+  background: #1f1a14;
+  border-color: #1f1a14;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1024px) {
+  .section {
+    min-height: 500px;
+    padding: 64px 20px;
+  }
+
+  .description {
+    font-size: 1.08rem;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    min-height: 440px;
+    padding: 54px 18px;
+  }
+
+  .title {
+    margin-bottom: 14px;
+  }
+
+  .description {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .button {
+    margin-top: 28px;
+    min-width: 240px;
+    padding: 14px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .section {
+    min-height: 400px;
+    padding: 48px 14px;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+
+  .description {
+    font-size: 0.96rem;
+  }
+
+  .button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
