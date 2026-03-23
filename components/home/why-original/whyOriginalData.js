@@ -1,7 +1,7 @@
 export const whyOriginalCards = [
   {
     id: 1,
-    image: "/images/why-original-1.jpg",
+    image: "https://picsum.photos/seed/why-original-1/1200/900",
     eyebrow: "UNIQUELY YOURS",
     title: "A room feels more intentional",
     description:
@@ -9,7 +9,8 @@ export const whyOriginalCards = [
   },
   {
     id: 2,
-    image: "/images/why-original-2.jpg",
+    image:
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "REAL PRESENCE",
     title: "Each piece carries real presence",
     description:
@@ -17,7 +18,8 @@ export const whyOriginalCards = [
   },
   {
     id: 3,
-    image: "/images/why-original-3.jpg",
+    image:
+      "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "SUPPORT ARTISTS",
     title: "You support living artists",
     description:
@@ -25,7 +27,8 @@ export const whyOriginalCards = [
   },
   {
     id: 4,
-    image: "/images/why-original-4.jpg",
+    image:
+      "https://images.unsplash.com/photo-1579965342575-16428a7c8881?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "TRANSFORM YOUR SPACE",
     title: "Art changes the atmosphere",
     description:
@@ -33,7 +36,8 @@ export const whyOriginalCards = [
   },
   {
     id: 5,
-    image: "/images/why-original-5.jpg",
+    image:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
     eyebrow: "CONNECT WITH PROCESS",
     title: "Every work carries a human touch",
     description:

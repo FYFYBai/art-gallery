@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Header.module.css";
 import { languageOptions, navItems, rotatingTerms } from "./headerData";
 import { CartIcon, GlobeIcon, SearchIcon, UserIcon } from "./icons";
 
 export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [visibleDropdown, setVisibleDropdown] = useState(null);
+  const [isDropdownClosing, setIsDropdownClosing] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [searchTermIndex, setSearchTermIndex] = useState(0);
+  const closeDropdownTimerRef = useRef(null);
+  const hideDropdownTimerRef = useRef(null);
 
   const activeItem = useMemo(() => {
-    return navItems.find((item) => item.label === activeDropdown) || null;
-  }, [activeDropdown]);
+    return navItems.find((item) => item.label === visibleDropdown) || null;
+  }, [visibleDropdown]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -31,6 +35,8 @@ export default function Header() {
       if (event.key === "Escape") {
         setLanguageOpen(false);
         setActiveDropdown(null);
+        setVisibleDropdown(null);
+        setIsDropdownClosing(false);
       }
     };
 
@@ -52,20 +58,67 @@ export default function Header() {
     event.stopPropagation();
   };
 
+  const clearDropdownCloseTimer = () => {
+    if (closeDropdownTimerRef.current) {
+      clearTimeout(closeDropdownTimerRef.current);
+      closeDropdownTimerRef.current = null;
+    }
+  };
+
+  const clearDropdownHideTimer = () => {
+    if (hideDropdownTimerRef.current) {
+      clearTimeout(hideDropdownTimerRef.current);
+      hideDropdownTimerRef.current = null;
+    }
+  };
+
+  const hideDropdown = () => {
+    clearDropdownCloseTimer();
+    clearDropdownHideTimer();
+    setActiveDropdown(null);
+    setIsDropdownClosing(true);
+
+    hideDropdownTimerRef.current = setTimeout(() => {
+      setVisibleDropdown(null);
+      setIsDropdownClosing(false);
+      hideDropdownTimerRef.current = null;
+    }, 180);
+  };
+
+  const scheduleDropdownClose = () => {
+    clearDropdownCloseTimer();
+
+    closeDropdownTimerRef.current = setTimeout(() => {
+      hideDropdown();
+    }, 120);
+  };
+
+  const openDropdown = (label) => {
+    clearDropdownCloseTimer();
+    clearDropdownHideTimer();
+    setIsDropdownClosing(false);
+    setActiveDropdown(label);
+    setVisibleDropdown(label);
+  };
+
   const isOverlayVisible = Boolean(activeDropdown);
+
+  useEffect(() => {
+    return () => {
+      clearDropdownCloseTimer();
+      clearDropdownHideTimer();
+    };
+  }, []);
 
   return (
     <>
-      <header
-        className={styles.siteHeader}
-        onMouseLeave={() => setActiveDropdown(null)}
-      >
+      <header className={styles.siteHeader}>
         <div className={styles.headerShell}>
-          <div className={styles.headerLeft}>
-            <a href="/" className={styles.logoLink} aria-label="Go to homepage">
-              LOGO
-            </a>
+          <a href="/" className={styles.logoLink} aria-label="Go to homepage">
+            LOGO
+          </a>
 
+          <div className={styles.headerRight}>
             <nav className={styles.mainNav} aria-label="Main navigation">
               <ul className={styles.navList}>
                 {navItems.map((item) => {
@@ -77,8 +130,11 @@ export default function Header() {
                       className={`${styles.navItem} ${
                         hasDropdown ? styles.hasDropdown : ""
                       }`}
-                      onMouseEnter={() =>
-                        hasDropdown && setActiveDropdown(item.label)
+                      onMouseEnter={() => hasDropdown && openDropdown(item.label)}
+                      onMouseLeave={() =>
+                        hasDropdown && activeDropdown === item.label
+                          ? scheduleDropdownClose()
+                          : undefined
                       }
                     >
                       <a href={item.link} className={styles.navLink}>
@@ -89,9 +145,7 @@ export default function Header() {
                 })}
               </ul>
             </nav>
-          </div>
 
-          <div className={styles.headerRight}>
             <div className={styles.searchBar} aria-label="Search">
               <span className={styles.searchIconWrap}>
                 <SearchIcon className={styles.headerIconSvg} />
@@ -169,8 +223,11 @@ export default function Header() {
 
         {activeItem && (
           <div
-            className={styles.globalDropdown}
-            onMouseEnter={() => setActiveDropdown(activeItem.label)}
+            className={`${styles.globalDropdown} ${
+              isDropdownClosing ? styles.isClosing : styles.isOpen
+            }`}
+            onMouseEnter={() => openDropdown(activeItem.label)}
+            onMouseLeave={scheduleDropdownClose}
           >
             <div className={styles.globalDropdownInner}>
               <div className={styles.dropdownColumns}>

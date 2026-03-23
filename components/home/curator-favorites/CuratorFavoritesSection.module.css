@@ -1,6 +1,6 @@
 .section {
   padding: 56px 32px 72px;
-  background: #f3f3f1;
+  background: var(--surface-main);
 }
 
 .inner {
@@ -17,61 +17,84 @@
 }
 
 .title {
+  font-family: var(--font-title), serif;
   font-size: 1.95rem;
   line-height: 1.08;
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: #111;
+  color: var(--text-main);
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .arrowButton {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #b7b7b1;
   border-radius: 999px;
-  border: 1px solid #111;
   background: transparent;
+  color: #353535;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: default;
-  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.arrowMuted {
-  border-color: rgba(17, 17, 17, 0.08);
-  background: rgba(17, 17, 17, 0.04);
+.arrowButton:hover {
+  background: #ecebe7;
+  border-color: #8f8f89;
 }
 
-.arrowLeft,
-.arrowRight {
-  width: 10px;
-  height: 10px;
-  display: inline-block;
-  border-top: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
+.arrowButton:active {
+  transform: scale(0.96);
 }
 
-.arrowLeft {
-  transform: rotate(-135deg);
-  color: rgba(17, 17, 17, 0.28);
-  margin-left: 4px;
+.arrowButton:disabled {
+  cursor: not-allowed;
+  color: #bdbdb7;
+  border-color: #d6d6d1;
+  background: transparent;
+  opacity: 0.75;
 }
 
-.arrowRight {
-  transform: rotate(45deg);
-  color: #111;
-  margin-right: 2px;
+.arrowButton:disabled:hover {
+  background: transparent;
+  border-color: #d6d6d1;
+  transform: none;
 }
 
-.grid {
+.arrowSvg {
+  width: 18px;
+  height: 18px;
+}
+
+.carouselViewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.carouselTrack {
+  display: flex;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.carouselPage {
+  flex: 0 0 auto;
+}
+
+.pageGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 22px;
 }
 
@@ -79,12 +102,17 @@
   min-width: 0;
 }
 
+.imageLink {
+  display: block;
+  text-decoration: none;
+}
+
 .imageWrap {
   width: 100%;
   aspect-ratio: 1.42 / 1;
   overflow: hidden;
   background: #ddd6cb;
-  margin-bottom: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .image {
@@ -92,29 +120,48 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.35s ease;
 }
 
-.cardTitle {
-  font-size: 0.96rem;
+.imageLink:hover .image {
+  transform: scale(1.03);
+}
+
+.cardTitleLink {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--font-title), serif;
+  font-size: 1rem;
   line-height: 1.35;
-  font-weight: 400;
-  color: #111;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: none;
+  transition: color 0.25s ease;
 }
 
-@media (max-width: 1400px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.cardTitleLink::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 6px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease;
+}
+
+.cardTitleLink:hover {
+  color: var(--accent);
+}
+
+.cardTitleLink:hover::after {
+  transform: scaleX(1);
 }
 
 @media (max-width: 900px) {
   .section {
     padding: 48px 24px 60px;
-  }
-
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
   }
 }
 
@@ -123,24 +170,11 @@
     margin-bottom: 22px;
   }
 
-  .controls {
-    gap: 10px;
-  }
-
   .arrowButton {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cardTitle {
-    font-size: 0.92rem;
-  }
-}
-@media (max-width: 640px) {
   .title {
     font-size: 1.35rem;
     line-height: 1.12;
