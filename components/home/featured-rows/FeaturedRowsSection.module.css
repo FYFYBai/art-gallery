@@ -1,6 +1,6 @@
 .section {
   width: 100%;
-  background: #f3f3f1;
+  background: var(--surface-main);
   padding: 56px 20px 72px;
 }
 
@@ -23,10 +23,11 @@
 
 .rowTitle {
   margin: 0;
+  font-family: var(--font-title), serif;
   font-size: 2rem;
   line-height: 1.2;
   font-weight: 500;
-  color: #1f1f1f;
+  color: var(--text-main);
 }
 
 .rowControls {
@@ -38,10 +39,10 @@
 .navButton {
   width: 38px;
   height: 38px;
-  border: 1px solid #b7b7b1;
+  border: 1px solid var(--line-mid);
   border-radius: 999px;
   background: transparent;
-  color: #353535;
+  color: var(--text-main);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -55,8 +56,8 @@
 }
 
 .navButton:hover {
-  background: #ecebe7;
-  border-color: #8f8f89;
+  background: var(--surface-muted);
+  border-color: var(--accent-soft);
 }
 
 .navButton:active {
@@ -65,15 +66,15 @@
 
 .navButton:disabled {
   cursor: not-allowed;
-  color: #bdbdb7;
-  border-color: #d6d6d1;
+  color: var(--text-faint);
+  border-color: var(--line-soft);
   background: transparent;
   opacity: 0.75;
 }
 
 .navButton:disabled:hover {
   background: transparent;
-  border-color: #d6d6d1;
+  border-color: var(--line-soft);
   transform: none;
 }
 
@@ -113,7 +114,7 @@
 
 .imageFrame {
   aspect-ratio: 0.8 / 1;
-  background: #ecece9;
+  background: var(--surface-muted);
   padding: 14px;
   overflow: hidden;
   display: flex;
@@ -143,10 +144,11 @@
 }
 
 .price {
+  font-family: var(--font-body), sans-serif;
   font-size: 1rem;
   line-height: 1.3;
   font-weight: 600;
-  color: #1f1f1f;
+  color: var(--text-main);
 }
 
 .actions {
@@ -162,7 +164,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #444;
+  color: var(--text-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -170,7 +172,7 @@
 }
 
 .iconButton:hover {
-  color: #7a5a3a;
+  color: var(--accent-strong);
 }
 
 .metaIcon {
@@ -181,7 +183,8 @@
 .titleLink {
   display: inline-block;
   margin-top: 8px;
-  color: #1f1f1f;
+  font-family: var(--font-title), serif;
+  color: var(--text-main);
   text-decoration: none;
   font-size: 0.98rem;
   line-height: 1.45;
@@ -189,14 +192,15 @@
 }
 
 .titleLink:hover {
-  text-decoration: underline;
+  color: var(--accent-strong);
 }
 
 .metaLine {
   margin: 3px 0 0;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.88rem;
   line-height: 1.45;
-  color: #545454;
+  color: var(--text-soft);
 }
 
 .priceFilter {
@@ -209,10 +213,11 @@
 
 .priceFilterTitle {
   margin: 0;
+  font-family: var(--font-title), serif;
   font-size: 1.35rem;
   line-height: 1.2;
   font-weight: 500;
-  color: #1f1f1f;
+  color: var(--text-main);
   white-space: nowrap;
 }
 
@@ -226,10 +231,11 @@
 .priceButton {
   min-width: 150px;
   padding: 12px 18px;
-  border: 1px solid #222;
+  border: 1px solid var(--line-mid);
   border-radius: 10px;
-  background: #ffffff;
-  color: #1f1f1f;
+  background: var(--white);
+  color: var(--text-main);
+  font-family: var(--font-body), sans-serif;
   font-size: 0.88rem;
   line-height: 1.2;
   font-weight: 600;
@@ -243,8 +249,8 @@
 }
 
 .priceButton:hover {
-  background: #1f1f1f;
-  color: #ffffff;
+  background: var(--surface-dark);
+  color: var(--white);
   transform: translateY(-1px);
 }
 

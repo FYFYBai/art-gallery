@@ -34,10 +34,10 @@
 .arrowButton {
   width: 38px;
   height: 38px;
-  border: 1px solid #b7b7b1;
+  border: 1px solid var(--line-mid);
   border-radius: 999px;
   background: transparent;
-  color: #353535;
+  color: var(--text-main);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -51,8 +51,8 @@
 }
 
 .arrowButton:hover {
-  background: #ecebe7;
-  border-color: #8f8f89;
+  background: var(--surface-muted);
+  border-color: var(--accent-soft);
 }
 
 .arrowButton:active {
@@ -61,15 +61,15 @@
 
 .arrowButton:disabled {
   cursor: not-allowed;
-  color: #bdbdb7;
-  border-color: #d6d6d1;
+  color: var(--text-faint);
+  border-color: var(--line-soft);
   background: transparent;
   opacity: 0.75;
 }
 
 .arrowButton:disabled:hover {
   background: transparent;
-  border-color: #d6d6d1;
+  border-color: var(--line-soft);
   transform: none;
 }
 
@@ -111,7 +111,7 @@
   width: 100%;
   aspect-ratio: 1.42 / 1;
   overflow: hidden;
-  background: #ddd6cb;
+  background: var(--surface-strong);
   border-radius: var(--radius-sm);
 }
 

@@ -1,0 +1,5 @@
+Primary Background: #F5F0E6
+Secondary Background: #FCFAF5
+Soft Neutral / Border: #D8CBB8
+Accent: #B89B72
+Text / Dark Neutral: #4E4338

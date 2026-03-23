@@ -3,7 +3,7 @@
   width: 100%;
   height: clamp(520px, 72vh, 860px);
   overflow: hidden;
-  background: #d9d9d9;
+  background: var(--surface-muted);
 }
 
 .slidesWrapper {
@@ -40,10 +40,10 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.18) 0%,
-    rgba(0, 0, 0, 0.08) 28%,
-    rgba(0, 0, 0, 0.04) 50%,
-    rgba(0, 0, 0, 0.02) 100%
+    rgba(78, 67, 56, 0.26) 0%,
+    rgba(78, 67, 56, 0.14) 30%,
+    rgba(78, 67, 56, 0.06) 52%,
+    rgba(78, 67, 56, 0.02) 100%
   );
 }
 
@@ -53,18 +53,19 @@
   left: clamp(24px, 6vw, 84px);
   bottom: clamp(28px, 6vw, 72px);
   padding: clamp(14px, 2vw, 28px);
-  background: rgba(170, 170, 170, 0.34);
-  backdrop-filter: blur(2px);
+  background: rgba(245, 240, 230, 0.2);
+  backdrop-filter: blur(4px);
   animation: contentEnter 0.75s ease;
 }
 
 /* 内部白色文本框 */
 .contentCard {
-  background: #ffffff;
+  background: rgba(252, 250, 245, 0.94);
   padding: clamp(24px, 3vw, 42px) clamp(24px, 3.4vw, 46px)
     clamp(24px, 3vw, 38px);
   width: min(560px, calc(100vw - 96px));
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(216, 203, 184, 0.45);
 }
 
 .eyebrow {
@@ -75,7 +76,7 @@
   font-weight: 400;
   letter-spacing: 0.01em;
   text-transform: uppercase;
-  color: #2f2f2f;
+  color: var(--text-main);
 }
 
 .title {
@@ -84,7 +85,7 @@
   font-size: clamp(1.15rem, 1.5vw, 1.95rem);
   line-height: 1.32;
   font-weight: 400;
-  color: #3b3b3b;
+  color: var(--text-soft);
 }
 
 .link {
@@ -95,7 +96,7 @@
   line-height: 1.2;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #2f2f2f;
+  color: var(--text-main);
   text-decoration: none;
   transition: color 0.25s ease;
 }
@@ -108,18 +109,18 @@
   margin-top: 6px;
   background: currentColor;
   transform-origin: left center;
-  transform: scaleX(1);
+  transform: scaleX(0);
   transition:
     transform 0.25s ease,
     background-color 0.25s ease;
 }
 
 .link:hover {
-  color: #8a5a3b;
+  color: var(--accent-strong);
 }
 
 .link:hover::after {
-  transform: scaleX(1.04);
+  transform: scaleX(1);
 }
 
 /* 左右整条交互层 */
@@ -169,18 +170,18 @@
 
 /* 默认不明显，鼠标靠近才显现 */
 .sideControl:hover {
-  background: rgba(128, 128, 128, 0.28);
+  background: rgba(184, 155, 114, 0.24);
   color: rgba(255, 255, 255, 0.94);
 }
 
 /* 当用户 hover hero 时，让左右区域有轻微存在感 */
 .hero:hover .sideControl {
-  background: rgba(128, 128, 128, 0.08);
+  background: rgba(184, 155, 114, 0.08);
   color: rgba(255, 255, 255, 0.45);
 }
 
 .hero:hover .sideControl:hover {
-  background: rgba(128, 128, 128, 0.28);
+  background: rgba(184, 155, 114, 0.24);
   color: rgba(255, 255, 255, 0.94);
 }
 

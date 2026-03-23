@@ -1,6 +1,6 @@
 .section {
   width: 100%;
-  background: #efefef;
+  background: var(--surface-main);
   padding: 84px 32px 92px;
 }
 
@@ -17,29 +17,31 @@
 
 .title {
   margin: 0 0 18px;
+  font-family: var(--font-title), serif;
   font-size: 2.2rem;
   line-height: 1.2;
   font-weight: 500;
-  color: #1f1f1f;
+  color: var(--text-main);
   letter-spacing: -0.01em;
 }
 
 .description {
   margin: 0;
+  font-family: var(--font-body), sans-serif;
   font-size: 1.2rem;
   line-height: 1.8;
-  color: #2f2f2f;
+  color: var(--text-soft);
 }
 
 .link {
   color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.14em;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
   transition: color 0.2s ease;
 }
 
 .link:hover {
-  color: #7a5a3a;
+  color: var(--accent-strong);
 }
 
 .grid {
@@ -49,8 +51,8 @@
 }
 
 .card {
-  background: #f8f8f8;
-  border-radius: 4px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
   padding: 30px 28px 24px;
   min-height: 225px;
   display: flex;
@@ -63,22 +65,24 @@
   margin-bottom: 22px;
   font-size: 1.8rem;
   line-height: 1;
-  color: #111111;
+  color: var(--accent-strong);
 }
 
 .cardTitle {
   margin: 0 0 14px;
+  font-family: var(--font-title), serif;
   font-size: 1.65rem;
   line-height: 1.35;
   font-weight: 500;
-  color: #1f1f1f;
+  color: var(--text-main);
 }
 
 .cardText {
   margin: 0;
+  font-family: var(--font-body), sans-serif;
   font-size: 1.05rem;
   line-height: 1.6;
-  color: #2f2f2f;
+  color: var(--text-soft);
   max-width: 290px;
 }
 

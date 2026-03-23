@@ -1,6 +1,6 @@
 .section {
   padding: 120px 32px 140px;
-  background: #f3f3f1;
+  background: var(--surface-main);
 }
 
 .inner {
@@ -43,26 +43,29 @@
 
 .eyebrow {
   margin-bottom: 16px;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #8b847a;
+  color: var(--text-faint);
 }
 
 .title {
   margin-bottom: 28px;
+  font-family: var(--font-title), serif;
   font-size: clamp(3rem, 4.8vw, 4.4rem);
   line-height: 0.96;
   font-weight: 400;
   letter-spacing: -0.02em;
-  color: #2f2f2f;
+  color: var(--text-main);
 }
 
 .description {
   max-width: 24ch;
+  font-family: var(--font-body), sans-serif;
   font-size: 1.02rem;
   line-height: 1.65;
-  color: #4a4a4a;
+  color: var(--text-soft);
 }
 
 .rightColumn {
@@ -74,8 +77,8 @@
 
 .card {
   width: min(900px, 100%);
-  background: #ece9e1;
-  border-radius: 5px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
   padding: 16px;
   display: grid;
   grid-template-columns: 390px minmax(0, 1fr);
@@ -87,7 +90,8 @@
   width: 100%;
   aspect-ratio: 1 / 0.84;
   overflow: hidden;
-  background: #d9d2c7;
+  background: var(--surface-strong);
+  border-radius: 8px;
 }
 
 .cardImage {
@@ -106,26 +110,29 @@
 
 .cardEyebrow {
   margin-bottom: 12px;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #1f3553;
+  color: var(--accent-strong);
 }
 
 .cardTitle {
   margin-bottom: 14px;
+  font-family: var(--font-title), serif;
   font-size: 1.42rem;
   line-height: 1.08;
   font-weight: 500;
   letter-spacing: -0.018em;
-  color: #1f2d3d;
+  color: var(--text-main);
 }
 
 .cardDescription {
   max-width: 28ch;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.94rem;
   line-height: 1.62;
-  color: #2d2d2d;
+  color: var(--text-soft);
 }
 
 @media (max-width: 1200px) {
