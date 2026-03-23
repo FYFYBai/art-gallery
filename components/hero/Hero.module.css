@@ -69,6 +69,7 @@
 
 .eyebrow {
   margin: 0 0 18px;
+  font-family: var(--font-title), serif;
   font-size: clamp(1.8rem, 4.2vw, 4rem);
   line-height: 0.98;
   font-weight: 400;
@@ -79,6 +80,7 @@
 
 .title {
   margin: 0 0 22px;
+  font-family: var(--font-body), sans-serif;
   font-size: clamp(1.15rem, 1.5vw, 1.95rem);
   line-height: 1.32;
   font-weight: 400;
@@ -88,6 +90,7 @@
 .link {
   display: inline-block;
   position: relative;
+  font-family: var(--font-body), sans-serif;
   font-size: 1.02rem;
   line-height: 1.2;
   letter-spacing: 0.03em;

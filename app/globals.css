@@ -5,28 +5,49 @@
 }
 
 :root {
+  --font-body: var(--font-sans);
+  --font-title: var(--font-serif);
   --header-height: 84px;
-  --header-bg: rgba(247, 243, 238, 0.96);
-  --page-bg: #f7f3ee;
-  --text-main: #111;
-  --text-soft: #666;
-  --text-faint: #777;
-  --line-soft: rgba(17, 17, 17, 0.08);
-  --line-mid: rgba(17, 17, 17, 0.14);
-  --white: #fff;
-  --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.08);
-  --overlay-bg: rgba(0, 0, 0, 0.28);
+  --header-bg: rgba(250, 246, 240, 0.84);
+  --page-bg: #f5f0e6;
+  --surface-main: #fbf7f1;
+  --surface-muted: #f1e7d7;
+  --surface-strong: #e6d6c0;
+  --surface-dark: #2f241d;
+  --text-main: #241913;
+  --text-soft: #67594f;
+  --text-faint: #8a7b70;
+  --accent: #8d5f3f;
+  --accent-strong: #6d472f;
+  --accent-soft: #d6b894;
+  --line-soft: rgba(66, 45, 33, 0.1);
+  --line-mid: rgba(66, 45, 33, 0.18);
+  --white: #fffdf9;
+  --shadow-soft: 0 24px 70px rgba(68, 43, 23, 0.08);
+  --shadow-card: 0 18px 40px rgba(77, 50, 29, 0.08);
+  --overlay-bg: rgba(36, 24, 18, 0.22);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
 }
 
 html,
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--page-bg);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.72),
+      transparent 34%
+    ),
+    linear-gradient(180deg, #f9f4ec 0%, var(--page-bg) 40%, #efe3d3 100%);
   color: var(--text-main);
+  scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
+  line-height: 1.5;
 }
 
 a {
@@ -39,40 +60,11 @@ input {
   font: inherit;
 }
 
-.pageContent {
+.pageContent,
+main {
   position: relative;
+}
+
+.pageContent {
   z-index: 1;
-}
-
-.heroSection {
-  min-height: calc(100vh - var(--header-height));
-  display: flex;
-  align-items: center;
-  padding: 64px 40px;
-}
-
-.heroContent {
-  max-width: 760px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.heroEyebrow {
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  margin-bottom: 18px;
-}
-
-.heroTitle {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  line-height: 0.95;
-  margin-bottom: 22px;
-}
-
-.heroText {
-  font-size: 1rem;
-  line-height: 1.8;
-  color: #4a4a4a;
 }

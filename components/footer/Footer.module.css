@@ -19,25 +19,92 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.brandBlock {
-  max-width: 460px;
+.subscribeBlock {
+  max-width: 560px;
 }
 
-.logo {
-  display: inline-block;
+.subscribeTitle {
+  margin: 0;
+  font-family: var(--font-title), serif;
   color: #ffffff;
-  text-decoration: none;
-  font-size: 1.15rem;
+  font-size: 1.8rem;
   line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
-.tagline {
+.subscribeText {
   margin: 16px 0 0;
+  font-family: var(--font-body), sans-serif;
   color: rgba(255, 255, 255, 0.72);
   font-size: 0.98rem;
   line-height: 1.7;
+}
+
+.subscribeForm {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.emailInput {
+  min-width: 260px;
+  flex: 1 1 320px;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.95rem;
+}
+
+.emailInput::placeholder {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.submitButton {
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: #f3f1ec;
+  color: #141414;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.submitButton:hover {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.submitButton:active {
+  transform: translateY(1px);
 }
 
 .nav {
@@ -48,6 +115,9 @@
 }
 
 .link {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-body), sans-serif;
   color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
   font-size: 0.95rem;
@@ -55,8 +125,24 @@
   transition: color 0.2s ease;
 }
 
+.link::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 6px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease;
+}
+
 .link:hover {
   color: #ffffff;
+}
+
+.link:hover::after {
+  transform: scaleX(1);
 }
 
 .bottomRow {
@@ -69,6 +155,7 @@
 
 .copy {
   margin: 0;
+  font-family: var(--font-body), sans-serif;
   color: rgba(255, 255, 255, 0.58);
   font-size: 0.88rem;
   line-height: 1.5;
@@ -81,6 +168,7 @@
 }
 
 .legalLink {
+  font-family: var(--font-body), sans-serif;
   color: rgba(255, 255, 255, 0.58);
   text-decoration: none;
   font-size: 0.88rem;
@@ -118,12 +206,17 @@
     padding: 40px 14px 22px;
   }
 
-  .logo {
-    font-size: 1.02rem;
+  .subscribeTitle {
+    font-size: 1.45rem;
   }
 
-  .tagline {
+  .subscribeText {
     font-size: 0.92rem;
+  }
+
+  .emailInput,
+  .submitButton {
+    width: 100%;
   }
 
   .link,

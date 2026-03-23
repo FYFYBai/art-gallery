@@ -5,28 +5,44 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.topRow}>
-          <div className={styles.brandBlock}>
-            <a href="/" className={styles.logo}>
-              ART GALLERY
-            </a>
-            <p className={styles.tagline}>
-              Discover original works, curated collections, and timeless pieces
-              for your space.
+          <div className={styles.subscribeBlock}>
+            <h2 className={styles.subscribeTitle}>Stay close to the studio</h2>
+            <p className={styles.subscribeText}>
+              Receive occasional updates on new works, exhibitions, and quiet
+              moments from the gallery.
             </p>
+
+            <form className={styles.subscribeForm}>
+              <label htmlFor="footer-email" className={styles.visuallyHidden}>
+                Email address
+              </label>
+              <input
+                id="footer-email"
+                type="email"
+                placeholder="Your email address"
+                className={styles.emailInput}
+              />
+              <button type="submit" className={styles.submitButton}>
+                Subscribe
+              </button>
+            </form>
           </div>
 
           <nav className={styles.nav} aria-label="Footer navigation">
             <a href="#" className={styles.link}>
-              Paintings
+              Œuvres
             </a>
             <a href="#" className={styles.link}>
-              Drawings
+              Séries
             </a>
             <a href="#" className={styles.link}>
-              Trade
+              À propos
             </a>
             <a href="#" className={styles.link}>
-              Info
+              Expositions
+            </a>
+            <a href="#" className={styles.link}>
+              Contact
             </a>
           </nav>
         </div>

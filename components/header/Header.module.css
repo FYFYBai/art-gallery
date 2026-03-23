@@ -16,13 +16,6 @@
   padding: 0 28px 0 32px;
 }
 
-.headerLeft {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 34px;
-}
-
 .logoLink {
   display: inline-flex;
   align-items: center;
@@ -30,6 +23,7 @@
   width: 92px;
   height: 40px;
   border: 1px solid var(--text-main);
+  font-family: var(--font-title), serif;
   font-size: 0.9rem;
   letter-spacing: 0.14em;
   flex-shrink: 0;
@@ -39,6 +33,7 @@
 
 .mainNav {
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .navList {
@@ -57,6 +52,7 @@
   display: inline-flex;
   align-items: center;
   height: var(--header-height);
+  font-family: var(--font-body), sans-serif;
   font-size: 0.95rem;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -86,7 +82,8 @@
   align-items: center;
   justify-content: flex-end;
   gap: 14px;
-  flex-shrink: 0;
+  min-width: 0;
+  margin-left: auto;
 }
 
 .searchBar {
@@ -114,6 +111,7 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  font-family: var(--font-body), sans-serif;
   color: #585858;
   font-size: 0.93rem;
   overflow: hidden;
@@ -205,6 +203,7 @@
   width: 100%;
   border: none;
   background: transparent;
+  font-family: var(--font-body), sans-serif;
   text-align: left;
   padding: 11px 14px;
   cursor: pointer;
@@ -224,6 +223,19 @@
   border-bottom: 1px solid var(--line-soft);
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.04);
   z-index: 1100;
+  will-change: opacity, transform;
+  transform-origin: top center;
+  animation-duration: 0.22s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+.isOpen {
+  animation-name: dropdownFadeIn;
+}
+
+.isClosing {
+  animation-name: dropdownFadeOut;
 }
 
 .globalDropdownInner {
@@ -247,6 +259,7 @@
 
 .columnTitle {
   margin-bottom: 14px;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -262,6 +275,7 @@
 
 .dropdownItemLink {
   display: inline-block;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.96rem;
   line-height: 1.4;
   transition: opacity 0.2s ease;
@@ -292,6 +306,7 @@
 }
 
 .promoEyebrow {
+  font-family: var(--font-body), sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -301,12 +316,14 @@
 }
 
 .promoTitle {
+  font-family: var(--font-title), serif;
   font-size: 1.25rem;
   line-height: 1.2;
   margin-bottom: 12px;
 }
 
 .promoDescription {
+  font-family: var(--font-body), sans-serif;
   font-size: 0.95rem;
   line-height: 1.6;
   color: #4b4b4b;
@@ -317,6 +334,7 @@
   display: inline-block;
   border-bottom: 1px solid var(--text-main);
   padding-bottom: 2px;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.95rem;
   text-decoration: none;
   color: inherit;
@@ -334,6 +352,28 @@
 
 .isVisible {
   opacity: 1;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 @media (max-width: 1200px) {
@@ -354,10 +394,6 @@
   .headerShell {
     gap: 18px;
     padding: 0 20px;
-  }
-
-  .headerLeft {
-    gap: 24px;
   }
 
   .navList {
