@@ -107,40 +107,97 @@
   flex-shrink: 0;
 }
 
-.searchPlaceholder {
-  display: flex;
-  align-items: center;
+.searchInput {
+  flex: 1 1 auto;
   min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
   font-family: var(--font-body), sans-serif;
   color: var(--text-soft);
   font-size: 0.93rem;
-  overflow: hidden;
-  white-space: nowrap;
+  outline: none;
 }
 
-.searchStaticText {
+.searchInput::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-faint);
+  transition: color 0.25s ease;
+}
+
+.searchInput:focus::placeholder {
+  color: rgba(143, 127, 111, 0.7);
+}
+
+.searchSubmitButton {
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-}
-
-.rotatingWordViewport {
-  position: relative;
+  border: none;
+  background: transparent;
+  color: var(--accent-strong);
   display: inline-flex;
-  align-items: flex-start;
-  height: 1.5em;
-  overflow: hidden;
-  margin: 0 3px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-6px);
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    color 0.22s ease;
 }
 
-.rotatingWordTrack {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.35s ease;
+.searchClearButton {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(184, 155, 114, 0.14);
+  color: var(--text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
 }
 
-.rotatingWord {
-  display: block;
-  height: 1.5em;
-  line-height: 1.5em;
+.searchClearButton:hover {
+  background: rgba(184, 155, 114, 0.24);
+  color: var(--text-main);
+}
+
+.searchClearButton:active {
+  transform: scale(0.96);
+}
+
+.searchClearIcon {
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.searchSubmitVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.searchSubmitButton:hover {
+  color: var(--accent);
+}
+
+.searchSubmitIcon {
+  width: 18px;
+  height: 18px;
 }
 
 .headerActions {

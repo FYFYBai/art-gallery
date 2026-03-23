@@ -3,13 +3,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Header.module.css";
 import { languageOptions, navItems, rotatingTerms } from "./headerData";
-import { CartIcon, GlobeIcon, SearchIcon, UserIcon } from "./icons";
+import {
+  ArrowRightIcon,
+  CartIcon,
+  GlobeIcon,
+  SearchIcon,
+  UserIcon,
+} from "./icons";
 
 export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [visibleDropdown, setVisibleDropdown] = useState(null);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const closeDropdownTimerRef = useRef(null);
   const hideDropdownTimerRef = useRef(null);
@@ -101,7 +108,20 @@ export default function Header() {
     setVisibleDropdown(label);
   };
 
+  const trimmedSearchQuery = searchQuery.trim();
+  const searchPlaceholder = `Search for ${rotatingTerms[searchTermIndex]}`;
   const isOverlayVisible = Boolean(activeDropdown);
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+
+    if (!trimmedSearchQuery) {
+      return;
+    }
+
+    // Placeholder for future search-page routing.
+    window.location.hash = `search=${encodeURIComponent(trimmedSearchQuery)}`;
+  };
 
   useEffect(() => {
     return () => {
@@ -146,29 +166,45 @@ export default function Header() {
               </ul>
             </nav>
 
-            <div className={styles.searchBar} aria-label="Search">
+            <form
+              className={styles.searchBar}
+              aria-label="Search"
+              onSubmit={handleSearchSubmit}
+            >
               <span className={styles.searchIconWrap}>
                 <SearchIcon className={styles.headerIconSvg} />
               </span>
 
-              <div className={styles.searchPlaceholder}>
-                <span className={styles.searchStaticText}>Search for </span>
-                <span className={styles.rotatingWordViewport}>
-                  <span
-                    className={styles.rotatingWordTrack}
-                    style={{
-                      transform: `translateY(-${searchTermIndex * 1.5}em)`,
-                    }}
-                  >
-                    {rotatingTerms.map((term) => (
-                      <span key={term} className={styles.rotatingWord}>
-                        {term}
-                      </span>
-                    ))}
-                  </span>
-                </span>
-              </div>
-            </div>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={searchPlaceholder}
+                className={styles.searchInput}
+              />
+
+              {trimmedSearchQuery && (
+                <button
+                  type="button"
+                  className={styles.searchClearButton}
+                  aria-label="Clear search"
+                  onClick={() => setSearchQuery("")}
+                >
+                  <span className={styles.searchClearIcon}>×</span>
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className={`${styles.searchSubmitButton} ${
+                  trimmedSearchQuery ? styles.searchSubmitVisible : ""
+                }`}
+                aria-label="Submit search"
+                tabIndex={trimmedSearchQuery ? 0 : -1}
+              >
+                <ArrowRightIcon className={styles.searchSubmitIcon} />
+              </button>
+            </form>
 
             <div className={styles.headerActions}>
               <div
