@@ -6,7 +6,7 @@ export const navItems = [
       {
         title: "Œuvres",
         items: [
-          "Peintures à l’huile",
+          "Peintures à l'huile",
           "Aquarelles",
           "Dessins",
           "Dessins au fusain",

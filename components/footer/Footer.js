@@ -59,9 +59,6 @@ export default function Footer() {
             <a href="#" className={styles.legalLink}>
               Terms
             </a>
-            <a href="#" className={styles.legalLink}>
-              Contact
-            </a>
           </div>
         </div>
       </div>
