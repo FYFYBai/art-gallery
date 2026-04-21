@@ -86,6 +86,7 @@
 .carouselTrack {
   display: flex;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 0, 0);
   will-change: transform;
 }
 
@@ -113,6 +114,7 @@
   overflow: hidden;
   background: var(--surface-strong);
   border-radius: var(--radius-sm);
+  contain: paint;
 }
 
 .image {
@@ -121,6 +123,8 @@
   object-fit: cover;
   display: block;
   transition: transform 0.35s ease;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .imageLink:hover .image {

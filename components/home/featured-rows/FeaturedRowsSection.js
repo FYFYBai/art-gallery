@@ -186,23 +186,17 @@ function ProductRow({ row }) {
   const totalPages = pages.length;
   const safePageIndex = Math.min(pageIndex, Math.max(totalPages - 1, 0));
 
-  useEffect(() => {
-    if (pageIndex !== safePageIndex) {
-      setPageIndex(safePageIndex);
-    }
-  }, [pageIndex, safePageIndex]);
-
   const canGoPrev = safePageIndex > 0;
   const canGoNext = safePageIndex < totalPages - 1;
 
   const goPrev = () => {
     if (!canGoPrev) return;
-    setPageIndex((prev) => prev - 1);
+    setPageIndex(safePageIndex - 1);
   };
 
   const goNext = () => {
     if (!canGoNext) return;
-    setPageIndex((prev) => prev + 1);
+    setPageIndex(safePageIndex + 1);
   };
 
   return (

@@ -1,0 +1,126 @@
+.page {
+  background: var(--surface-main);
+}
+
+.section {
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  align-items: center;
+  padding: clamp(72px, 10vw, 132px) 32px;
+}
+
+.textOnlySection {
+  background:
+    radial-gradient(
+      circle at 18% 20%,
+      rgba(184, 155, 114, 0.14),
+      transparent 30%
+    ),
+    linear-gradient(180deg, var(--surface-main), var(--page-bg));
+}
+
+.textOnlyInner {
+  width: min(880px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.imageSection {
+  background: var(--page-bg);
+}
+
+.imageInner {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.8fr);
+  align-items: center;
+  gap: clamp(40px, 7vw, 96px);
+}
+
+.imageWrap {
+  min-height: 520px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  box-shadow: var(--shadow-card);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  object-fit: cover;
+  display: block;
+}
+
+.imageTextBlock {
+  max-width: 560px;
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-title), serif;
+  font-size: clamp(3.8rem, 8vw, 7.8rem);
+  line-height: 0.94;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  color: var(--text-main);
+}
+
+.lead {
+  margin: clamp(28px, 4vw, 44px) 0 0;
+  font-family: var(--font-title), serif;
+  font-size: clamp(1.5rem, 2.4vw, 2.35rem);
+  line-height: 1.24;
+  font-weight: 400;
+  color: var(--text-main);
+}
+
+.bodyText {
+  margin: 22px 0 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: clamp(1rem, 1.35vw, 1.18rem);
+  line-height: 1.8;
+  color: var(--text-soft);
+}
+
+@media (max-width: 900px) {
+  .section {
+    min-height: auto;
+    padding: 76px 22px;
+  }
+
+  .textOnlyInner {
+    text-align: left;
+  }
+
+  .imageInner {
+    grid-template-columns: 1fr;
+  }
+
+  .imageTextBlock {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .section {
+    padding: 60px 16px;
+  }
+
+  .imageWrap,
+  .image {
+    min-height: 360px;
+  }
+}

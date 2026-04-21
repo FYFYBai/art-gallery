@@ -40,7 +40,7 @@ export const navItems = [
   },
   {
     label: "À propos",
-    link: "#",
+    link: "/a-propos",
   },
   {
     label: "Expositions",

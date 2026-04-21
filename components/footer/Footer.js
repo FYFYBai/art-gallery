@@ -35,7 +35,7 @@ export default function Footer() {
             <a href="#" className={styles.link}>
               Séries
             </a>
-            <a href="#" className={styles.link}>
+            <a href="/a-propos" className={styles.link}>
               À propos
             </a>
             <a href="#" className={styles.link}>

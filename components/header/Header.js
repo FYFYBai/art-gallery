@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Header.module.css";
 import { languageOptions, navItems, rotatingTerms } from "./headerData";
@@ -16,6 +17,7 @@ export default function Header() {
   const [visibleDropdown, setVisibleDropdown] = useState(null);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const closeDropdownTimerRef = useRef(null);
@@ -36,11 +38,13 @@ export default function Header() {
   useEffect(() => {
     const closeMenus = () => {
       setLanguageOpen(false);
+      setAccountOpen(false);
     };
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setLanguageOpen(false);
+        setAccountOpen(false);
         setActiveDropdown(null);
         setVisibleDropdown(null);
         setIsDropdownClosing(false);
@@ -59,6 +63,17 @@ export default function Header() {
   const handleLanguageToggle = (event) => {
     event.stopPropagation();
     setLanguageOpen((prev) => !prev);
+    setAccountOpen(false);
+  };
+
+  const handleAccountToggle = (event) => {
+    event.stopPropagation();
+    setAccountOpen((prev) => !prev);
+    setLanguageOpen(false);
+  };
+
+  const closeAccountModal = () => {
+    setAccountOpen(false);
   };
 
   const stopPropagation = (event) => {
@@ -134,9 +149,9 @@ export default function Header() {
     <>
       <header className={styles.siteHeader}>
         <div className={styles.headerShell}>
-          <a href="/" className={styles.logoLink} aria-label="Go to homepage">
+          <Link href="/" className={styles.logoLink} aria-label="Go to homepage">
             LOGO
-          </a>
+          </Link>
 
           <div className={styles.headerRight}>
             <nav className={styles.mainNav} aria-label="Main navigation">
@@ -238,13 +253,19 @@ export default function Header() {
                 )}
               </div>
 
-              <button
-                type="button"
-                className={styles.iconButton}
-                aria-label="Account"
-              >
-                <UserIcon className={styles.headerIconSvg} />
-              </button>
+              <div className={styles.accountMenuWrap}>
+                <button
+                  type="button"
+                  className={`${styles.iconButton} ${
+                    accountOpen ? styles.isActive : ""
+                  }`}
+                  aria-label="Account"
+                  aria-expanded={accountOpen}
+                  onClick={handleAccountToggle}
+                >
+                  <UserIcon className={styles.headerIconSvg} />
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -307,6 +328,92 @@ export default function Header() {
           isOverlayVisible ? styles.isVisible : ""
         }`}
       />
+
+      {accountOpen && (
+        <div
+          className={styles.accountModalOverlay}
+          role="presentation"
+          onClick={closeAccountModal}
+        >
+          <div
+            className={styles.accountModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="account-login-title"
+            onClick={stopPropagation}
+          >
+            <button
+              type="button"
+              className={styles.accountModalClose}
+              aria-label="Close account login"
+              onClick={closeAccountModal}
+            >
+              ×
+            </button>
+
+            <div className={styles.accountHeader}>
+              <p className={styles.accountEyebrow}>Espace privé</p>
+              <h2 id="account-login-title" className={styles.accountTitle}>
+                Connexion
+              </h2>
+              <p className={styles.accountText}>
+                Accédez à vos favoris, demandes et sélections privées.
+              </p>
+            </div>
+
+            <form className={styles.loginForm}>
+              <label className={styles.loginLabel} htmlFor="login-email">
+                Email
+              </label>
+              <input
+                id="login-email"
+                type="email"
+                className={styles.loginInput}
+                placeholder="nom@example.com"
+              />
+
+              <label className={styles.loginLabel} htmlFor="login-password">
+                Password
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                className={styles.loginInput}
+                placeholder="Your password"
+              />
+
+              <div className={styles.accountLinksRow}>
+                <a href="#" className={styles.accountTextLink}>
+                  Forgot password?
+                </a>
+                <a href="#" className={styles.accountTextLink}>
+                  Register account
+                </a>
+              </div>
+
+              <button type="submit" className={styles.loginButton}>
+                Login
+              </button>
+            </form>
+
+            <div className={styles.socialLoginBlock}>
+              <p className={styles.socialDivider}>Or continue with</p>
+
+              <div className={styles.socialButtons}>
+                <button type="button" className={styles.socialButton}>
+                  Google
+                </button>
+                <button type="button" className={styles.socialButton}>
+                  Facebook
+                </button>
+                <button type="button" className={styles.socialButton}>
+                  Instagram
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

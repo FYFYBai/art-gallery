@@ -23,9 +23,11 @@
     opacity 0.8s ease,
     visibility 0.8s ease,
     transform 1.2s ease;
+  backface-visibility: hidden;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  will-change: opacity, transform;
 }
 
 .active {
@@ -54,8 +56,10 @@
   bottom: clamp(28px, 6vw, 72px);
   padding: clamp(14px, 2vw, 28px);
   background: rgba(245, 240, 230, 0.2);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
   animation: contentEnter 0.75s ease;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
 }
 
 /* 内部白色文本框 */
@@ -138,6 +142,7 @@
     background-color 0.25s ease,
     color 0.25s ease,
     opacity 0.25s ease;
+  transform: translateZ(0);
 }
 
 .leftControl {

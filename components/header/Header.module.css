@@ -3,8 +3,9 @@
   top: 0;
   z-index: 1000;
   background: var(--header-bg);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line-soft);
+  transform: translateZ(0);
 }
 
 .headerShell {
@@ -206,7 +207,8 @@
   gap: 8px;
 }
 
-.languageMenuWrap {
+.languageMenuWrap,
+.accountMenuWrap {
   position: relative;
 }
 
@@ -271,6 +273,251 @@
   background: var(--surface-muted);
 }
 
+.accountModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(78, 67, 56, 0.38);
+  backdrop-filter: blur(4px);
+  animation: accountOverlayIn 0.22s ease;
+  will-change: opacity;
+}
+
+.accountModal {
+  position: relative;
+  width: min(420px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 30px;
+  background: var(--white);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  animation: accountModalIn 0.24s ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: opacity, transform;
+}
+
+.accountModalClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(184, 155, 114, 0.14);
+  color: var(--text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.accountModalClose:hover {
+  background: rgba(184, 155, 114, 0.24);
+  color: var(--text-main);
+}
+
+.accountModalClose:active {
+  transform: scale(0.96);
+}
+
+.accountHeader {
+  margin-bottom: 20px;
+}
+
+.accountEyebrow {
+  margin: 0 0 8px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.accountTitle {
+  margin: 0;
+  font-family: var(--font-title), serif;
+  font-size: 2rem;
+  line-height: 1.05;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.accountText {
+  margin: 10px 0 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+.loginForm {
+  display: grid;
+  gap: 10px;
+}
+
+.loginLabel {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+.loginInput {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  color: var(--text-main);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.94rem;
+  padding: 0 13px;
+  outline: none;
+  transition:
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.loginInput::placeholder {
+  color: var(--text-faint);
+}
+
+.loginInput:focus {
+  background: var(--white);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(184, 155, 114, 0.16);
+}
+
+.accountLinksRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0 8px;
+}
+
+.accountTextLink {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+
+.accountTextLink::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin-top: 3px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.22s ease;
+}
+
+.accountTextLink:hover {
+  color: var(--accent-strong);
+}
+
+.accountTextLink:hover::after {
+  transform: scaleX(1);
+}
+
+.loginButton {
+  height: 46px;
+  border: 1px solid var(--surface-dark);
+  border-radius: 8px;
+  background: var(--surface-dark);
+  color: var(--white);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.loginButton:hover {
+  background: var(--accent);
+  color: var(--text-main);
+}
+
+.loginButton:active {
+  transform: translateY(1px);
+}
+
+.socialLoginBlock {
+  margin-top: 22px;
+}
+
+.socialDivider {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.socialDivider::before,
+.socialDivider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--line-soft);
+}
+
+.socialButtons {
+  display: grid;
+  gap: 8px;
+}
+
+.socialButton {
+  height: 42px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease;
+}
+
+.socialButton:hover {
+  background: var(--surface-muted);
+  border-color: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
 .globalDropdown {
   position: absolute;
   top: 100%;
@@ -285,6 +532,7 @@
   animation-duration: 0.22s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
+  backface-visibility: hidden;
 }
 
 .isOpen {
@@ -430,6 +678,26 @@
   to {
     opacity: 0;
     transform: translateY(-6px);
+  }
+}
+
+@keyframes accountOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes accountModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 

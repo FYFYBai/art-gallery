@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./CuratorFavoritesSection.module.css";
 
 const DESKTOP_ITEMS_PER_VIEW = 5;
@@ -162,47 +162,39 @@ export default function CuratorFavoritesSection() {
   const canGoPrev = safePageIndex > 0;
   const canGoNext = safePageIndex < totalPages - 1;
 
-  const clearTimer = () => {
+  const clearTimer = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-  };
+  }, []);
 
-  const startTimer = () => {
+  useEffect(() => {
     clearTimer();
 
-    if (isHovered || totalPages <= 1) {
-      return;
+    if (!isHovered && totalPages > 1) {
+      timerRef.current = setTimeout(() => {
+        setPageIndex((prev) => {
+          const safePrev = Math.min(prev, Math.max(totalPages - 1, 0));
+
+          return safePrev + 1 >= totalPages ? 0 : safePrev + 1;
+        });
+      }, AUTOPLAY_DELAY_MS);
     }
-
-    timerRef.current = setTimeout(() => {
-      setPageIndex((prev) => (prev + 1 >= totalPages ? 0 : prev + 1));
-    }, AUTOPLAY_DELAY_MS);
-  };
-
-  useEffect(() => {
-    if (pageIndex !== safePageIndex) {
-      setPageIndex(safePageIndex);
-    }
-  }, [pageIndex, safePageIndex]);
-
-  useEffect(() => {
-    startTimer();
 
     return () => {
       clearTimer();
     };
-  }, [safePageIndex, isHovered, totalPages]);
+  }, [clearTimer, safePageIndex, isHovered, totalPages]);
 
   const goPrev = () => {
     clearTimer();
-    setPageIndex((prev) => (prev === 0 ? totalPages - 1 : prev - 1));
+    setPageIndex(safePageIndex === 0 ? totalPages - 1 : safePageIndex - 1);
   };
 
   const goNext = () => {
     clearTimer();
-    setPageIndex((prev) => (prev + 1 >= totalPages ? 0 : prev + 1));
+    setPageIndex(safePageIndex + 1 >= totalPages ? 0 : safePageIndex + 1);
   };
 
   return (

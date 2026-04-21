@@ -90,15 +90,21 @@ export function CartIcon({ className = "" }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={className}>
       <path
-        d="M4 6h2l1.3 7.2a1.2 1.2 0 0 0 1.2 1h7.8a1.2 1.2 0 0 0 1.2-.9L19 8H7.1"
+        d="M5.6 9.2h12.8l.8 10.1H4.8L5.6 9.2z"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.7"
+        strokeWidth="1.55"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="10" cy="18.2" r="1.2" fill="currentColor" />
-      <circle cx="17" cy="18.2" r="1.2" fill="currentColor" />
+      <path
+        d="M8.6 10.8V8.2a3.4 3.4 0 0 1 6.8 0v2.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.55"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
