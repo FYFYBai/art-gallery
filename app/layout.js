@@ -16,6 +16,9 @@ const notoSerif = Noto_Serif({
 export const metadata = {
   title: "Art Gallery",
   description: "Art gallery website frontend",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {

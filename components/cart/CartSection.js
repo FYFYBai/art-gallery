@@ -15,7 +15,8 @@ function getNextButtonLabel(currentStep) {
 export default function CartSection() {
   const [currentStep, setCurrentStep] = useState(1);
 
-  const progressWidth = `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`;
+  const progressWidth = `${((currentStep - 0.5) / STEPS.length) * 100}%`;
+  const progressTrackWidth = `${((STEPS.length - 0.5) / STEPS.length) * 100}%`;
 
   const handleNextStep = () => {
     setCurrentStep((prev) => (prev === STEPS.length ? 1 : prev + 1));
@@ -26,7 +27,10 @@ export default function CartSection() {
       <div className={styles.inner}>
         {/* Top progress stepper */}
         <div className={styles.stepper}>
-          <div className={styles.stepperLine} />
+          <div
+            className={styles.stepperLine}
+            style={{ width: progressTrackWidth }}
+          />
           <div
             className={styles.stepperFill}
             style={{ width: progressWidth }}

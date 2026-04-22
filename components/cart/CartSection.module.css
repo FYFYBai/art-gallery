@@ -28,7 +28,7 @@
 
 .stepperLine {
   position: absolute;
-  top: 2px;
+  top: 3px;
   left: 0;
   right: 0;
   height: 1px;
@@ -37,7 +37,7 @@
 
 .stepperFill {
   position: absolute;
-  top: 2px;
+  top: 3px;
   left: 0;
   height: 1px;
   background: var(--accent-strong);

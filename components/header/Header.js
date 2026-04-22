@@ -149,8 +149,12 @@ export default function Header() {
     <>
       <header className={styles.siteHeader}>
         <div className={styles.headerShell}>
-          <Link href="/" className={styles.logoLink} aria-label="Go to homepage">
-            LOGO
+          <Link
+            href="/"
+            className={styles.logoLink}
+            aria-label="Go to homepage"
+          >
+            SYLVAINE ART
           </Link>
 
           <div className={styles.headerRight}>
@@ -165,7 +169,9 @@ export default function Header() {
                       className={`${styles.navItem} ${
                         hasDropdown ? styles.hasDropdown : ""
                       }`}
-                      onMouseEnter={() => hasDropdown && openDropdown(item.label)}
+                      onMouseEnter={() =>
+                        hasDropdown && openDropdown(item.label)
+                      }
                       onMouseLeave={() =>
                         hasDropdown && activeDropdown === item.label
                           ? scheduleDropdownClose()
@@ -267,13 +273,9 @@ export default function Header() {
                 </button>
               </div>
 
-              <button
-                type="button"
-                className={styles.iconButton}
-                aria-label="Cart"
-              >
+              <Link href="/cart" className={styles.iconButton} aria-label="Cart">
                 <CartIcon className={styles.headerIconSvg} />
-              </button>
+              </Link>
             </div>
           </div>
         </div>

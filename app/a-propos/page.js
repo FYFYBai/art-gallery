@@ -3,14 +3,12 @@ import styles from "./AProposPage.module.css";
 const artistText = {
   name: "Sylvaine",
   intro: "Sylvaine est une artiste peintre basée à Montréal.",
-  body:
-    "Son travail explore la lumière, la perception et la mémoire du paysage à travers la peinture à l’huile et le dessin.",
+  body: "Son travail explore la lumière, la perception et la mémoire du paysage à travers la peinture à l'huile et le dessin.",
 };
 
 export const metadata = {
   title: "À propos | Sylvaine",
-  description:
-    "À propos de Sylvaine, artiste peintre basée à Montréal.",
+  description: "À propos de Sylvaine, artiste peintre basée à Montréal.",
 };
 
 export default function AProposPage() {
