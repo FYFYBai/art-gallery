@@ -23,11 +23,32 @@ The global header and footer persist across all routes through `app/layout.js`.
 
 ## Tech Stack
 
+Current frontend:
+
 - Next.js App Router
 - React
 - CSS Modules
 - `next/font/google` for Noto Sans and Noto Serif
 - Local font loading for the logo font through `app/globals.css`
+
+Planned backend stack:
+
+- Java Spring Boot REST API
+- PostgreSQL database
+- Spring Security
+- JWT and/or secure session-cookie authentication
+- Stripe for payments and checkout
+
+Planned architecture:
+
+```txt
+Next.js frontend
+  -> Spring Boot API
+  -> PostgreSQL
+  -> Stripe payment flow
+```
+
+The current login, cart, checkout, and confirmation views are front-end prototypes only. They are intended to be connected later to the Spring Boot backend, persisted user/cart/order data, and Stripe checkout/payment flows.
 
 ## Project Structure
 
