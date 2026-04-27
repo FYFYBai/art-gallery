@@ -34,7 +34,7 @@ export default function AProposPage() {
           </div>
 
           <div className={styles.imageTextBlock}>
-            <p className={styles.eyebrow}>Portrait d’artiste</p>
+            <p className={styles.eyebrow}>Portrait d'artiste</p>
             <h2 className={styles.title}>{artistText.name}</h2>
             <p className={styles.lead}>{artistText.intro}</p>
             <p className={styles.bodyText}>{artistText.body}</p>
