@@ -3,45 +3,53 @@ import styles from "./DisplaySample.module.css";
 const sampleItems = [
   {
     id: 1,
-    title: "Find Your Statement",
-    action: "SEE NEW ARRIVALS",
-    image:
-      "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=900&q=80",
-    alt: "Sample artwork 1",
+    title: "Séries",
+    description:
+      "Explorer les variations d'un même motif à travers le temps et la lumière.",
+    action: "DÉCOUVRIR",
+    image: "/images/display-sample/display1.png",
+    alt: "Peinture texturée bleue et blanche avec voilier",
   },
   {
     id: 2,
-    title: "Find Your Art Style",
-    action: "TAKE OUR QUIZ",
-    image:
-      "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=900&q=80",
-    alt: "Sample artwork 2",
+    title: "Œuvres",
+    description: "Découvrir l'ensemble des peintures disponibles.",
+    action: "DÉCOUVRIR",
+    image: "/images/display-sample/display2.png",
+    alt: "Détail d'une peinture texturée blanche et bleue",
   },
   {
     id: 3,
-    title: "The Contemporary Still Life",
-    action: "EXPLORE THE EXHIBITION",
-    image:
-      "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=900&q=80",
-    alt: "Sample artwork 3",
+    title: "Processus",
+    description:
+      "Entre geste, matière et mémoire, la peinture se construit lentement.",
+    action: "DÉCOUVRIR",
+    image: "/images/display-sample/display3.png",
+    alt: "Geste de peinture bleue sur surface blanche texturée",
   },
   {
     id: 4,
-    title: "Lucky Art Finds",
-    action: "SEE AFFORDABLE PICKS",
-    image:
-      "https://images.unsplash.com/photo-1579965342575-16428a7c8881?auto=format&fit=crop&w=900&q=80",
-    alt: "Sample artwork 4",
+    title: "Dans l'espace",
+    description:
+      "Imaginer l'œuvre dans un intérieur, et la relation qu'elle crée avec le lieu.",
+    action: "DÉCOUVRIR",
+    image: "/images/display-sample/display4.png",
+    alt: "Peinture bleue et blanche encadrée dans un intérieur",
   },
 ];
+
+const sectionIntro = {
+  heading: "Entrer dans l'univers de l'œuvre",
+  subheading:
+    "Explorer différentes manières de regarder, de ressentir et de s'approprier l'art.",
+};
 
 export default function DisplaySample() {
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <h2 className={styles.heading}>
-          Experience the Joy of Living with Original Art
-        </h2>
+        <h2 className={styles.heading}>{sectionIntro.heading}</h2>
+        <p className={styles.subheading}>{sectionIntro.subheading}</p>
 
         <div className={styles.grid}>
           {sampleItems.map((item) => (
@@ -57,9 +65,14 @@ export default function DisplaySample() {
               </a>
 
               <div className={styles.textBlock}>
-                <p className={styles.title}>{item.title}</p>
+                <h3 className={styles.title}>{item.title}</h3>
+                <span className={styles.cardDivider} aria-hidden="true" />
+                <p className={styles.description}>{item.description}</p>
                 <a href="#" className={styles.action}>
                   {item.action}
+                  <span className={styles.actionArrow} aria-hidden="true">
+                    →
+                  </span>
                 </a>
               </div>
             </article>

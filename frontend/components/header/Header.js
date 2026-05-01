@@ -20,8 +20,12 @@ export default function Header() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
+  const [previousSearchTermIndex, setPreviousSearchTermIndex] = useState(null);
+  const [searchTermAnimating, setSearchTermAnimating] = useState(false);
   const closeDropdownTimerRef = useRef(null);
   const hideDropdownTimerRef = useRef(null);
+  const searchTermIndexRef = useRef(0);
+  const searchAnimationTimerRef = useRef(null);
 
   const activeItem = useMemo(() => {
     return navItems.find((item) => item.label === visibleDropdown) || null;
@@ -29,10 +33,32 @@ export default function Header() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setSearchTermIndex((prev) => (prev + 1) % rotatingTerms.length);
+      const previousIndex = searchTermIndexRef.current;
+      const nextIndex = (previousIndex + 1) % rotatingTerms.length;
+
+      if (searchAnimationTimerRef.current) {
+        clearTimeout(searchAnimationTimerRef.current);
+      }
+
+      setPreviousSearchTermIndex(previousIndex);
+      searchTermIndexRef.current = nextIndex;
+      setSearchTermIndex(nextIndex);
+      setSearchTermAnimating(true);
+
+      searchAnimationTimerRef.current = setTimeout(() => {
+        setSearchTermAnimating(false);
+        setPreviousSearchTermIndex(null);
+        searchAnimationTimerRef.current = null;
+      }, 360);
     }, 2200);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+
+      if (searchAnimationTimerRef.current) {
+        clearTimeout(searchAnimationTimerRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -124,7 +150,11 @@ export default function Header() {
   };
 
   const trimmedSearchQuery = searchQuery.trim();
-  const searchPlaceholder = `Search for ${rotatingTerms[searchTermIndex]}`;
+  const searchTerm = rotatingTerms[searchTermIndex];
+  const previousSearchTerm =
+    previousSearchTermIndex === null
+      ? null
+      : rotatingTerms[previousSearchTermIndex];
   const isOverlayVisible = Boolean(activeDropdown);
 
   const handleSearchSubmit = (event) => {
@@ -196,13 +226,40 @@ export default function Header() {
                 <SearchIcon className={styles.headerIconSvg} />
               </span>
 
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={searchPlaceholder}
-                className={styles.searchInput}
-              />
+              <div className={styles.searchInputWrap}>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder=""
+                  className={styles.searchInput}
+                />
+
+                {!searchQuery && (
+                  <span className={styles.searchPlaceholder}>
+                    <span className={styles.searchPlaceholderPrefix}>
+                      Search for&nbsp;
+                    </span>
+                    <span className={styles.searchTermSlot}>
+                      {searchTermAnimating && previousSearchTerm && (
+                        <span className={styles.searchTermExit}>
+                          {previousSearchTerm}
+                        </span>
+                      )}
+                      <span
+                        key={searchTermIndex}
+                        className={
+                          searchTermAnimating
+                            ? styles.searchTermEnter
+                            : styles.searchTermCurrent
+                        }
+                      >
+                        {searchTerm}
+                      </span>
+                    </span>
+                  </span>
+                )}
+              </div>
 
               {trimmedSearchQuery && (
                 <button

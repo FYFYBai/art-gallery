@@ -62,8 +62,12 @@ export default function Hero() {
                 <div className={styles.contentCard}>
                   <p className={styles.eyebrow}>{slide.eyebrow}</p>
                   <h2 className={styles.title}>{slide.title}</h2>
+                  <span className={styles.divider} aria-hidden="true" />
                   <a href={slide.linkHref} className={styles.link}>
                     {slide.linkText}
+                    <span className={styles.linkArrow} aria-hidden="true">
+                      →
+                    </span>
                   </a>
                 </div>
               </div>
