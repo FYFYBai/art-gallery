@@ -24,7 +24,7 @@
     visibility 0.8s ease,
     transform 1.2s ease;
   backface-visibility: hidden;
-  background-size: cover;
+  background-size: 100% 100%;
   background-position: center center;
   background-repeat: no-repeat;
   will-change: opacity, transform;
@@ -52,11 +52,8 @@
 /* 外层半透明灰色边框块 */
 .contentOuter {
   position: absolute;
-  left: clamp(24px, 6vw, 84px);
-  bottom: clamp(28px, 6vw, 72px);
-  padding: clamp(14px, 2vw, 28px);
-  background: rgba(245, 240, 230, 0.2);
-  backdrop-filter: blur(3px);
+  left: clamp(34px, 6.6vw, 116px);
+  top: clamp(72px, 13.2vh, 126px);
   animation: contentEnter 0.75s ease;
   backface-visibility: hidden;
   will-change: opacity, transform;
@@ -64,43 +61,53 @@
 
 /* 内部白色文本框 */
 .contentCard {
-  background: rgba(252, 250, 245, 0.94);
-  padding: clamp(24px, 3vw, 42px) clamp(24px, 3.4vw, 46px)
-    clamp(24px, 3vw, 38px);
-  width: min(560px, calc(100vw - 96px));
-  box-shadow: var(--shadow-card);
-  border: 1px solid rgba(216, 203, 184, 0.45);
+  width: min(620px, calc(100vw - 72px));
+  color: #22211f;
+  user-select: none;
 }
 
 .eyebrow {
-  margin: 0 0 18px;
-  font-family: var(--font-title), serif;
-  font-size: clamp(1.8rem, 4.2vw, 4rem);
-  line-height: 0.98;
-  font-weight: 400;
-  letter-spacing: 0.01em;
+  margin: 0 0 clamp(54px, 8.2vh, 84px);
+  font-family: var(--font-logo);
+  font-size: clamp(1.3rem, 1.95vw, 2.35rem);
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: var(--text-main);
+  color: currentColor;
 }
 
 .title {
-  margin: 0 0 22px;
-  font-family: var(--font-body), sans-serif;
-  font-size: clamp(1.15rem, 1.5vw, 1.95rem);
-  line-height: 1.32;
-  font-weight: 400;
-  color: var(--text-soft);
+  margin: 0;
+  font-family: var(--font-logo);
+  font-size: clamp(3rem, 4.5vw, 4.65rem);
+  line-height: 1.12;
+  font-weight: 300;
+  letter-spacing: 0;
+  color: currentColor;
+  white-space: pre-line;
+}
+
+.divider {
+  display: block;
+  width: 58px;
+  height: 1px;
+  margin: clamp(28px, 4.2vh, 42px) 0 clamp(32px, 5vh, 50px);
+  background: currentColor;
 }
 
 .link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 26px;
   position: relative;
   font-family: var(--font-body), sans-serif;
-  font-size: 1.02rem;
+  font-size: clamp(0.76rem, 0.95vw, 0.95rem);
   line-height: 1.2;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-main);
+  color: currentColor;
   text-decoration: none;
   transition: color 0.25s ease;
 }
@@ -108,12 +115,15 @@
 .link::after {
   content: "";
   display: block;
-  width: 100%;
+  width: calc((100% - 42px) * 0.98);
   height: 1px;
   margin-top: 6px;
   background: currentColor;
+  position: absolute;
+  left: 0;
+  top: 100%;
   transform-origin: left center;
-  transform: scaleX(0);
+  transform: scaleX(1);
   transition:
     transform 0.25s ease,
     background-color 0.25s ease;
@@ -125,6 +135,12 @@
 
 .link:hover::after {
   transform: scaleX(1);
+}
+
+.linkArrow {
+  font-size: 1.28em;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 /* 左右整条交互层 */
@@ -208,24 +224,22 @@
 
   .contentOuter {
     left: 20px;
+    top: 64px;
     right: 20px;
-    bottom: 24px;
-    padding: 12px;
   }
 
   .contentCard {
     width: 100%;
     max-width: 100%;
-    padding: 22px 22px 24px;
   }
 
   .eyebrow {
-    margin-bottom: 14px;
+    margin-bottom: 46px;
     line-height: 1.02;
   }
 
   .title {
-    margin-bottom: 18px;
+    font-size: clamp(2.65rem, 7.5vw, 4.2rem);
   }
 
   .sideControl {
@@ -242,16 +256,25 @@
   .contentOuter {
     left: 14px;
     right: 14px;
-    bottom: 16px;
-    padding: 10px;
+    top: 54px;
   }
 
-  .contentCard {
-    padding: 18px 18px 20px;
+  .eyebrow {
+    margin-bottom: 34px;
+    font-size: 1.02rem;
+    letter-spacing: 0.32em;
+  }
+
+  .title {
+    font-size: clamp(2.2rem, 10.5vw, 3.2rem);
+  }
+
+  .divider {
+    margin: 24px 0 28px;
   }
 
   .link {
-    font-size: 0.92rem;
+    font-size: 0.72rem;
   }
 
   .sideControl {

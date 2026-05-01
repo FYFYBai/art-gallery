@@ -16,7 +16,7 @@ Primary goals so far:
 
 ## Stack
 
-- Next.js `16.1.6`
+- Next.js `^16.2.4`
 - React `19.2.3`
 - React DOM `19.2.3`
 - ESLint `9`
@@ -29,13 +29,14 @@ Primary goals so far:
 Useful commands:
 
 ```powershell
+cd frontend
 npm.cmd run lint
 npm.cmd run build
 npm.cmd run start
 npm.cmd run dev
 ```
 
-Use `npm.cmd` on Windows PowerShell if `npm` is blocked by execution policy.
+Run frontend commands from `frontend/`. Use `npm.cmd` on Windows PowerShell if `npm` is blocked by execution policy.
 
 ## Important Working Notes
 
@@ -46,19 +47,66 @@ Use `npm.cmd` on Windows PowerShell if `npm` is blocked by execution policy.
 - Many images are currently hardcoded external placeholders from Unsplash or Picsum. This is intentional for now.
 - The user may later ask to reverse the recent animation/performance optimization pass. Those changes are primarily CSS-only and listed below.
 
+## Backend Status
+
+### Database Layer (✅ Complete)
+
+The Spring Boot backend has a complete and robust PostgreSQL database schema via Flyway migrations:
+
+- **Migrations**: 10 SQL files under `backend/src/main/resources/db/migration/`
+- **Tables**: All core domain tables present (users, user_auth_providers, user_addresses, payment_methods, artworks, artwork_images, carts, cart_items, orders, order_items)
+- **Schema highlights**:
+  - UUID primary keys using `gen_random_uuid()`
+  - Proper constraints and CHECK conditions for domain values
+  - Indexes on artwork search fields (type, medium, year, sold_out, active)
+  - Unique constraints where needed (email, provider+provider_user_id, cart_id+artwork_id)
+  - Foreign keys with CASCADE delete policies
+  - Monetary fields use `NUMERIC(10,2)`
+  - `artwork_year` limited to 2024, 2025, 2026
+- **Configuration**: `application.yml` correctly enables Flyway with `spring.jpa.hibernate.ddl-auto: none`
+
+### Application Layer (⏳ Pending)
+
+The following layers are scaffolded but not yet implemented:
+
+- `backend/src/main/java/com/artgallery/controller/` — empty (package-info only)
+- `backend/src/main/java/com/artgallery/service/` — empty (package-info only)
+- `backend/src/main/java/com/artgallery/security/` — empty (package-info only)
+
+**Next backend work**:
+
+1. Implement REST controllers for auth, user, artwork, cart, order endpoints
+2. Implement business logic services
+3. Implement JWT security config and OAuth2 integration
+4. Wire repositories into services
+
+The repository layer (`com.artgallery.repository`) is already present with all necessary JpaRepository interfaces.
+
+### For Future Sessions
+
+When implementing the service/controller layer:
+
+- Match endpoint signatures to frontend expectations (Next.js frontend already has placeholder cart flow and auth UI ready)
+- Domain entities are well-modeled in `com.artgallery.domain.*` (User, UserAuthProvider, UserAddress, PaymentMethod, Artwork, Cart, Order, etc.)
+- Use the existing enum types (OAuthProvider, CartStatus, OrderStatus, PaymentType, PaymentProvider)
+- Follow Spring Security + JWT best practices
+- Spring Boot 3.5.0 and Java 24 are configured
+
 ## Repository Shape
 
 Top-level important files:
 
 ```txt
-app/
-components/
-public/
-color_pallet.txt
-package.json
-jsconfig.json
-next.config.mjs
-eslint.config.mjs
+frontend/app/
+frontend/components/
+frontend/public/
+frontend/color_pallet.txt
+frontend/package.json
+frontend/jsconfig.json
+frontend/next.config.mjs
+frontend/eslint.config.mjs
+backend/
+docker-compose.yml
 CODEX_PROJECT_CONTEXT.md
 ```
 
@@ -72,24 +120,24 @@ So imports commonly use `@/components/...`.
 
 ## App Router Structure
 
-Routes live under `app`.
+Routes live under `frontend/app`.
 
 Current routes:
 
 ```txt
-app/layout.js
-app/page.js
-app/a-propos/page.js
-app/a-propos/AProposPage.module.css
-app/cart/page.js
-app/globals.css
+frontend/app/layout.js
+frontend/app/page.js
+frontend/app/a-propos/page.js
+frontend/app/a-propos/AProposPage.module.css
+frontend/app/cart/page.js
+frontend/app/globals.css
 ```
 
-### `app/layout.js`
+### `frontend/app/layout.js`
 
 Global shell. Imports:
 
-- `app/globals.css`
+- `frontend/app/globals.css`
 - `Header`
 - `Footer`
 - `Noto_Sans`
@@ -105,7 +153,7 @@ This layout wraps all pages with:
 
 Because of this, route pages such as `/a-propos` and `/cart` automatically persist the header and footer.
 
-### `app/page.js`
+### `frontend/app/page.js`
 
 Homepage composition route. It imports and renders homepage sections in this order:
 
@@ -123,17 +171,17 @@ Previously removed from homepage but files remain:
 - `WhyShopSection`
 - `FeaturedRowsSection`
 
-These still exist in `components/home/...` but are not currently rendered in `app/page.js`.
+These still exist in `frontend/components/home/...` but are not currently rendered in `frontend/app/page.js`.
 
-### `app/a-propos`
+### `frontend/app/a-propos`
 
 Route for `/a-propos`.
 
 Files:
 
 ```txt
-app/a-propos/page.js
-app/a-propos/AProposPage.module.css
+frontend/app/a-propos/page.js
+frontend/app/a-propos/AProposPage.module.css
 ```
 
 The page currently has two demo main-content sections:
@@ -157,29 +205,29 @@ Current implementation uses a raw `<img>` placeholder and therefore triggers a N
 
 Future cleanup option:
 
-- If this page grows, keep `app/a-propos/page.js` as a route composer.
-- Move reusable sections into `components/a-propos/`.
+- If this page grows, keep `frontend/app/a-propos/page.js` as a route composer.
+- Move reusable sections into `frontend/components/a-propos/`.
 
-### `app/cart`
+### `frontend/app/cart`
 
 Route for `/cart`.
 
 Files:
 
 ```txt
-app/cart/page.js
-components/cart/CartSection.js
-components/cart/CartSection.module.css
+frontend/app/cart/page.js
+frontend/components/cart/CartSection.js
+frontend/components/cart/CartSection.module.css
 ```
 
-`app/cart/page.js` only renders `<CartSection />`.
+`frontend/app/cart/page.js` only renders `<CartSection />`.
 
 ## Component Organization
 
 Main convention:
 
-- Shared/global components live directly under `components/<feature>/`.
-- Homepage-only sections live under `components/home/<section-name>/`.
+- Shared/global components live directly under `frontend/components/<feature>/`.
+- Homepage-only sections live under `frontend/components/home/<section-name>/`.
 - Each section usually has:
   - PascalCase component file
   - matching CSS module
@@ -188,40 +236,40 @@ Main convention:
 Examples:
 
 ```txt
-components/header/Header.js
-components/header/Header.module.css
-components/header/headerData.js
-components/header/icons.js
+frontend/components/header/Header.js
+frontend/components/header/Header.module.css
+frontend/components/header/headerData.js
+frontend/components/header/icons.js
 
-components/footer/Footer.js
-components/footer/Footer.module.css
+frontend/components/footer/Footer.js
+frontend/components/footer/Footer.module.css
 
-components/hero/Hero.js
-components/hero/Hero.module.css
-components/hero/heroSlides.js
+frontend/components/hero/Hero.js
+frontend/components/hero/Hero.module.css
+frontend/components/hero/heroSlides.js
 
-components/home/display-sample/DisplaySample.js
-components/home/display-sample/DisplaySample.module.css
+frontend/components/home/display-sample/DisplaySample.js
+frontend/components/home/display-sample/DisplaySample.module.css
 
-components/home/why-original/WhyOriginalSection.js
-components/home/why-original/WhyOriginalSection.module.css
-components/home/why-original/whyOriginalData.js
+frontend/components/home/why-original/WhyOriginalSection.js
+frontend/components/home/why-original/WhyOriginalSection.module.css
+frontend/components/home/why-original/whyOriginalData.js
 
-components/home/curator-favorites/CuratorFavoritesSection.js
-components/home/curator-favorites/CuratorFavoritesSection.module.css
+frontend/components/home/curator-favorites/CuratorFavoritesSection.js
+frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
 
-components/home/curated-experience/CuratedExperienceSection.js
-components/home/curated-experience/CuratedExperienceSection.module.css
+frontend/components/home/curated-experience/CuratedExperienceSection.js
+frontend/components/home/curated-experience/CuratedExperienceSection.module.css
 
-components/cart/CartSection.js
-components/cart/CartSection.module.css
+frontend/components/cart/CartSection.js
+frontend/components/cart/CartSection.module.css
 ```
 
 ## Design System And Styling Rules
 
 ### Color Palette
 
-Palette source: `color_pallet.txt`
+Palette source: `frontend/color_pallet.txt`
 
 ```txt
 Primary Background: #F5F0E6
@@ -231,7 +279,7 @@ Accent: #B89B72
 Text / Dark Neutral: #4E4338
 ```
 
-These are represented in `app/globals.css` as tokens:
+These are represented in `frontend/app/globals.css` as tokens:
 
 ```css
 --page-bg: #f5f0e6;
@@ -259,14 +307,14 @@ User rule:
 - `Noto Serif` for titles/headings.
 - Sans-serif for body text, UI, labels, buttons, forms, navigation.
 
-Implemented through `next/font/google` in `app/layout.js`:
+Implemented through `next/font/google` in `frontend/app/layout.js`:
 
 ```js
 Noto_Sans -> --font-sans
 Noto_Serif -> --font-serif
 ```
 
-Global aliases in `app/globals.css`:
+Global aliases in `frontend/app/globals.css`:
 
 ```css
 --font-body: var(--font-sans);
@@ -298,10 +346,10 @@ The site recently received a conservative performance optimization pass because 
 Touched files:
 
 ```txt
-components/header/Header.module.css
-components/hero/Hero.module.css
-components/home/curator-favorites/CuratorFavoritesSection.module.css
-components/home/featured-rows/FeaturedRowsSection.module.css
+frontend/components/header/Header.module.css
+frontend/components/hero/Hero.module.css
+frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
+frontend/components/home/featured-rows/FeaturedRowsSection.module.css
 ```
 
 Optimization types:
@@ -321,10 +369,10 @@ If the user asks to reverse this optimization pass, inspect the diff around thos
 Files:
 
 ```txt
-components/header/Header.js
-components/header/Header.module.css
-components/header/headerData.js
-components/header/icons.js
+frontend/components/header/Header.js
+frontend/components/header/Header.module.css
+frontend/components/header/headerData.js
+frontend/components/header/icons.js
 ```
 
 ### Header Layout
@@ -423,7 +471,7 @@ CSS classes are in `Header.module.css`, including:
 
 ### Icons
 
-Shared SVG icon components are in `components/header/icons.js`.
+Shared SVG icon components are in `frontend/components/header/icons.js`.
 
 Important:
 
@@ -443,8 +491,8 @@ Current `CartIcon` design direction:
 Files:
 
 ```txt
-components/footer/Footer.js
-components/footer/Footer.module.css
+frontend/components/footer/Footer.js
+frontend/components/footer/Footer.module.css
 ```
 
 Footer currently contains:
@@ -465,9 +513,9 @@ Footer nav links have animated underline hover.
 Files:
 
 ```txt
-components/hero/Hero.js
-components/hero/Hero.module.css
-components/hero/heroSlides.js
+frontend/components/hero/Hero.js
+frontend/components/hero/Hero.module.css
+frontend/components/hero/heroSlides.js
 ```
 
 `Hero.js` is a client component with carousel state and previous/next side controls.
@@ -489,8 +537,8 @@ Styling uses a content card over a background image, with warm overlay and anima
 Files:
 
 ```txt
-components/home/display-sample/DisplaySample.js
-components/home/display-sample/DisplaySample.module.css
+frontend/components/home/display-sample/DisplaySample.js
+frontend/components/home/display-sample/DisplaySample.module.css
 ```
 
 Homepage section with four sample artwork/category cards.
@@ -506,9 +554,9 @@ Action links use animated underline hover.
 Files:
 
 ```txt
-components/home/why-original/WhyOriginalSection.js
-components/home/why-original/WhyOriginalSection.module.css
-components/home/why-original/whyOriginalData.js
+frontend/components/home/why-original/WhyOriginalSection.js
+frontend/components/home/why-original/WhyOriginalSection.module.css
+frontend/components/home/why-original/whyOriginalData.js
 ```
 
 Interactive client section with custom sticky/fixed behavior for the left text column.
@@ -524,8 +572,8 @@ Important: This component manually calculates sticky behavior with scroll/resize
 Files:
 
 ```txt
-components/home/curator-favorites/CuratorFavoritesSection.js
-components/home/curator-favorites/CuratorFavoritesSection.module.css
+frontend/components/home/curator-favorites/CuratorFavoritesSection.js
+frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
 ```
 
 Client carousel with 15 hardcoded placeholder items.
@@ -549,8 +597,8 @@ If modifying carousel state, run lint. React Compiler rules are strict.
 Files:
 
 ```txt
-components/home/curated-experience/CuratedExperienceSection.js
-components/home/curated-experience/CuratedExperienceSection.module.css
+frontend/components/home/curated-experience/CuratedExperienceSection.js
+frontend/components/home/curated-experience/CuratedExperienceSection.module.css
 ```
 
 Full-width background-image CTA section.
@@ -559,12 +607,12 @@ Uses warm overlay and a CTA button.
 
 ### Sections Not Currently Rendered
 
-These still exist but are not currently included in `app/page.js`:
+These still exist but are not currently included in `frontend/app/page.js`:
 
 ```txt
-components/home/shop-category/ShopCategorySection.js
-components/home/why-shop/WhyShopSection.js
-components/home/featured-rows/FeaturedRowsSection.js
+frontend/components/home/shop-category/ShopCategorySection.js
+frontend/components/home/why-shop/WhyShopSection.js
+frontend/components/home/featured-rows/FeaturedRowsSection.js
 ```
 
 `FeaturedRowsSection` is a product carousel with two rows and sample product data. It still passes lint and may be reused later.
@@ -574,9 +622,9 @@ components/home/featured-rows/FeaturedRowsSection.js
 Files:
 
 ```txt
-app/cart/page.js
-components/cart/CartSection.js
-components/cart/CartSection.module.css
+frontend/app/cart/page.js
+frontend/components/cart/CartSection.js
+frontend/components/cart/CartSection.module.css
 ```
 
 Current state:
@@ -620,6 +668,7 @@ Customer service panel appears on the right for all stages.
 Run:
 
 ```powershell
+cd frontend
 npm.cmd run lint
 ```
 
@@ -631,18 +680,18 @@ Current lint status:
 Warning locations include:
 
 ```txt
-app/a-propos/page.js
-components/home/curator-favorites/CuratorFavoritesSection.js
-components/home/display-sample/DisplaySample.js
-components/home/featured-rows/FeaturedRowsSection.js
-components/home/why-original/WhyOriginalSection.js
+frontend/app/a-propos/page.js
+frontend/components/home/curator-favorites/CuratorFavoritesSection.js
+frontend/components/home/display-sample/DisplaySample.js
+frontend/components/home/featured-rows/FeaturedRowsSection.js
+frontend/components/home/why-original/WhyOriginalSection.js
 ```
 
 These warnings are accepted for now because image assets and image strategy are temporary.
 
 Future improvement:
 
-- Move important images into `public/`.
+- Move important images into `frontend/public/`.
 - Use Next `<Image />` for local/remote optimized images.
 - Configure remote domains if needed.
 
@@ -653,7 +702,7 @@ Current image implementation is temporary:
 - Many sections use external URLs from Unsplash or Picsum.
 - Some components use raw `<img>`.
 - Hero uses CSS background images.
-- Public folder currently only has default SVG assets, not real artwork.
+- `frontend/public/` currently contains the favicon, local font files, and legal-policy document placeholders, but not real artwork.
 
 Do not invest heavily in image optimization unless the user asks, because real image implementation is planned later.
 
@@ -670,7 +719,7 @@ Current meaningful routes:
 Header/footer links:
 
 - `À propos` -> `/a-propos`
-- Cart button should eventually link to `/cart` if not already requested. Check `Header.js` before changing; current cart icon may still be a plain button depending on latest state.
+- Cart button links to `/cart` in `frontend/components/header/Header.js`.
 - Search currently writes URL hash only, no real search page yet.
 
 ## Common Future Tasks And Where To Work
@@ -680,13 +729,13 @@ Header/footer links:
 Look in:
 
 ```txt
-components/header/headerData.js
+frontend/components/header/headerData.js
 ```
 
 Then adjust dropdown styling if needed in:
 
 ```txt
-components/header/Header.module.css
+frontend/components/header/Header.module.css
 ```
 
 ### Change header behavior
@@ -694,19 +743,19 @@ components/header/Header.module.css
 Look in:
 
 ```txt
-components/header/Header.js
+frontend/components/header/Header.js
 ```
 
 Important state:
 
 ```js
-activeDropdown
-visibleDropdown
-isDropdownClosing
-languageOpen
-accountOpen
-searchQuery
-searchTermIndex
+activeDropdown;
+visibleDropdown;
+isDropdownClosing;
+languageOpen;
+accountOpen;
+searchQuery;
+searchTermIndex;
 ```
 
 ### Change global palette or typography
@@ -714,8 +763,8 @@ searchTermIndex
 Look in:
 
 ```txt
-app/globals.css
-app/layout.js
+frontend/app/globals.css
+frontend/app/layout.js
 ```
 
 ### Change homepage section order
@@ -723,22 +772,22 @@ app/layout.js
 Look in:
 
 ```txt
-app/page.js
+frontend/app/page.js
 ```
 
 ### Add a new route page
 
-Add a folder under `app`:
+Add a folder under `frontend/app`:
 
 ```txt
-app/<route-name>/page.js
-app/<route-name>/<RouteName>.module.css
+frontend/app/<route-name>/page.js
+frontend/app/<route-name>/<RouteName>.module.css
 ```
 
 If the page gets complex, place reusable sections in:
 
 ```txt
-components/<route-name>/
+frontend/components/<route-name>/
 ```
 
 ### Work on cart flow
@@ -746,8 +795,8 @@ components/<route-name>/
 Look in:
 
 ```txt
-components/cart/CartSection.js
-components/cart/CartSection.module.css
+frontend/components/cart/CartSection.js
+frontend/components/cart/CartSection.module.css
 ```
 
 ### Update shared icons
@@ -755,7 +804,7 @@ components/cart/CartSection.module.css
 Look in:
 
 ```txt
-components/header/icons.js
+frontend/components/header/icons.js
 ```
 
 Important: `CartIcon` is shared between header and cart page.
@@ -782,13 +831,13 @@ Important: `CartIcon` is shared between header and cart page.
   - language menu
   - account modal
   - cart button
-  
+
   If it grows further, consider extracting:
-  
+
 ```txt
-components/header/SearchBar.js
-components/header/AccountModal.js
-components/header/NavDropdown.js
+frontend/components/header/SearchBar.js
+frontend/components/header/AccountModal.js
+frontend/components/header/NavDropdown.js
 ```
 
 - Cart flow is temporary demo state only. It does not persist cart data and has no checkout backend.
@@ -806,9 +855,18 @@ If the user asks to make structure cleaner:
 2. Move large data arrays into data files:
    - `curatorFavoritesData.js`
    - cart sample data if needed
-3. Move `a-propos` sections into `components/a-propos/` if the route gets more complex.
+3. Move `a-propos` sections into `frontend/components/a-propos/` if the route gets more complex.
 4. Decide image strategy:
    - Local public assets
    - Next Image
    - CDN / CMS later
 5. Convert placeholder buttons/links to actual routes only when routing plan is clear.
+
+## Session Notes (May 1, 2026)
+
+- Backend database schema is finalized and solid. Flyway migrations are complete (V1–V10).
+- Backend service/controller layer is pending implementation.
+- **Today's focus**: Refining the homepage layout and sections.
+  - Review and adjust existing homepage sections (Hero, DisplaySample, WhyOriginal, CuratorFavorites, CuratedExperience).
+  - Consider polish, spacing, and visual hierarchy.
+  - Sections not rendered (ShopCategory, WhyShop, FeaturedRows) remain available for future use.

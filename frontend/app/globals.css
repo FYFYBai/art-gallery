@@ -12,10 +12,19 @@
   font-weight: 400;
 }
 
+@font-face {
+  font-family: "Sylvaine Playfair";
+  src: url("/fonts/PlayfairDisplay-Regular.ttf?v=2") format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
 :root {
   --font-body: var(--font-sans);
   --font-title: var(--font-serif);
   --font-logo: "Sylvaine Didot", serif;
+  --font-display: "Sylvaine Playfair", serif;
   --header-height: 84px;
   --header-bg: rgba(252, 250, 245, 0.82);
   --page-bg: #f5f0e6;

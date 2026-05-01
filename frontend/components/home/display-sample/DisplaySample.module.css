@@ -1,34 +1,62 @@
 .section {
   width: 100%;
   background: var(--surface-main);
-  padding: 72px 0 84px;
+  padding: 84px 0 96px;
 }
 
 .inner {
-  width: min(1400px, calc(100% - 64px));
+  width: min(1480px, calc(100% - 64px));
   margin: 0 auto;
 }
 
 .heading {
-  margin: 0 0 32px;
+  margin: 0 0 12px;
+  text-align: center;
+  font-family: var(--font-display), serif;
+  font-size: clamp(3rem, 5vw, 5.1rem);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-main);
+}
+
+.subheading {
+  max-width: none;
+  margin: 0 auto 42px;
   text-align: center;
   font-family: var(--font-title), serif;
-  font-size: clamp(2rem, 3.2vw, 3rem);
-  line-height: 1.1;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--text-main);
+  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  line-height: 1.45;
+  color: var(--text-soft);
+  white-space: nowrap;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  min-height: 100%;
+  background: rgba(252, 250, 245, 0.7);
+  border: 1px solid rgba(216, 203, 184, 0.72);
+  border-radius: 6px;
+  transition:
+    transform 0.32s ease,
+    border-color 0.32s ease,
+    background-color 0.32s ease,
+    box-shadow 0.32s ease;
+}
+
+.card:hover {
+  background: rgba(252, 250, 245, 0.92);
+  border-color: rgba(184, 155, 114, 0.72);
+  box-shadow: 0 18px 42px rgba(78, 67, 56, 0.11);
+  transform: translateY(-8px);
 }
 
 .imageLink {
@@ -39,10 +67,10 @@
 .imageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1.24;
   overflow: hidden;
   background: var(--surface-muted);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
 .image {
@@ -54,30 +82,57 @@
 }
 
 .card:hover .image {
-  transform: scale(1.03);
+  transform: scale(1.025);
 }
 
 .textBlock {
-  padding-top: 14px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 310px;
+  padding: 32px 26px 30px;
+  border-top: 1px solid rgba(216, 203, 184, 0.58);
 }
 
 .title {
-  margin: 0 0 8px;
-  font-family: var(--font-title), serif;
-  font-size: 1.15rem;
-  line-height: 1.28;
-  font-weight: 500;
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.8rem, 2.35vw, 2.45rem);
+  line-height: 1.02;
+  font-weight: 400;
+  letter-spacing: 0;
   color: var(--text-main);
 }
 
+.cardDivider {
+  display: block;
+  width: 24px;
+  height: 1px;
+  margin: 22px 0 22px;
+  background: var(--text-main);
+}
+
+.description {
+  max-width: 24ch;
+  margin: 0;
+  font-family: var(--font-title), serif;
+  font-size: clamp(0.98rem, 1.1vw, 1.12rem);
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
 .action {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
   position: relative;
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.78rem;
+  margin-top: auto;
+  font-family: var(--font-title), serif;
+  font-size: 0.82rem;
   line-height: 1.2;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-main);
   text-decoration: none;
@@ -86,13 +141,14 @@
 
 .action::after {
   content: "";
-  display: block;
-  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  width: calc(100% - 36px);
   height: 1px;
-  margin-top: 6px;
   background: currentColor;
   transform: scaleX(0);
-  transform-origin: left center;
+  transform-origin: center;
   transition: transform 0.25s ease;
 }
 
@@ -104,6 +160,12 @@
   transform: scaleX(1);
 }
 
+.actionArrow {
+  font-size: 1.22em;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -112,7 +174,7 @@
 
 @media (max-width: 640px) {
   .section {
-    padding: 52px 0 60px;
+    padding: 58px 0 68px;
   }
 
   .inner {
@@ -120,12 +182,26 @@
   }
 
   .heading {
-    margin-bottom: 24px;
-    font-size: 1.7rem;
+    font-size: 2.35rem;
+  }
+
+  .subheading {
+    margin-bottom: 30px;
+    font-size: 0.98rem;
+    white-space: normal;
   }
 
   .grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
+  }
+
+  .imageWrapper {
+    aspect-ratio: 1.12 / 1;
+  }
+
+  .textBlock {
+    min-height: 250px;
+    padding: 28px 24px;
   }
 }
