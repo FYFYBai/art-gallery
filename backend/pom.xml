@@ -19,7 +19,7 @@
     <description>Art Gallery e-commerce backend</description>
 
     <properties>
-        <java.version>25</java.version>
+        <java.version>24</java.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jqwik.version>1.8.5</jqwik.version>
         <testcontainers.version>1.20.4</testcontainers.version>
