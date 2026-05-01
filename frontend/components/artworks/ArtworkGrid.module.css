@@ -1,0 +1,124 @@
+.section {
+  padding: 48px 4rem 80px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-playfair);
+  font-size: 1rem;
+  font-weight: 400;
+  font-stretch: normal;
+  line-height: 1.43rem;
+  cursor: pointer;
+  color: #000;
+  letter-spacing: 0.05em;
+  transition: color 0.15s ease;
+}
+
+.filterButton:hover {
+  color: var(--accent-strong);
+}
+
+.filterIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.heading {
+  font-family: var(--font-playfair);
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.count {
+  font-size: 0.875rem;
+  color: #888;
+  margin: 0;
+}
+
+.empty {
+  color: #888;
+  font-size: 1rem;
+  padding: 40px 0;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.card:hover .image,
+.card:hover .imagePlaceholder {
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.imageWrap {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #f4f4f4;
+  margin-bottom: 14px;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ececec 0%, #d8d8d8 100%);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.price {
+  font-size: 0.875rem;
+  color: #555;
+  margin: 0;
+}

@@ -1,15 +1,15 @@
 export const navItems = [
   {
     label: "Œuvres",
-    link: "#",
+    link: "/artworks",
     columns: [
       {
         title: "Œuvres",
         items: [
-          "Peintures à l'huile",
-          "Aquarelles",
-          "Dessins",
-          "Dessins au fusain",
+          { label: "Peintures à l'huile", slug: "oil-paintings" },
+          { label: "Aquarelles",          slug: "watercolors" },
+          { label: "Dessins",             slug: "drawings" },
+          { label: "Dessins au fusain",   slug: "charcoal" },
         ],
       },
     ],
@@ -19,15 +19,21 @@ export const navItems = [
       description:
         "Explorez une sélection de travaux originaux à travers plusieurs médiums.",
       cta: "Voir les œuvres",
+      link: "/artworks",
     },
   },
   {
     label: "Séries",
-    link: "#",
+    link: "/artworks",
     columns: [
       {
         title: "Séries",
-        items: ["Impressionnisme", "Abstraction", "Paysages", "Portraits"],
+        items: [
+          { label: "Impressionnisme", slug: "impressionism" },
+          { label: "Abstraction",     slug: "abstraction" },
+          { label: "Paysages",        slug: "landscapes" },
+          { label: "Portraits",       slug: "portraits" },
+        ],
       },
     ],
     promo: {
@@ -36,6 +42,7 @@ export const navItems = [
       description:
         "Parcourez les œuvres par approche visuelle, ambiance et sujet.",
       cta: "Découvrir les séries",
+      link: "/artworks",
     },
   },
   {
@@ -49,8 +56,8 @@ export const navItems = [
       {
         title: "Expositions",
         items: [
-          "2022 — Exposition collective, Montréal",
-          "2023 — Université de Montréal, exposition étudiante",
+          { label: "2022 — Exposition collective, Montréal",          slug: "expo-2022" },
+          { label: "2023 — Université de Montréal, exposition étudiante", slug: "expo-2023" },
         ],
       },
     ],
@@ -60,6 +67,7 @@ export const navItems = [
       description:
         "Retrouvez un aperçu des expositions collectives et étudiantes récentes.",
       cta: "Voir les expositions",
+      link: "#",
     },
   },
   {

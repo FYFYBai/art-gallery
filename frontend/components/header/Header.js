@@ -353,10 +353,14 @@ export default function Header() {
 
                     <ul className={styles.columnList}>
                       {column.items.map((subItem) => (
-                        <li key={subItem}>
-                          <a href="#" className={styles.dropdownItemLink}>
-                            {subItem}
-                          </a>
+                        <li key={subItem.slug}>
+                          <Link
+                            href={`/artworks?type=${subItem.slug}`}
+                            className={styles.dropdownItemLink}
+                            onClick={hideDropdown}
+                          >
+                            {subItem.label}
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -373,7 +377,7 @@ export default function Header() {
                 <p className={styles.promoDescription}>
                   {activeItem.promo.description}
                 </p>
-                <a href="#" className={styles.promoCta}>
+                <a href={activeItem.promo.link} className={styles.promoCta}>
                   {activeItem.promo.cta}
                 </a>
               </aside>
