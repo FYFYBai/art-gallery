@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "../../../i18n/IntlContext";
+import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./Hero.module.css";
 import heroSlides from "./heroSlides";
 
