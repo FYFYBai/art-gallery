@@ -1,21 +1,27 @@
+"use client";
+
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./ShopCategorySection.module.css";
 
-const categories = ["PAINTINGS", "PHOTOGRAPHY", "FINE ART PRINTS", "SCULPTURE"];
+const CATEGORY_KEYS = [
+  "categoryPaintings",
+  "categoryPhotography",
+  "categoryFineArtPrints",
+  "categorySculpture",
+];
 
 export default function ShopCategorySection() {
+  const t = useTranslations("home");
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <h2 className={styles.title}>Shop by Category</h2>
+        <h2 className={styles.title}>{t("shopByCategory")}</h2>
 
         <div className={styles.buttonRow}>
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={styles.categoryButton}
-            >
-              {category}
+          {CATEGORY_KEYS.map((key) => (
+            <button key={key} type="button" className={styles.categoryButton}>
+              {t(key)}
             </button>
           ))}
         </div>

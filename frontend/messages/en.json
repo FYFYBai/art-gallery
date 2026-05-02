@@ -1,0 +1,191 @@
+{
+  "nav": {
+    "artworks": "Artworks",
+    "series": "Series",
+    "about": "About",
+    "exhibitions": "Exhibitions",
+    "contact": "Contact"
+  },
+  "artworkTypes": {
+    "title": "Artworks",
+    "oilPaintings": "Oil Paintings",
+    "watercolors": "Watercolors",
+    "drawings": "Drawings",
+    "charcoal": "Charcoal Drawings"
+  },
+  "series": {
+    "title": "Series",
+    "impressionism": "Impressionism",
+    "abstraction": "Abstraction",
+    "landscapes": "Landscapes",
+    "portraits": "Portraits"
+  },
+  "exhibitions": {
+    "title": "Exhibitions",
+    "expo2022": "2022 — Group Exhibition, Montreal",
+    "expo2023": "2023 — Université de Montréal, Student Exhibition"
+  },
+  "promo": {
+    "artworks": {
+      "eyebrow": "Collection",
+      "title": "Original Works",
+      "description": "Explore a selection of original works across multiple mediums.",
+      "cta": "View Artworks"
+    },
+    "series": {
+      "eyebrow": "Series",
+      "title": "Thematic Universes",
+      "description": "Browse works by visual approach, mood and subject.",
+      "cta": "Discover Series"
+    },
+    "exhibitions": {
+      "eyebrow": "Archives",
+      "title": "Recent Exhibitions",
+      "description": "An overview of recent group and student exhibitions.",
+      "cta": "View Exhibitions"
+    }
+  },
+  "header": {
+    "logoLabel": "Go to homepage",
+    "cartLabel": "Cart",
+    "accountLabel": "Account",
+    "languageLabel": "Language options"
+  },
+  "search": {
+    "artistName": "artist name",
+    "painting": "painting",
+    "returnPolicy": "return policy"
+  },
+  "account": {
+    "eyebrow": "Private Space",
+    "title": "Login",
+    "description": "Access your favourites, requests and private selections.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "forgotPassword": "Forgot password?",
+    "register": "Register account",
+    "loginButton": "Login",
+    "orContinueWith": "Or continue with"
+  },
+  "artworkGrid": {
+    "allArtworks": "All Artworks",
+    "filter": "Filter",
+    "noArtworks": "No artworks in this category.",
+    "artworkCount": "{count} artwork",
+    "artworkCountPlural": "{count} artworks"
+  },
+  "filterPanel": {
+    "title": "Filters",
+    "artworkType": "Artwork Type",
+    "medium": "Medium",
+    "priceRange": "Price Range",
+    "year": "Year",
+    "reset": "Reset",
+    "apply": "Apply",
+    "upTo": "Up to {price}",
+    "priceMax": "CA$10,000+"
+  },
+  "mediums": {
+    "canvas": "Canvas",
+    "paper": "Paper",
+    "woodPanel": "Wood Panel",
+    "mixedMedia": "Mixed Media"
+  },
+  "footer": {
+    "subscribeTitle": "Stay close to the studio",
+    "subscribeText": "Receive occasional updates on new works, exhibitions, and quiet moments from the gallery.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Your email address",
+    "subscribe": "Subscribe",
+    "navLabel": "Footer navigation",
+    "copyright": "© 2026 Art Gallery. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "hero": {
+    "ariaLabel": "Featured gallery highlights",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide"
+  },
+  "cart": {
+    "stepCart": "Cart",
+    "stepCheckout": "Checkout",
+    "stepConfirmation": "Confirmation",
+    "proceedToCheckout": "Proceed to Checkout",
+    "placeDemoOrder": "Place Demo Order",
+    "backToCart": "Back to Cart",
+    "emptyCart": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "checkoutEyebrow": "Checkout",
+    "checkoutTitle": "Complete your details",
+    "checkoutText": "This sample checkout view is ready for future billing, delivery, and payment integrations.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "collector@example.com",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "Your name",
+    "addressLabel": "Delivery address",
+    "addressPlaceholder": "Street address",
+    "cityLabel": "City",
+    "cityPlaceholder": "Montréal",
+    "confirmationEyebrow": "Confirmation",
+    "confirmationTitle": "Request received",
+    "confirmationText": "This sample confirmation page shows where order details, receipt information, and next steps will appear.",
+    "demoOrder": "Demo order",
+    "customerService": "Customer Service",
+    "serviceHours": "Monday to Saturday 9am - 6pm EST :",
+    "freeDelivery": "Free standard delivery",
+    "returnsExchanges": "Returns & exchanges",
+    "shopSecurely": "Shop securely"
+  },
+  "home": {
+    "shopByCategory": "Shop by Category",
+    "categoryPaintings": "PAINTINGS",
+    "categoryPhotography": "PHOTOGRAPHY",
+    "categoryFineArtPrints": "FINE ART PRINTS",
+    "categorySculpture": "SCULPTURE",
+    "curatorFavorites": "Curator Favorites",
+    "previousCurator": "Previous curator favorites",
+    "nextCurator": "Next curator favorites",
+    "curatedTitle": "Personalized, Curated Experience",
+    "curatedDescription": "Discovering art you love should be easy and enjoyable. Our expert curators create weekly collections to simplify browsing and offer complimentary art advisory services, providing one-on-one guidance tailored to your taste, space, and budget.",
+    "curatedCta": "CONNECT WITH AN ADVISOR",
+    "whyShopTitle": "Why Shop With Us?",
+    "whyShopDescription": "Discover original paintings, fine art photography, sculpture, and more from a curated selection of original art.",
+    "whyShopOriginalPaintings": "original paintings",
+    "whyShopPhotography": "fine art photography",
+    "whyShopSculpture": "sculpture",
+    "whyCard1Title": "Global Selection",
+    "whyCard1Text": "Explore a worldwide selection of original artwork for sale by thousands of artists.",
+    "whyCard2Title": "Satisfaction Guaranteed",
+    "whyCard2Text": "Our 14-day satisfaction guarantee allows you to buy with confidence.",
+    "whyCard3Title": "Thousands of 5-Star Reviews",
+    "whyCard3Text": "We deliver world-class customer service to all of our art buyers.",
+    "whyCard4Title": "Support Emerging Artists",
+    "whyCard4Text": "We pay our artists more on every sale than other galleries.",
+    "whyOriginalTitle": "WHY BUY ORIGINAL ART",
+    "whyOriginalSubtitle": "Collect art that feels personal, lasting, and alive.",
+    "whyOriginalBody": "Original works bring texture, individuality, and emotional weight into a space in a way mass-produced decor usually cannot.",
+    "displaySectionTitle": "Entrer dans l'univers de l'œuvre",
+    "displaySectionSubtitle": "Explorer différentes manières de regarder, de ressentir et de s'approprier l'art.",
+    "saveItem": "Save item",
+    "addToCollection": "Add to collection",
+    "addToCart": "Add to cart",
+    "shopByPrice": "Shop by Price",
+    "priceUnder700": "UNDER C$700",
+    "price700to1400": "C$700–C$1,400",
+    "price1400to2800": "C$1,400–C$2,800",
+    "price2800to7000": "C$2,800–C$7,000"
+  },
+  "about": {
+    "eyebrow": "About",
+    "name": "Sylvaine",
+    "intro": "Sylvaine is a painter based in Montreal.",
+    "body": "Her work explores light, perception and the memory of landscape through oil painting and drawing.",
+    "portraitEyebrow": "Artist Portrait",
+    "imageAlt": "Studio with abstract painting",
+    "metaTitle": "About | Sylvaine",
+    "metaDescription": "About Sylvaine, painter based in Montreal."
+  }
+}

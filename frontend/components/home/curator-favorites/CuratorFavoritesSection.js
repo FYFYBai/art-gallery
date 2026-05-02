@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./CuratorFavoritesSection.module.css";
 
 const DESKTOP_ITEMS_PER_VIEW = 5;
@@ -135,6 +136,7 @@ function chunkItems(items, size) {
 }
 
 export default function CuratorFavoritesSection() {
+  const t = useTranslations("home");
   const [pageIndex, setPageIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(DESKTOP_ITEMS_PER_VIEW);
   const [isHovered, setIsHovered] = useState(false);
@@ -205,7 +207,7 @@ export default function CuratorFavoritesSection() {
     >
       <div className={styles.inner}>
         <div className={styles.headerRow}>
-          <h2 className={styles.title}>Curator Favorites</h2>
+          <h2 className={styles.title}>{t("curatorFavorites")}</h2>
 
           <div className={styles.controls}>
             <button
@@ -213,7 +215,7 @@ export default function CuratorFavoritesSection() {
               className={styles.arrowButton}
               onClick={goPrev}
               disabled={!canGoPrev && totalPages <= 1}
-              aria-label="Previous curator favorites"
+              aria-label={t("previousCurator")}
             >
               <ArrowLeftIcon />
             </button>
@@ -223,7 +225,7 @@ export default function CuratorFavoritesSection() {
               className={styles.arrowButton}
               onClick={goNext}
               disabled={!canGoNext && totalPages <= 1}
-              aria-label="Next curator favorites"
+              aria-label={t("nextCurator")}
             >
               <ArrowRightIcon />
             </button>

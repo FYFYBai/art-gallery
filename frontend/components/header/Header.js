@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations, useLocale } from "../../i18n/IntlContext";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "./Header.module.css";
-import { languageOptions, navItems, rotatingTerms } from "./headerData";
+import { languageOptions, getNavItems } from "./headerData";
 import {
   ArrowRightIcon,
   CartIcon,
@@ -16,6 +18,18 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 export default function Header() {
+  const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const navItems = getNavItems(t);
+  const rotatingTerms = [
+    t("search.artistName"),
+    t("search.painting"),
+    t("search.returnPolicy"),
+  ];
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [visibleDropdown, setVisibleDropdown] = useState(null);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
@@ -36,13 +50,15 @@ export default function Header() {
   const registerSubmittingRef = useRef(false);
 
   const activeItem = useMemo(() => {
-    return navItems.find((item) => item.label === visibleDropdown) || null;
-  }, [visibleDropdown]);
+    return navItems.find((item) => item.labelKey === visibleDropdown) || null;
+  }, [visibleDropdown, navItems]);
+
+  const rotatingTermsLength = rotatingTerms.length;
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       const previousIndex = searchTermIndexRef.current;
-      const nextIndex = (previousIndex + 1) % rotatingTerms.length;
+      const nextIndex = (previousIndex + 1) % rotatingTermsLength;
 
       if (searchAnimationTimerRef.current) {
         clearTimeout(searchAnimationTimerRef.current);
@@ -62,12 +78,11 @@ export default function Header() {
 
     return () => {
       clearInterval(intervalId);
-
       if (searchAnimationTimerRef.current) {
         clearTimeout(searchAnimationTimerRef.current);
       }
     };
-  }, []);
+  }, [rotatingTermsLength]);
 
   useEffect(() => {
     const closeMenus = () => {
@@ -93,6 +108,14 @@ export default function Header() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, []);
+
+  const handleLanguageSelect = (code) => {
+    // Replace the locale segment in the current path
+    const segments = window.location.pathname.split("/");
+    segments[1] = code; // segments[0] is "", segments[1] is the locale
+    router.push(segments.join("/") || "/");
+    setLanguageOpen(false);
+  };
 
   const handleLanguageToggle = (event) => {
     event.stopPropagation();
@@ -264,18 +287,17 @@ export default function Header() {
 
   const scheduleDropdownClose = () => {
     clearDropdownCloseTimer();
-
     closeDropdownTimerRef.current = setTimeout(() => {
       hideDropdown();
     }, 120);
   };
 
-  const openDropdown = (label) => {
+  const openDropdown = (labelKey) => {
     clearDropdownCloseTimer();
     clearDropdownHideTimer();
     setIsDropdownClosing(false);
-    setActiveDropdown(label);
-    setVisibleDropdown(label);
+    setActiveDropdown(labelKey);
+    setVisibleDropdown(labelKey);
   };
 
   const trimmedSearchQuery = searchQuery.trim();
@@ -288,12 +310,7 @@ export default function Header() {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-
-    if (!trimmedSearchQuery) {
-      return;
-    }
-
-    // Placeholder for future search-page routing.
+    if (!trimmedSearchQuery) return;
     window.location.hash = `search=${encodeURIComponent(trimmedSearchQuery)}`;
   };
 
@@ -317,7 +334,7 @@ export default function Header() {
           <Link
             href="/"
             className={styles.logoLink}
-            aria-label="Go to homepage"
+            aria-label={t("header.logoLabel")}
           >
             SYLVAINE ART
           </Link>
@@ -327,25 +344,22 @@ export default function Header() {
               <ul className={styles.navList}>
                 {navItems.map((item) => {
                   const hasDropdown = Boolean(item.columns);
-
                   return (
                     <li
-                      key={item.label}
-                      className={`${styles.navItem} ${
-                        hasDropdown ? styles.hasDropdown : ""
-                      }`}
+                      key={item.labelKey}
+                      className={`${styles.navItem} ${hasDropdown ? styles.hasDropdown : ""}`}
                       onMouseEnter={() =>
-                        hasDropdown && openDropdown(item.label)
+                        hasDropdown && openDropdown(item.labelKey)
                       }
                       onMouseLeave={() =>
-                        hasDropdown && activeDropdown === item.label
+                        hasDropdown && activeDropdown === item.labelKey
                           ? scheduleDropdownClose()
                           : undefined
                       }
                     >
-                      <a href={item.link} className={styles.navLink}>
+                      <Link href={item.link} className={styles.navLink}>
                         {item.label}
-                      </a>
+                      </Link>
                     </li>
                   );
                 })}
@@ -365,11 +379,10 @@ export default function Header() {
                 <input
                   type="search"
                   value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder=""
                   className={styles.searchInput}
                 />
-
                 {!searchQuery && (
                   <span className={styles.searchPlaceholder}>
                     <span className={styles.searchPlaceholderPrefix}>
@@ -409,9 +422,7 @@ export default function Header() {
 
               <button
                 type="submit"
-                className={`${styles.searchSubmitButton} ${
-                  trimmedSearchQuery ? styles.searchSubmitVisible : ""
-                }`}
+                className={`${styles.searchSubmitButton} ${trimmedSearchQuery ? styles.searchSubmitVisible : ""}`}
                 aria-label="Submit search"
                 tabIndex={trimmedSearchQuery ? 0 : -1}
               >
@@ -420,16 +431,15 @@ export default function Header() {
             </form>
 
             <div className={styles.headerActions}>
+              {/* Language switcher */}
               <div
                 className={styles.languageMenuWrap}
                 onClick={stopPropagation}
               >
                 <button
                   type="button"
-                  className={`${styles.iconButton} ${
-                    languageOpen ? styles.isActive : ""
-                  }`}
-                  aria-label="Language options"
+                  className={`${styles.iconButton} ${languageOpen ? styles.isActive : ""}`}
+                  aria-label={t("header.languageLabel")}
                   aria-expanded={languageOpen}
                   onClick={handleLanguageToggle}
                 >
@@ -440,24 +450,24 @@ export default function Header() {
                   <div className={styles.languageDropdown}>
                     {languageOptions.map((option) => (
                       <button
-                        key={option}
+                        key={option.code}
                         type="button"
-                        className={styles.languageOption}
+                        className={`${styles.languageOption} ${locale === option.code ? styles.isSelected : ""}`}
+                        onClick={() => handleLanguageSelect(option.code)}
                       >
-                        {option}
+                        {option.label}
                       </button>
                     ))}
                   </div>
                 )}
               </div>
 
+              {/* Account */}
               <div className={styles.accountMenuWrap}>
                 <button
                   type="button"
-                  className={`${styles.iconButton} ${
-                    accountOpen ? styles.isActive : ""
-                  }`}
-                  aria-label="Account"
+                  className={`${styles.iconButton} ${accountOpen ? styles.isActive : ""}`}
+                  aria-label={t("header.accountLabel")}
                   aria-expanded={accountOpen}
                   onClick={handleAccountToggle}
                 >
@@ -465,19 +475,23 @@ export default function Header() {
                 </button>
               </div>
 
-              <Link href="/cart" className={styles.iconButton} aria-label="Cart">
+              {/* Cart */}
+              <Link
+                href="/cart"
+                className={styles.iconButton}
+                aria-label={t("header.cartLabel")}
+              >
                 <CartIcon className={styles.headerIconSvg} />
               </Link>
             </div>
           </div>
         </div>
 
+        {/* Mega dropdown */}
         {activeItem && (
           <div
-            className={`${styles.globalDropdown} ${
-              isDropdownClosing ? styles.isClosing : styles.isOpen
-            }`}
-            onMouseEnter={() => openDropdown(activeItem.label)}
+            className={`${styles.globalDropdown} ${isDropdownClosing ? styles.isClosing : styles.isOpen}`}
+            onMouseEnter={() => openDropdown(activeItem.labelKey)}
             onMouseLeave={scheduleDropdownClose}
           >
             <div className={styles.globalDropdownInner}>
@@ -485,13 +499,16 @@ export default function Header() {
                 {activeItem.columns.map((column) => (
                   <div key={column.title} className={styles.dropdownColumn}>
                     <p className={styles.columnTitle}>{column.title}</p>
-
                     <ul className={styles.columnList}>
                       {column.items.map((subItem) => (
-                        <li key={subItem}>
-                          <a href="#" className={styles.dropdownItemLink}>
-                            {subItem}
-                          </a>
+                        <li key={subItem.slug}>
+                          <Link
+                            href={`/artworks?type=${subItem.slug}`}
+                            className={styles.dropdownItemLink}
+                            onClick={hideDropdown}
+                          >
+                            {subItem.label}
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -508,9 +525,9 @@ export default function Header() {
                 <p className={styles.promoDescription}>
                   {activeItem.promo.description}
                 </p>
-                <a href="#" className={styles.promoCta}>
+                <Link href={activeItem.promo.link} className={styles.promoCta}>
                   {activeItem.promo.cta}
-                </a>
+                </Link>
               </aside>
             </div>
           </div>
@@ -518,11 +535,10 @@ export default function Header() {
       </header>
 
       <div
-        className={`${styles.pageOverlay} ${
-          isOverlayVisible ? styles.isVisible : ""
-        }`}
+        className={`${styles.pageOverlay} ${isOverlayVisible ? styles.isVisible : ""}`}
       />
 
+      {/* Account modal */}
       {accountOpen && (
         <div
           className={styles.accountModalOverlay}
@@ -546,36 +562,40 @@ export default function Header() {
             </button>
 
             <div className={styles.accountHeader}>
-              <p className={styles.accountEyebrow}>Espace privé</p>
+              <p className={styles.accountEyebrow}>{t("account.eyebrow")}</p>
               <h2 id="account-login-title" className={styles.accountTitle}>
-                {accountMode === "login" ? "Connexion" : "Create account"}
+                {accountMode === "login"
+                  ? t("account.title")
+                  : "Create account"}
               </h2>
-              <p className={styles.accountText}>
-                Accédez à vos favoris, demandes et sélections privées.
-              </p>
+              <p className={styles.accountText}>{t("account.description")}</p>
             </div>
 
-            <form key={accountMode} className={styles.loginForm} onSubmit={handleAccountSubmit}>
+            <form
+              key={accountMode}
+              className={styles.loginForm}
+              onSubmit={handleAccountSubmit}
+            >
               <label className={styles.loginLabel} htmlFor="login-email">
-                Email
+                {t("account.emailLabel")}
               </label>
               <input
                 id="login-email"
                 name="email"
                 type="email"
                 className={styles.loginInput}
-                placeholder="nom@example.com"
+                placeholder={t("account.emailPlaceholder")}
               />
 
               <label className={styles.loginLabel} htmlFor="login-password">
-                Password
+                {t("account.passwordLabel")}
               </label>
               <input
                 id="login-password"
                 name="password"
                 type="password"
                 className={styles.loginInput}
-                placeholder="Your password"
+                placeholder={t("account.passwordPlaceholder")}
               />
 
               {accountMode === "register" && (
@@ -599,14 +619,14 @@ export default function Header() {
               {accountMode === "login" ? (
                 <div className={styles.accountLinksRow}>
                   <a href="#" className={styles.accountTextLink}>
-                    Forgot password?
+                    {t("account.forgotPassword")}
                   </a>
                   <button
                     type="button"
                     className={styles.accountTextLink}
                     onClick={() => switchAccountMode("register")}
                   >
-                    Register account
+                    {t("account.register")}
                   </button>
                 </div>
               ) : (
@@ -627,7 +647,7 @@ export default function Header() {
                 disabled={accountMode === "register" && isRegisterSubmitting}
               >
                 {accountMode === "login"
-                  ? "Login"
+                  ? t("account.loginButton")
                   : isRegisterSubmitting
                     ? "Creating..."
                     : "Create account"}
@@ -648,8 +668,9 @@ export default function Header() {
             )}
 
             <div className={styles.socialLoginBlock}>
-              <p className={styles.socialDivider}>Or continue with</p>
-
+              <p className={styles.socialDivider}>
+                {t("account.orContinueWith")}
+              </p>
               <div className={styles.socialButtons}>
                 <button type="button" className={styles.socialButton}>
                   Google

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./FeaturedRowsSection.module.css";
 import { featuredRows } from "./featuredRowsData";
 
@@ -97,6 +98,8 @@ function BagIcon() {
 }
 
 function ProductCard({ item }) {
+  const t = useTranslations("home");
+
   return (
     <article className={styles.card}>
       <a href="#" className={styles.imageLink}>
@@ -109,34 +112,19 @@ function ProductCard({ item }) {
         <span className={styles.price}>{item.price}</span>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label="Save item"
-          >
+          <button type="button" className={styles.iconButton} aria-label={t("saveItem")}>
             <HeartIcon />
           </button>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label="Add to collection"
-          >
+          <button type="button" className={styles.iconButton} aria-label={t("addToCollection")}>
             <PlusCircleIcon />
           </button>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label="Add to cart"
-          >
+          <button type="button" className={styles.iconButton} aria-label={t("addToCart")}>
             <BagIcon />
           </button>
         </div>
       </div>
 
-      <a href="#" className={styles.titleLink}>
-        {item.title}
-      </a>
-
+      <a href="#" className={styles.titleLink}>{item.title}</a>
       <p className={styles.metaLine}>{item.artist}</p>
       <p className={styles.metaLine}>{item.medium}</p>
       <p className={styles.metaLine}>{item.size}</p>
@@ -162,6 +150,7 @@ function chunkItems(items, size) {
 }
 
 function ProductRow({ row }) {
+  const t = useTranslations("home");
   const [pageIndex, setPageIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(DESKTOP_ITEMS_PER_VIEW);
 
@@ -210,7 +199,7 @@ function ProductRow({ row }) {
             className={styles.navButton}
             onClick={goPrev}
             disabled={!canGoPrev}
-            aria-label={`Previous items for ${row.title}`}
+            aria-label={`${t("previousCurator")} ${row.title}`}
           >
             <ArrowLeftIcon />
           </button>
@@ -220,7 +209,7 @@ function ProductRow({ row }) {
             className={styles.navButton}
             onClick={goNext}
             disabled={!canGoNext}
-            aria-label={`Next items for ${row.title}`}
+            aria-label={`${t("nextCurator")} ${row.title}`}
           >
             <ArrowRightIcon />
           </button>
@@ -260,6 +249,8 @@ function ProductRow({ row }) {
 }
 
 export default function FeaturedRowsSection() {
+  const t = useTranslations("home");
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -268,21 +259,13 @@ export default function FeaturedRowsSection() {
         ))}
 
         <div className={styles.priceFilter}>
-          <h3 className={styles.priceFilterTitle}>Shop by Price</h3>
+          <h3 className={styles.priceFilterTitle}>{t("shopByPrice")}</h3>
 
           <div className={styles.priceButtons}>
-            <button type="button" className={styles.priceButton}>
-              UNDER C$700
-            </button>
-            <button type="button" className={styles.priceButton}>
-              C$700-C$1,400
-            </button>
-            <button type="button" className={styles.priceButton}>
-              C$1,400-C$2,800
-            </button>
-            <button type="button" className={styles.priceButton}>
-              C$2,800-C$7,000
-            </button>
+            <button type="button" className={styles.priceButton}>{t("priceUnder700")}</button>
+            <button type="button" className={styles.priceButton}>{t("price700to1400")}</button>
+            <button type="button" className={styles.priceButton}>{t("price1400to2800")}</button>
+            <button type="button" className={styles.priceButton}>{t("price2800to7000")}</button>
           </div>
         </div>
       </div>

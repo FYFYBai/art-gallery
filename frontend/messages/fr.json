@@ -1,0 +1,191 @@
+{
+  "nav": {
+    "artworks": "Œuvres",
+    "series": "Séries",
+    "about": "À propos",
+    "exhibitions": "Expositions",
+    "contact": "Contact"
+  },
+  "artworkTypes": {
+    "title": "Œuvres",
+    "oilPaintings": "Peintures à l'huile",
+    "watercolors": "Aquarelles",
+    "drawings": "Dessins",
+    "charcoal": "Dessins au fusain"
+  },
+  "series": {
+    "title": "Séries",
+    "impressionism": "Impressionnisme",
+    "abstraction": "Abstraction",
+    "landscapes": "Paysages",
+    "portraits": "Portraits"
+  },
+  "exhibitions": {
+    "title": "Expositions",
+    "expo2022": "2022 — Exposition collective, Montréal",
+    "expo2023": "2023 — Université de Montréal, exposition étudiante"
+  },
+  "promo": {
+    "artworks": {
+      "eyebrow": "Collection",
+      "title": "Œuvres originales",
+      "description": "Explorez une sélection de travaux originaux à travers plusieurs médiums.",
+      "cta": "Voir les œuvres"
+    },
+    "series": {
+      "eyebrow": "Série",
+      "title": "Univers thématiques",
+      "description": "Parcourez les œuvres par approche visuelle, ambiance et sujet.",
+      "cta": "Découvrir les séries"
+    },
+    "exhibitions": {
+      "eyebrow": "Archives",
+      "title": "Expositions récentes",
+      "description": "Retrouvez un aperçu des expositions collectives et étudiantes récentes.",
+      "cta": "Voir les expositions"
+    }
+  },
+  "header": {
+    "logoLabel": "Aller à l'accueil",
+    "cartLabel": "Panier",
+    "accountLabel": "Compte",
+    "languageLabel": "Options de langue"
+  },
+  "search": {
+    "artistName": "nom d'artiste",
+    "painting": "peinture",
+    "returnPolicy": "politique de retour"
+  },
+  "account": {
+    "eyebrow": "Espace privé",
+    "title": "Connexion",
+    "description": "Accédez à vos favoris, demandes et sélections privées.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "nom@example.com",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "register": "Créer un compte",
+    "loginButton": "Connexion",
+    "orContinueWith": "Ou continuer avec"
+  },
+  "artworkGrid": {
+    "allArtworks": "Toutes les œuvres",
+    "filter": "Filtrer",
+    "noArtworks": "Aucune œuvre dans cette catégorie.",
+    "artworkCount": "{count} œuvre",
+    "artworkCountPlural": "{count} œuvres"
+  },
+  "filterPanel": {
+    "title": "Filtres",
+    "artworkType": "Type d'œuvre",
+    "medium": "Médium",
+    "priceRange": "Fourchette de prix",
+    "year": "Année",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer",
+    "upTo": "Jusqu'à {price}",
+    "priceMax": "CA$10 000+"
+  },
+  "mediums": {
+    "canvas": "Toile",
+    "paper": "Papier",
+    "woodPanel": "Panneau de bois",
+    "mixedMedia": "Techniques mixtes"
+  },
+  "footer": {
+    "subscribeTitle": "Restez proche de l'atelier",
+    "subscribeText": "Recevez des nouvelles occasionnelles sur les nouvelles œuvres, expositions et moments de la galerie.",
+    "emailLabel": "Adresse email",
+    "emailPlaceholder": "Votre adresse email",
+    "subscribe": "S'abonner",
+    "navLabel": "Navigation du pied de page",
+    "copyright": "© 2026 Art Gallery. Tous droits réservés.",
+    "privacy": "Confidentialité",
+    "terms": "Conditions"
+  },
+  "hero": {
+    "ariaLabel": "Sélection de la galerie",
+    "previousSlide": "Diapositive précédente",
+    "nextSlide": "Diapositive suivante"
+  },
+  "cart": {
+    "stepCart": "Panier",
+    "stepCheckout": "Paiement",
+    "stepConfirmation": "Confirmation",
+    "proceedToCheckout": "Passer à la caisse",
+    "placeDemoOrder": "Passer la commande démo",
+    "backToCart": "Retour au panier",
+    "emptyCart": "Votre panier est vide",
+    "continueShopping": "Continuer les achats",
+    "checkoutEyebrow": "Paiement",
+    "checkoutTitle": "Complétez vos informations",
+    "checkoutText": "Cette vue de paiement est prête pour les futures intégrations de facturation, livraison et paiement.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "collectionneur@example.com",
+    "fullNameLabel": "Nom complet",
+    "fullNamePlaceholder": "Votre nom",
+    "addressLabel": "Adresse de livraison",
+    "addressPlaceholder": "Adresse",
+    "cityLabel": "Ville",
+    "cityPlaceholder": "Montréal",
+    "confirmationEyebrow": "Confirmation",
+    "confirmationTitle": "Demande reçue",
+    "confirmationText": "Cette page de confirmation montre où apparaîtront les détails de la commande, le reçu et les prochaines étapes.",
+    "demoOrder": "Commande démo",
+    "customerService": "Service client",
+    "serviceHours": "Lundi au samedi 9h - 18h EST :",
+    "freeDelivery": "Livraison standard gratuite",
+    "returnsExchanges": "Retours & échanges",
+    "shopSecurely": "Achat sécurisé"
+  },
+  "home": {
+    "shopByCategory": "Acheter par catégorie",
+    "categoryPaintings": "PEINTURES",
+    "categoryPhotography": "PHOTOGRAPHIE",
+    "categoryFineArtPrints": "ESTAMPES",
+    "categorySculpture": "SCULPTURE",
+    "curatorFavorites": "Coups de cœur",
+    "previousCurator": "Coups de cœur précédents",
+    "nextCurator": "Coups de cœur suivants",
+    "curatedTitle": "Une expérience personnalisée et curatée",
+    "curatedDescription": "Découvrir l'art que vous aimez devrait être simple et agréable. Nos curateurs créent des collections hebdomadaires pour simplifier la navigation et offrent des services de conseil artistique gratuits.",
+    "curatedCta": "CONTACTER UN CONSEILLER",
+    "whyShopTitle": "Pourquoi acheter ici ?",
+    "whyShopDescription": "Découvrez des peintures originales, de la photographie d'art, de la sculpture et plus encore.",
+    "whyShopOriginalPaintings": "peintures originales",
+    "whyShopPhotography": "photographie d'art",
+    "whyShopSculpture": "sculpture",
+    "whyCard1Title": "Sélection mondiale",
+    "whyCard1Text": "Explorez une sélection mondiale d'œuvres originales de milliers d'artistes.",
+    "whyCard2Title": "Satisfaction garantie",
+    "whyCard2Text": "Notre garantie de satisfaction de 14 jours vous permet d'acheter en toute confiance.",
+    "whyCard3Title": "Des milliers d'avis 5 étoiles",
+    "whyCard3Text": "Nous offrons un service client de classe mondiale à tous nos acheteurs.",
+    "whyCard4Title": "Soutenir les artistes émergents",
+    "whyCard4Text": "Nous rémunérons mieux nos artistes que les autres galeries.",
+    "whyOriginalTitle": "POURQUOI ACHETER DE L'ART ORIGINAL",
+    "whyOriginalSubtitle": "Collectionnez une œuvre qui vous ressemble, durable et vivante.",
+    "whyOriginalBody": "Les œuvres originales apportent texture, individualité et poids émotionnel dans un espace d'une manière que la décoration de masse ne peut généralement pas égaler.",
+    "displaySectionTitle": "Entrer dans l'univers de l'œuvre",
+    "displaySectionSubtitle": "Explorer différentes manières de regarder, de ressentir et de s'approprier l'art.",
+    "saveItem": "Sauvegarder",
+    "addToCollection": "Ajouter à la collection",
+    "addToCart": "Ajouter au panier",
+    "shopByPrice": "Acheter par prix",
+    "priceUnder700": "MOINS DE C$700",
+    "price700to1400": "C$700–C$1 400",
+    "price1400to2800": "C$1 400–C$2 800",
+    "price2800to7000": "C$2 800–C$7 000"
+  },
+  "about": {
+    "eyebrow": "À propos",
+    "name": "Sylvaine",
+    "intro": "Sylvaine est une artiste peintre basée à Montréal.",
+    "body": "Son travail explore la lumière, la perception et la mémoire du paysage à travers la peinture à l'huile et le dessin.",
+    "portraitEyebrow": "Portrait d'artiste",
+    "imageAlt": "Atelier avec peinture abstraite",
+    "metaTitle": "À propos | Sylvaine",
+    "metaDescription": "À propos de Sylvaine, artiste peintre basée à Montréal."
+  }
+}

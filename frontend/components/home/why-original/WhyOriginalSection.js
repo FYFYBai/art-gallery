@@ -1,16 +1,10 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./WhyOriginalSection.module.css";
 import { whyOriginalCards } from "./whyOriginalData";
 
-const leftCopy = {
-  eyebrow: "L'ART DANS VOTRE QUOTIDIEN",
-  description:
-    "Chaque peinture ne se limite pas à une image. Elle transforme la lumière, le silence et la perception d'un espace.",
-};
-
 export default function WhyOriginalSection() {
+  const t = useTranslations("home");
   const sectionRef = useRef(null);
   const leftColumnRef = useRef(null);
   const leftContentRef = useRef(null);
@@ -100,23 +94,13 @@ export default function WhyOriginalSection() {
             className={`${styles.leftContent} ${stateClass}`}
             style={mode === "fixed" ? fixedStyle : undefined}
           >
-            <p className={styles.eyebrow}>{leftCopy.eyebrow}</p>
+            <p className={styles.eyebrow}>{t("whyOriginalTitle")}</p>
 
-            <h2 className={styles.title}>
-              Habiter une
-              <br />
-              œuvre, c&apos;est
-              <br />
-              habiter une
-              <br />
-              sensation.
-            </h2>
+            <h2 className={styles.title}>{t("whyOriginalSubtitle")}</h2>
 
             <span className={styles.titleRule} aria-hidden="true" />
 
-            <p className={styles.description}>
-              {leftCopy.description}
-            </p>
+            <p className={styles.description}>{t("whyOriginalBody")}</p>
           </div>
         </div>
 
