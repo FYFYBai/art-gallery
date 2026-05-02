@@ -1,46 +1,42 @@
 export const whyOriginalCards = [
   {
     id: 1,
-    image: "https://picsum.photos/seed/why-original-1/1200/900",
-    eyebrow: "UNIQUELY YOURS",
-    title: "A room feels more intentional",
+    image: "/images/why-original/1.png",
+    eyebrow: "",
+    title: "Une présence silencieuse",
     description:
-      "Original artwork gives a space a focal point and makes it feel considered rather than simply decorated.",
+      "L'œuvre s'inscrit dans l'espace sans le dominer.\nElle accompagne le regard, doucement.",
   },
   {
     id: 2,
-    image:
-      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "REAL PRESENCE",
-    title: "Each piece carries real presence",
+    image: "/images/why-original/2.png",
+    eyebrow: "",
+    title: "Une matière vivante",
     description:
-      "Material, scale, texture, and hand-made variation create a depth that reproductions often flatten.",
+      "Chaque texture capte la lumière différemment.\nLa peinture change selon l'instant.",
   },
   {
     id: 3,
-    image:
-      "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "SUPPORT ARTISTS",
-    title: "You support living artists",
+    image: "/images/why-original/3.png",
+    eyebrow: "",
+    title: "Un espace transformé",
     description:
-      "Buying original work directly supports creative practice and gives the collection meaning beyond appearance.",
+      "Une œuvre ne décore pas.\nElle redéfinit la manière d'habiter un lieu.",
   },
   {
     id: 4,
-    image:
-      "https://images.unsplash.com/photo-1579965342575-16428a7c8881?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "TRANSFORM YOUR SPACE",
-    title: "Art changes the atmosphere",
+    image: "/images/why-original/4.png",
+    eyebrow: "",
+    title: "Une invitation au ralentissement",
     description:
-      "Original pieces shape the mood of a room in a way mass-produced decor rarely can.",
+      "L'œuvre crée une pause visuelle et mentale.\nElle ouvre un espace pour respirer.",
   },
   {
     id: 5,
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    eyebrow: "CONNECT WITH PROCESS",
-    title: "Every work carries a human touch",
+    image: "/images/why-original/5.png",
+    eyebrow: "",
+    title: "Une émotion qui demeure",
     description:
-      "Behind each piece is a maker, a process, and a set of choices that give the work character.",
+      "Bien au-delà du regard, l'œuvre laisse une trace subtile et durable.",
   },
 ];

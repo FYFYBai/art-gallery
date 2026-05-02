@@ -12,12 +12,18 @@ import {
   UserIcon,
 } from "./icons";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [visibleDropdown, setVisibleDropdown] = useState(null);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountMode, setAccountMode] = useState("login");
+  const [accountToast, setAccountToast] = useState(null);
+  const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const [previousSearchTermIndex, setPreviousSearchTermIndex] = useState(null);
@@ -26,6 +32,8 @@ export default function Header() {
   const hideDropdownTimerRef = useRef(null);
   const searchTermIndexRef = useRef(0);
   const searchAnimationTimerRef = useRef(null);
+  const accountToastTimerRef = useRef(null);
+  const registerSubmittingRef = useRef(false);
 
   const activeItem = useMemo(() => {
     return navItems.find((item) => item.label === visibleDropdown) || null;
@@ -94,12 +102,133 @@ export default function Header() {
 
   const handleAccountToggle = (event) => {
     event.stopPropagation();
-    setAccountOpen((prev) => !prev);
+    setAccountOpen((prev) => {
+      const nextOpen = !prev;
+
+      if (nextOpen) {
+        setAccountMode("login");
+        setAccountToast(null);
+      }
+
+      return nextOpen;
+    });
     setLanguageOpen(false);
   };
 
   const closeAccountModal = () => {
     setAccountOpen(false);
+    setAccountMode("login");
+    setAccountToast(null);
+  };
+
+  const showAccountToast = (nextToast) => {
+    if (accountToastTimerRef.current) {
+      clearTimeout(accountToastTimerRef.current);
+    }
+
+    setAccountToast(nextToast);
+
+    accountToastTimerRef.current = setTimeout(() => {
+      setAccountToast(null);
+      accountToastTimerRef.current = null;
+    }, 3600);
+  };
+
+  const switchAccountMode = (nextMode) => {
+    setAccountMode(nextMode);
+    setAccountToast(null);
+  };
+
+  const handleAccountSubmit = async (event) => {
+    event.preventDefault();
+
+    if (accountMode !== "register") {
+      return;
+    }
+
+    if (registerSubmittingRef.current) {
+      return;
+    }
+
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+    const passwordConfirmation = String(
+      formData.get("passwordConfirmation") || "",
+    );
+
+    if (!email || !password || !passwordConfirmation) {
+      showAccountToast({
+        type: "error",
+        message: "Please fill in all registration fields.",
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      showAccountToast({
+        type: "error",
+        message: "Password must be at least 8 characters.",
+      });
+      return;
+    }
+
+    if (password !== passwordConfirmation) {
+      showAccountToast({
+        type: "error",
+        message: "Passwords must match.",
+      });
+      return;
+    }
+
+    registerSubmittingRef.current = true;
+    setIsRegisterSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          passwordConfirmation,
+        }),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const fallbackMessage = "Registration failed. Please try again.";
+        const apiMessage = result?.errors?.[0] || result?.message;
+        const duplicateEmail = response.status === 409;
+
+        showAccountToast({
+          type: duplicateEmail ? "success" : "error",
+          message: duplicateEmail
+            ? "An account already exists for this email. If you just registered, it was created successfully."
+            : apiMessage || fallbackMessage,
+        });
+        return;
+      }
+
+      formElement.reset();
+      showAccountToast({
+        type: "success",
+        message: result?.message || "Registration succeeded.",
+      });
+    } catch {
+      showAccountToast({
+        type: "error",
+        message:
+          "Registration response was interrupted. If retry says the account already exists, the first request succeeded.",
+      });
+    } finally {
+      registerSubmittingRef.current = false;
+      setIsRegisterSubmitting(false);
+    }
   };
 
   const stopPropagation = (event) => {
@@ -172,6 +301,12 @@ export default function Header() {
     return () => {
       clearDropdownCloseTimer();
       clearDropdownHideTimer();
+
+      if (accountToastTimerRef.current) {
+        clearTimeout(accountToastTimerRef.current);
+      }
+
+      registerSubmittingRef.current = false;
     };
   }, []);
 
@@ -413,19 +548,20 @@ export default function Header() {
             <div className={styles.accountHeader}>
               <p className={styles.accountEyebrow}>Espace privé</p>
               <h2 id="account-login-title" className={styles.accountTitle}>
-                Connexion
+                {accountMode === "login" ? "Connexion" : "Create account"}
               </h2>
               <p className={styles.accountText}>
                 Accédez à vos favoris, demandes et sélections privées.
               </p>
             </div>
 
-            <form className={styles.loginForm}>
+            <form key={accountMode} className={styles.loginForm} onSubmit={handleAccountSubmit}>
               <label className={styles.loginLabel} htmlFor="login-email">
                 Email
               </label>
               <input
                 id="login-email"
+                name="email"
                 type="email"
                 className={styles.loginInput}
                 placeholder="nom@example.com"
@@ -436,24 +572,80 @@ export default function Header() {
               </label>
               <input
                 id="login-password"
+                name="password"
                 type="password"
                 className={styles.loginInput}
                 placeholder="Your password"
               />
 
-              <div className={styles.accountLinksRow}>
-                <a href="#" className={styles.accountTextLink}>
-                  Forgot password?
-                </a>
-                <a href="#" className={styles.accountTextLink}>
-                  Register account
-                </a>
-              </div>
+              {accountMode === "register" && (
+                <>
+                  <label
+                    className={styles.loginLabel}
+                    htmlFor="register-password-confirmation"
+                  >
+                    Password confirmation
+                  </label>
+                  <input
+                    id="register-password-confirmation"
+                    name="passwordConfirmation"
+                    type="password"
+                    className={styles.loginInput}
+                    placeholder="Confirm your password"
+                  />
+                </>
+              )}
 
-              <button type="submit" className={styles.loginButton}>
-                Login
+              {accountMode === "login" ? (
+                <div className={styles.accountLinksRow}>
+                  <a href="#" className={styles.accountTextLink}>
+                    Forgot password?
+                  </a>
+                  <button
+                    type="button"
+                    className={styles.accountTextLink}
+                    onClick={() => switchAccountMode("register")}
+                  >
+                    Register account
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.accountLinksRow}>
+                  <button
+                    type="button"
+                    className={styles.accountTextLink}
+                    onClick={() => switchAccountMode("login")}
+                  >
+                    Back to login
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className={styles.loginButton}
+                disabled={accountMode === "register" && isRegisterSubmitting}
+              >
+                {accountMode === "login"
+                  ? "Login"
+                  : isRegisterSubmitting
+                    ? "Creating..."
+                    : "Create account"}
               </button>
             </form>
+
+            {accountToast && (
+              <div
+                className={`${styles.accountToast} ${
+                  accountToast.type === "success"
+                    ? styles.accountToastSuccess
+                    : styles.accountToastError
+                }`}
+                role="status"
+              >
+                {accountToast.message}
+              </div>
+            )}
 
             <div className={styles.socialLoginBlock}>
               <p className={styles.socialDivider}>Or continue with</p>

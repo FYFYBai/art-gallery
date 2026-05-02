@@ -4,6 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./WhyOriginalSection.module.css";
 import { whyOriginalCards } from "./whyOriginalData";
 
+const leftCopy = {
+  eyebrow: "L'ART DANS VOTRE QUOTIDIEN",
+  description:
+    "Chaque peinture ne se limite pas à une image. Elle transforme la lumière, le silence et la perception d'un espace.",
+};
+
 export default function WhyOriginalSection() {
   const sectionRef = useRef(null);
   const leftColumnRef = useRef(null);
@@ -94,21 +100,22 @@ export default function WhyOriginalSection() {
             className={`${styles.leftContent} ${stateClass}`}
             style={mode === "fixed" ? fixedStyle : undefined}
           >
-            <p className={styles.eyebrow}>WHY BUY ORIGINAL ART</p>
+            <p className={styles.eyebrow}>{leftCopy.eyebrow}</p>
 
             <h2 className={styles.title}>
-              Collect art that
+              Habiter une
               <br />
-              feels personal,
+              œuvre, c&apos;est
               <br />
-              lasting, and
+              habiter une
               <br />
-              alive.
+              sensation.
             </h2>
 
+            <span className={styles.titleRule} aria-hidden="true" />
+
             <p className={styles.description}>
-              Original works bring texture, individuality, and emotional weight
-              into a space in a way mass-produced decor usually cannot.
+              {leftCopy.description}
             </p>
           </div>
         </div>
@@ -125,7 +132,9 @@ export default function WhyOriginalSection() {
               </div>
 
               <div className={styles.cardTextBlock}>
-                <p className={styles.cardEyebrow}>{card.eyebrow}</p>
+                {card.eyebrow && (
+                  <p className={styles.cardEyebrow}>{card.eyebrow}</p>
+                )}
                 <h3 className={styles.cardTitle}>{card.title}</h3>
                 <p className={styles.cardDescription}>{card.description}</p>
               </div>
