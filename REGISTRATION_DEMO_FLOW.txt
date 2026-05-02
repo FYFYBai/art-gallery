@@ -1,0 +1,206 @@
+Registration Demo Flow
+======================
+
+Purpose
+-------
+This demo shows a small end-to-end registration feature:
+
+1. The user opens the account popup in the navbar.
+2. The user clicks "Register account".
+3. The popup switches from login mode to registration mode.
+4. The frontend validates the form.
+5. The frontend sends a POST request to the Spring Boot backend.
+6. The backend validates the request, hashes the password, saves a user row in PostgreSQL, and returns a response.
+7. The frontend shows a temporary success or failure message.
+
+
+Frontend Files
+--------------
+
+frontend/components/header/Header.js
+
+- Owns the account popup state.
+- Uses accountMode to switch between "login" and "register".
+- Renders the registration fields:
+  - email
+  - password
+  - password confirmation
+- Handles registration submit in handleAccountSubmit.
+- Performs basic frontend checks:
+  - all fields are filled
+  - password is at least 8 characters
+  - password and confirmation match
+- Sends the request to:
+  POST http://localhost:8080/api/auth/register
+- Shows accountToast messages for success or failure.
+- Uses NEXT_PUBLIC_API_BASE_URL if set, otherwise defaults to http://localhost:8080.
+
+frontend/components/header/Header.module.css
+
+- Styles the account modal.
+- Styles the login/register form.
+- Adds the small transition when switching between login and register form.
+- Styles the temporary success/failure popup:
+  - accountToast
+  - accountToastSuccess
+  - accountToastError
+
+
+Backend Files
+-------------
+
+backend/src/main/java/com/artgallery/controller/AuthController.java
+
+- Defines the REST endpoint:
+  POST /api/auth/register
+- Accepts RegisterRequest JSON.
+- Uses @Valid so Bean Validation runs before service logic.
+- Delegates actual registration work to AuthService.
+
+backend/src/main/java/com/artgallery/dto/request/RegisterRequest.java
+
+- Defines the incoming registration payload:
+  - email
+  - password
+  - passwordConfirmation
+- Validation rules:
+  - email is required and must be valid
+  - password is required and must be 8 to 100 characters
+  - password confirmation is required
+  - password and confirmation must match
+
+backend/src/main/java/com/artgallery/service/AuthService.java
+
+- Contains the registration business logic.
+- Normalizes email by trimming and lowercasing it.
+- Checks if the email already exists with UserRepository.
+- Hashes the password using PasswordEncoder.
+- Creates and saves a User entity.
+- Returns RegisterResponse after saving.
+
+backend/src/main/java/com/artgallery/repository/UserRepository.java
+
+- Spring Data JPA repository for the User entity.
+- Provides existsByEmail and findByEmail.
+- Used by AuthService to detect duplicate registrations.
+
+backend/src/main/java/com/artgallery/domain/user/User.java
+
+- JPA entity mapped to the users table.
+- Registration writes:
+  - email
+  - passwordHash
+  - isActive
+- BaseEntity provides id, createdAt, and updatedAt.
+
+backend/src/main/java/com/artgallery/dto/response/RegisterResponse.java
+
+- Success response returned to the frontend.
+- Includes:
+  - id
+  - email
+  - message
+
+backend/src/main/java/com/artgallery/dto/response/ApiErrorResponse.java
+
+- Error response shape used for validation and duplicate-email failures.
+- Includes:
+  - message
+  - errors
+
+backend/src/main/java/com/artgallery/exception/DuplicateEmailException.java
+
+- Custom exception thrown when the email is already registered.
+
+backend/src/main/java/com/artgallery/exception/GlobalExceptionHandler.java
+
+- Converts backend exceptions into JSON error responses.
+- Handles:
+  - validation errors with 400 Bad Request
+  - duplicate email with 409 Conflict
+
+backend/src/main/java/com/artgallery/config/SecurityConfig.java
+
+- Allows the demo registration endpoint without login.
+- Disables CSRF for this stateless API demo.
+- Adds CORS support so the Next.js frontend can call Spring Boot locally.
+- Allows local frontend origins such as:
+  - http://localhost:*
+  - http://127.0.0.1:*
+- Defines BCryptPasswordEncoder as the PasswordEncoder bean.
+
+
+Database Flow
+-------------
+
+The users table is created by:
+
+backend/src/main/resources/db/migration/V1__create_users_table.sql
+
+Important columns:
+
+- id
+- email
+- password_hash
+- is_active
+- created_at
+- updated_at
+
+When registration succeeds, a new row is inserted into users.
+The password stored in password_hash is a BCrypt hash, not the raw password.
+
+
+Validation Test
+---------------
+
+backend/src/test/java/com/artgallery/dto/request/RegisterRequestValidationTest.java
+
+This test file demonstrates backend form validation:
+
+- valid request passes
+- invalid email fails
+- short password fails
+- password mismatch fails
+
+Run backend tests with:
+
+cd backend
+mvn test
+
+
+Local Demo Steps
+----------------
+
+1. Start PostgreSQL:
+
+docker compose up -d
+
+2. Start the backend:
+
+cd backend
+mvn spring-boot:run
+
+3. Start the frontend:
+
+cd frontend
+npm.cmd run dev
+
+4. Open the site in the browser.
+
+5. Click the account icon in the navbar.
+
+6. Click "Register account".
+
+7. Enter:
+
+- email
+- password
+- password confirmation
+
+8. Submit.
+
+Expected result:
+
+- On success, the modal shows "Registration succeeded."
+- If the same email is used again, the modal shows that the account already exists.
+
