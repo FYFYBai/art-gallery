@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "../../i18n/IntlContext";
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./WhyOriginalSection.module.css";
 import { whyOriginalCards } from "./whyOriginalData";
 
