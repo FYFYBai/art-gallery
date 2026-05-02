@@ -459,6 +459,7 @@
 .loginForm {
   display: grid;
   gap: 10px;
+  animation: accountFormSwitch 0.24s ease both;
 }
 
 .loginLabel {
@@ -507,9 +508,13 @@
 .accountTextLink {
   position: relative;
   display: inline-block;
+  padding: 0;
+  border: none;
+  background: transparent;
   font-family: var(--font-body), sans-serif;
   font-size: 0.82rem;
   color: var(--text-soft);
+  cursor: pointer;
   text-decoration: none;
   transition: color 0.22s ease;
 }
@@ -557,8 +562,40 @@
   color: var(--text-main);
 }
 
+.loginButton:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.loginButton:disabled:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
 .loginButton:active {
   transform: translateY(1px);
+}
+
+.accountToast {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  animation: accountToastIn 0.22s ease both;
+}
+
+.accountToastSuccess {
+  border: 1px solid rgba(75, 125, 92, 0.34);
+  background: rgba(75, 125, 92, 0.12);
+  color: #315c3e;
+}
+
+.accountToastError {
+  border: 1px solid rgba(154, 74, 58, 0.34);
+  background: rgba(154, 74, 58, 0.12);
+  color: #7c382c;
 }
 
 .socialLoginBlock {
@@ -789,6 +826,28 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes accountFormSwitch {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes accountToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

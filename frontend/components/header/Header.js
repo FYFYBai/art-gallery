@@ -14,6 +14,9 @@ import {
   UserIcon,
 } from "./icons";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export default function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -32,6 +35,9 @@ export default function Header() {
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountMode, setAccountMode] = useState("login");
+  const [accountToast, setAccountToast] = useState(null);
+  const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const [previousSearchTermIndex, setPreviousSearchTermIndex] = useState(null);
@@ -40,6 +46,8 @@ export default function Header() {
   const hideDropdownTimerRef = useRef(null);
   const searchTermIndexRef = useRef(0);
   const searchAnimationTimerRef = useRef(null);
+  const accountToastTimerRef = useRef(null);
+  const registerSubmittingRef = useRef(false);
 
   const activeItem = useMemo(() => {
     return navItems.find((item) => item.labelKey === visibleDropdown) || null;
@@ -117,12 +125,138 @@ export default function Header() {
 
   const handleAccountToggle = (event) => {
     event.stopPropagation();
-    setAccountOpen((prev) => !prev);
+    setAccountOpen((prev) => {
+      const nextOpen = !prev;
+
+      if (nextOpen) {
+        setAccountMode("login");
+        setAccountToast(null);
+      }
+
+      return nextOpen;
+    });
     setLanguageOpen(false);
   };
 
-  const closeAccountModal = () => setAccountOpen(false);
-  const stopPropagation = (event) => event.stopPropagation();
+  const closeAccountModal = () => {
+    setAccountOpen(false);
+    setAccountMode("login");
+    setAccountToast(null);
+  };
+
+  const showAccountToast = (nextToast) => {
+    if (accountToastTimerRef.current) {
+      clearTimeout(accountToastTimerRef.current);
+    }
+
+    setAccountToast(nextToast);
+
+    accountToastTimerRef.current = setTimeout(() => {
+      setAccountToast(null);
+      accountToastTimerRef.current = null;
+    }, 3600);
+  };
+
+  const switchAccountMode = (nextMode) => {
+    setAccountMode(nextMode);
+    setAccountToast(null);
+  };
+
+  const handleAccountSubmit = async (event) => {
+    event.preventDefault();
+
+    if (accountMode !== "register") {
+      return;
+    }
+
+    if (registerSubmittingRef.current) {
+      return;
+    }
+
+    const formElement = event.currentTarget;
+    const formData = new FormData(formElement);
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+    const passwordConfirmation = String(
+      formData.get("passwordConfirmation") || "",
+    );
+
+    if (!email || !password || !passwordConfirmation) {
+      showAccountToast({
+        type: "error",
+        message: "Please fill in all registration fields.",
+      });
+      return;
+    }
+
+    if (password.length < 8) {
+      showAccountToast({
+        type: "error",
+        message: "Password must be at least 8 characters.",
+      });
+      return;
+    }
+
+    if (password !== passwordConfirmation) {
+      showAccountToast({
+        type: "error",
+        message: "Passwords must match.",
+      });
+      return;
+    }
+
+    registerSubmittingRef.current = true;
+    setIsRegisterSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          passwordConfirmation,
+        }),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const fallbackMessage = "Registration failed. Please try again.";
+        const apiMessage = result?.errors?.[0] || result?.message;
+        const duplicateEmail = response.status === 409;
+
+        showAccountToast({
+          type: duplicateEmail ? "success" : "error",
+          message: duplicateEmail
+            ? "An account already exists for this email. If you just registered, it was created successfully."
+            : apiMessage || fallbackMessage,
+        });
+        return;
+      }
+
+      formElement.reset();
+      showAccountToast({
+        type: "success",
+        message: result?.message || "Registration succeeded.",
+      });
+    } catch {
+      showAccountToast({
+        type: "error",
+        message:
+          "Registration response was interrupted. If retry says the account already exists, the first request succeeded.",
+      });
+    } finally {
+      registerSubmittingRef.current = false;
+      setIsRegisterSubmitting(false);
+    }
+  };
+
+  const stopPropagation = (event) => {
+    event.stopPropagation();
+  };
 
   const clearDropdownCloseTimer = () => {
     if (closeDropdownTimerRef.current) {
@@ -184,6 +318,12 @@ export default function Header() {
     return () => {
       clearDropdownCloseTimer();
       clearDropdownHideTimer();
+
+      if (accountToastTimerRef.current) {
+        clearTimeout(accountToastTimerRef.current);
+      }
+
+      registerSubmittingRef.current = false;
     };
   }, []);
 
@@ -208,7 +348,9 @@ export default function Header() {
                     <li
                       key={item.labelKey}
                       className={`${styles.navItem} ${hasDropdown ? styles.hasDropdown : ""}`}
-                      onMouseEnter={() => hasDropdown && openDropdown(item.labelKey)}
+                      onMouseEnter={() =>
+                        hasDropdown && openDropdown(item.labelKey)
+                      }
                       onMouseLeave={() =>
                         hasDropdown && activeDropdown === item.labelKey
                           ? scheduleDropdownClose()
@@ -224,7 +366,11 @@ export default function Header() {
               </ul>
             </nav>
 
-            <form className={styles.searchBar} aria-label="Search" onSubmit={handleSearchSubmit}>
+            <form
+              className={styles.searchBar}
+              aria-label="Search"
+              onSubmit={handleSearchSubmit}
+            >
               <span className={styles.searchIconWrap}>
                 <SearchIcon className={styles.headerIconSvg} />
               </span>
@@ -239,14 +385,22 @@ export default function Header() {
                 />
                 {!searchQuery && (
                   <span className={styles.searchPlaceholder}>
-                    <span className={styles.searchPlaceholderPrefix}>Search for&nbsp;</span>
+                    <span className={styles.searchPlaceholderPrefix}>
+                      Search for&nbsp;
+                    </span>
                     <span className={styles.searchTermSlot}>
                       {searchTermAnimating && previousSearchTerm && (
-                        <span className={styles.searchTermExit}>{previousSearchTerm}</span>
+                        <span className={styles.searchTermExit}>
+                          {previousSearchTerm}
+                        </span>
                       )}
                       <span
                         key={searchTermIndex}
-                        className={searchTermAnimating ? styles.searchTermEnter : styles.searchTermCurrent}
+                        className={
+                          searchTermAnimating
+                            ? styles.searchTermEnter
+                            : styles.searchTermCurrent
+                        }
                       >
                         {searchTerm}
                       </span>
@@ -278,7 +432,10 @@ export default function Header() {
 
             <div className={styles.headerActions}>
               {/* Language switcher */}
-              <div className={styles.languageMenuWrap} onClick={stopPropagation}>
+              <div
+                className={styles.languageMenuWrap}
+                onClick={stopPropagation}
+              >
                 <button
                   type="button"
                   className={`${styles.iconButton} ${languageOpen ? styles.isActive : ""}`}
@@ -319,7 +476,11 @@ export default function Header() {
               </div>
 
               {/* Cart */}
-              <Link href="/cart" className={styles.iconButton} aria-label={t("header.cartLabel")}>
+              <Link
+                href="/cart"
+                className={styles.iconButton}
+                aria-label={t("header.cartLabel")}
+              >
                 <CartIcon className={styles.headerIconSvg} />
               </Link>
             </div>
@@ -357,9 +518,13 @@ export default function Header() {
 
               <aside className={styles.dropdownPromo}>
                 <div className={styles.promoImagePlaceholder}>Future Image</div>
-                <p className={styles.promoEyebrow}>{activeItem.promo.eyebrow}</p>
+                <p className={styles.promoEyebrow}>
+                  {activeItem.promo.eyebrow}
+                </p>
                 <h3 className={styles.promoTitle}>{activeItem.promo.title}</h3>
-                <p className={styles.promoDescription}>{activeItem.promo.description}</p>
+                <p className={styles.promoDescription}>
+                  {activeItem.promo.description}
+                </p>
                 <Link href={activeItem.promo.link} className={styles.promoCta}>
                   {activeItem.promo.cta}
                 </Link>
@@ -369,7 +534,9 @@ export default function Header() {
         )}
       </header>
 
-      <div className={`${styles.pageOverlay} ${isOverlayVisible ? styles.isVisible : ""}`} />
+      <div
+        className={`${styles.pageOverlay} ${isOverlayVisible ? styles.isVisible : ""}`}
+      />
 
       {/* Account modal */}
       {accountOpen && (
@@ -397,17 +564,24 @@ export default function Header() {
             <div className={styles.accountHeader}>
               <p className={styles.accountEyebrow}>{t("account.eyebrow")}</p>
               <h2 id="account-login-title" className={styles.accountTitle}>
-                {t("account.title")}
+                {accountMode === "login"
+                  ? t("account.title")
+                  : "Create account"}
               </h2>
               <p className={styles.accountText}>{t("account.description")}</p>
             </div>
 
-            <form className={styles.loginForm}>
+            <form
+              key={accountMode}
+              className={styles.loginForm}
+              onSubmit={handleAccountSubmit}
+            >
               <label className={styles.loginLabel} htmlFor="login-email">
                 {t("account.emailLabel")}
               </label>
               <input
                 id="login-email"
+                name="email"
                 type="email"
                 className={styles.loginInput}
                 placeholder={t("account.emailPlaceholder")}
@@ -418,27 +592,95 @@ export default function Header() {
               </label>
               <input
                 id="login-password"
+                name="password"
                 type="password"
                 className={styles.loginInput}
                 placeholder={t("account.passwordPlaceholder")}
               />
 
-              <div className={styles.accountLinksRow}>
-                <a href="#" className={styles.accountTextLink}>{t("account.forgotPassword")}</a>
-                <a href="#" className={styles.accountTextLink}>{t("account.register")}</a>
-              </div>
+              {accountMode === "register" && (
+                <>
+                  <label
+                    className={styles.loginLabel}
+                    htmlFor="register-password-confirmation"
+                  >
+                    Password confirmation
+                  </label>
+                  <input
+                    id="register-password-confirmation"
+                    name="passwordConfirmation"
+                    type="password"
+                    className={styles.loginInput}
+                    placeholder="Confirm your password"
+                  />
+                </>
+              )}
 
-              <button type="submit" className={styles.loginButton}>
-                {t("account.loginButton")}
+              {accountMode === "login" ? (
+                <div className={styles.accountLinksRow}>
+                  <a href="#" className={styles.accountTextLink}>
+                    {t("account.forgotPassword")}
+                  </a>
+                  <button
+                    type="button"
+                    className={styles.accountTextLink}
+                    onClick={() => switchAccountMode("register")}
+                  >
+                    {t("account.register")}
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.accountLinksRow}>
+                  <button
+                    type="button"
+                    className={styles.accountTextLink}
+                    onClick={() => switchAccountMode("login")}
+                  >
+                    Back to login
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className={styles.loginButton}
+                disabled={accountMode === "register" && isRegisterSubmitting}
+              >
+                {accountMode === "login"
+                  ? t("account.loginButton")
+                  : isRegisterSubmitting
+                    ? "Creating..."
+                    : "Create account"}
               </button>
             </form>
 
+            {accountToast && (
+              <div
+                className={`${styles.accountToast} ${
+                  accountToast.type === "success"
+                    ? styles.accountToastSuccess
+                    : styles.accountToastError
+                }`}
+                role="status"
+              >
+                {accountToast.message}
+              </div>
+            )}
+
             <div className={styles.socialLoginBlock}>
-              <p className={styles.socialDivider}>{t("account.orContinueWith")}</p>
+              <p className={styles.socialDivider}>
+                {t("account.orContinueWith")}
+              </p>
               <div className={styles.socialButtons}>
-                <button type="button" className={styles.socialButton}>Google</button>
-                <button type="button" className={styles.socialButton}>Facebook</button>
-                <button type="button" className={styles.socialButton}>Instagram</button>
+                <button type="button" className={styles.socialButton}>
+                  Google
+                </button>
+                <button type="button" className={styles.socialButton}>
+                  Facebook
+                </button>
+                <button type="button" className={styles.socialButton}>
+                  Instagram
+                </button>
               </div>
             </div>
           </div>

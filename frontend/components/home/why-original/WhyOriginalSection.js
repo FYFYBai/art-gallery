@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "../../../i18n/IntlContext";
+import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./WhyOriginalSection.module.css";
 import { whyOriginalCards } from "./whyOriginalData";
 
@@ -98,13 +96,11 @@ export default function WhyOriginalSection() {
           >
             <p className={styles.eyebrow}>{t("whyOriginalTitle")}</p>
 
-            <h2 className={styles.title}>
-              {t("whyOriginalSubtitle")}
-            </h2>
+            <h2 className={styles.title}>{t("whyOriginalSubtitle")}</h2>
 
-            <p className={styles.description}>
-              {t("whyOriginalBody")}
-            </p>
+            <span className={styles.titleRule} aria-hidden="true" />
+
+            <p className={styles.description}>{t("whyOriginalBody")}</p>
           </div>
         </div>
 
@@ -120,7 +116,9 @@ export default function WhyOriginalSection() {
               </div>
 
               <div className={styles.cardTextBlock}>
-                <p className={styles.cardEyebrow}>{card.eyebrow}</p>
+                {card.eyebrow && (
+                  <p className={styles.cardEyebrow}>{card.eyebrow}</p>
+                )}
                 <h3 className={styles.cardTitle}>{card.title}</h3>
                 <p className={styles.cardDescription}>{card.description}</p>
               </div>
