@@ -1,7 +1,8 @@
 import ArtworkGrid from "@/components/artworks/ArtworkGrid";
 
-export default function ArtworksPage({ searchParams }) {
-  const type = searchParams?.type ?? null;
+export default async function ArtworksPage({ searchParams }) {
+  const params = await searchParams;
+  const type = params?.type ?? null;
 
   return (
     <main>
