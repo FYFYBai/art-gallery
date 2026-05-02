@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./WhyOriginalSection.module.css";
 import { whyOriginalCards } from "./whyOriginalData";
 
 export default function WhyOriginalSection() {
+  const t = useTranslations("home");
   const sectionRef = useRef(null);
   const leftColumnRef = useRef(null);
   const leftContentRef = useRef(null);
@@ -94,21 +96,14 @@ export default function WhyOriginalSection() {
             className={`${styles.leftContent} ${stateClass}`}
             style={mode === "fixed" ? fixedStyle : undefined}
           >
-            <p className={styles.eyebrow}>WHY BUY ORIGINAL ART</p>
+            <p className={styles.eyebrow}>{t("whyOriginalTitle")}</p>
 
             <h2 className={styles.title}>
-              Collect art that
-              <br />
-              feels personal,
-              <br />
-              lasting, and
-              <br />
-              alive.
+              {t("whyOriginalSubtitle")}
             </h2>
 
             <p className={styles.description}>
-              Original works bring texture, individuality, and emotional weight
-              into a space in a way mass-produced decor usually cannot.
+              {t("whyOriginalBody")}
             </p>
           </div>
         </div>

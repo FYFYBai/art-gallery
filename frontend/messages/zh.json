@@ -1,0 +1,191 @@
+{
+  "nav": {
+    "artworks": "作品",
+    "series": "系列",
+    "about": "关于",
+    "exhibitions": "展览",
+    "contact": "联系"
+  },
+  "artworkTypes": {
+    "title": "作品",
+    "oilPaintings": "油画",
+    "watercolors": "水彩画",
+    "drawings": "素描",
+    "charcoal": "炭笔画"
+  },
+  "series": {
+    "title": "系列",
+    "impressionism": "印象派",
+    "abstraction": "抽象",
+    "landscapes": "风景",
+    "portraits": "肖像"
+  },
+  "exhibitions": {
+    "title": "展览",
+    "expo2022": "2022 — 联合展览，蒙特利尔",
+    "expo2023": "2023 — 蒙特利尔大学学生展览"
+  },
+  "promo": {
+    "artworks": {
+      "eyebrow": "收藏",
+      "title": "原创作品",
+      "description": "探索多种媒介的原创作品精选。",
+      "cta": "查看作品"
+    },
+    "series": {
+      "eyebrow": "系列",
+      "title": "主题世界",
+      "description": "按视觉风格、氛围和主题浏览作品。",
+      "cta": "探索系列"
+    },
+    "exhibitions": {
+      "eyebrow": "档案",
+      "title": "近期展览",
+      "description": "近期联合展览和学生展览概览。",
+      "cta": "查看展览"
+    }
+  },
+  "header": {
+    "logoLabel": "返回首页",
+    "cartLabel": "购物车",
+    "accountLabel": "账户",
+    "languageLabel": "语言选项"
+  },
+  "search": {
+    "artistName": "艺术家姓名",
+    "painting": "画作",
+    "returnPolicy": "退货政策"
+  },
+  "account": {
+    "eyebrow": "私人空间",
+    "title": "登录",
+    "description": "访问您的收藏、请求和私人精选。",
+    "emailLabel": "邮箱",
+    "emailPlaceholder": "name@example.com",
+    "passwordLabel": "密码",
+    "passwordPlaceholder": "您的密码",
+    "forgotPassword": "忘记密码？",
+    "register": "注册账户",
+    "loginButton": "登录",
+    "orContinueWith": "或继续使用"
+  },
+  "artworkGrid": {
+    "allArtworks": "所有作品",
+    "filter": "筛选",
+    "noArtworks": "该类别暂无作品。",
+    "artworkCount": "{count} 件作品",
+    "artworkCountPlural": "{count} 件作品"
+  },
+  "filterPanel": {
+    "title": "筛选",
+    "artworkType": "作品类型",
+    "medium": "媒介",
+    "priceRange": "价格区间",
+    "year": "年份",
+    "reset": "重置",
+    "apply": "应用",
+    "upTo": "最高 {price}",
+    "priceMax": "CA$10,000+"
+  },
+  "mediums": {
+    "canvas": "画布",
+    "paper": "纸张",
+    "woodPanel": "木板",
+    "mixedMedia": "混合媒介"
+  },
+  "footer": {
+    "subscribeTitle": "与工作室保持联系",
+    "subscribeText": "偶尔接收关于新作品、展览和画廊动态的更新。",
+    "emailLabel": "电子邮件地址",
+    "emailPlaceholder": "您的电子邮件地址",
+    "subscribe": "订阅",
+    "navLabel": "页脚导航",
+    "copyright": "© 2026 Art Gallery. 保留所有权利。",
+    "privacy": "隐私政策",
+    "terms": "使用条款"
+  },
+  "hero": {
+    "ariaLabel": "精选画廊作品",
+    "previousSlide": "上一张",
+    "nextSlide": "下一张"
+  },
+  "cart": {
+    "stepCart": "购物车",
+    "stepCheckout": "结账",
+    "stepConfirmation": "确认",
+    "proceedToCheckout": "前往结账",
+    "placeDemoOrder": "提交演示订单",
+    "backToCart": "返回购物车",
+    "emptyCart": "您的购物车是空的",
+    "continueShopping": "继续购物",
+    "checkoutEyebrow": "结账",
+    "checkoutTitle": "填写您的信息",
+    "checkoutText": "此结账页面已准备好用于未来的账单、配送和支付集成。",
+    "emailLabel": "邮箱",
+    "emailPlaceholder": "collector@example.com",
+    "fullNameLabel": "全名",
+    "fullNamePlaceholder": "您的姓名",
+    "addressLabel": "配送地址",
+    "addressPlaceholder": "街道地址",
+    "cityLabel": "城市",
+    "cityPlaceholder": "蒙特利尔",
+    "confirmationEyebrow": "确认",
+    "confirmationTitle": "请求已收到",
+    "confirmationText": "此确认页面将显示订单详情、收据信息和后续步骤。",
+    "demoOrder": "演示订单",
+    "customerService": "客户服务",
+    "serviceHours": "周一至周六 上午9点 - 下午6点 EST：",
+    "freeDelivery": "免费标准配送",
+    "returnsExchanges": "退换货",
+    "shopSecurely": "安全购物"
+  },
+  "home": {
+    "shopByCategory": "按类别购买",
+    "categoryPaintings": "绘画",
+    "categoryPhotography": "摄影",
+    "categoryFineArtPrints": "版画",
+    "categorySculpture": "雕塑",
+    "curatorFavorites": "策展人精选",
+    "previousCurator": "上一个精选",
+    "nextCurator": "下一个精选",
+    "curatedTitle": "个性化策展体验",
+    "curatedDescription": "发现您喜爱的艺术应该简单愉快。我们的专业策展人每周创建精选集，并提供免费的艺术顾问服务。",
+    "curatedCta": "联系顾问",
+    "whyShopTitle": "为什么在这里购买？",
+    "whyShopDescription": "探索原创绘画、艺术摄影、雕塑等精选原创艺术品。",
+    "whyShopOriginalPaintings": "原创绘画",
+    "whyShopPhotography": "艺术摄影",
+    "whyShopSculpture": "雕塑",
+    "whyCard1Title": "全球精选",
+    "whyCard1Text": "探索来自全球数千位艺术家的原创作品。",
+    "whyCard2Title": "满意保证",
+    "whyCard2Text": "我们的14天满意保证让您放心购买。",
+    "whyCard3Title": "数千个五星好评",
+    "whyCard3Text": "我们为所有买家提供世界级的客户服务。",
+    "whyCard4Title": "支持新兴艺术家",
+    "whyCard4Text": "我们为艺术家提供比其他画廊更高的销售分成。",
+    "whyOriginalTitle": "为什么购买原创艺术",
+    "whyOriginalSubtitle": "收藏一件有个人意义、持久而有生命力的作品。",
+    "whyOriginalBody": "原创作品以批量生产的装饰品无法比拟的方式，为空间带来质感、个性和情感重量。",
+    "displaySectionTitle": "进入作品的世界",
+    "displaySectionSubtitle": "探索不同的观看、感受和欣赏艺术的方式。",
+    "saveItem": "收藏",
+    "addToCollection": "加入收藏",
+    "addToCart": "加入购物车",
+    "shopByPrice": "按价格购买",
+    "priceUnder700": "C$700以下",
+    "price700to1400": "C$700–C$1,400",
+    "price1400to2800": "C$1,400–C$2,800",
+    "price2800to7000": "C$2,800–C$7,000"
+  },
+  "about": {
+    "eyebrow": "关于",
+    "name": "Sylvaine",
+    "intro": "Sylvaine 是一位驻蒙特利尔的画家。",
+    "body": "她的作品通过油画和素描探索光线、感知和风景记忆。",
+    "portraitEyebrow": "艺术家肖像",
+    "imageAlt": "工作室与抽象画",
+    "metaTitle": "关于 | Sylvaine",
+    "metaDescription": "关于驻蒙特利尔画家 Sylvaine。"
+  }
+}

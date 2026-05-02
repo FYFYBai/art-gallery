@@ -1,22 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./CartSection.module.css";
 import { CartIcon } from "@/components/header/icons";
 
-const STEPS = ["Cart", "Checkout", "Confirmation"];
-
-function getNextButtonLabel(currentStep) {
-  if (currentStep === 1) return "Proceed to Checkout";
-  if (currentStep === 2) return "Place Demo Order";
-  return "Back to Cart";
-}
-
 export default function CartSection() {
+  const t = useTranslations("cart");
   const [currentStep, setCurrentStep] = useState(1);
+
+  const STEPS = [t("stepCart"), t("stepCheckout"), t("stepConfirmation")];
 
   const progressWidth = `${((currentStep - 0.5) / STEPS.length) * 100}%`;
   const progressTrackWidth = `${((STEPS.length - 0.5) / STEPS.length) * 100}%`;
+
+  const getNextButtonLabel = () => {
+    if (currentStep === 1) return t("proceedToCheckout");
+    if (currentStep === 2) return t("placeDemoOrder");
+    return t("backToCart");
+  };
 
   const handleNextStep = () => {
     setCurrentStep((prev) => (prev === STEPS.length ? 1 : prev + 1));
@@ -25,28 +27,18 @@ export default function CartSection() {
   return (
     <section className={styles.cartPage}>
       <div className={styles.inner}>
-        {/* Top progress stepper */}
         <div className={styles.stepper}>
-          <div
-            className={styles.stepperLine}
-            style={{ width: progressTrackWidth }}
-          />
-          <div
-            className={styles.stepperFill}
-            style={{ width: progressWidth }}
-          />
+          <div className={styles.stepperLine} style={{ width: progressTrackWidth }} />
+          <div className={styles.stepperFill} style={{ width: progressWidth }} />
 
           <div className={styles.stepItems}>
             {STEPS.map((label, index) => {
               const stepNumber = index + 1;
-
               const stepClassName = [
                 styles.step,
                 stepNumber < currentStep ? styles.completed : "",
                 stepNumber === currentStep ? styles.active : "",
-              ]
-                .filter(Boolean)
-                .join(" ");
+              ].filter(Boolean).join(" ");
 
               return (
                 <div key={label} className={stepClassName}>
@@ -58,63 +50,40 @@ export default function CartSection() {
           </div>
         </div>
 
-        {/* Main content */}
         <div className={styles.contentGrid}>
-          {/* Left side */}
           <div className={styles.cartPanel}>
             {currentStep === 1 && (
               <div className={styles.emptyState}>
                 <div className={styles.bagIcon} aria-hidden="true">
                   <CartIcon className={styles.bagSvg} />
                 </div>
-
-                <p className={styles.emptyText}>Your cart is empty</p>
-
-                <button className={styles.shopButton}>Continue Shopping</button>
+                <p className={styles.emptyText}>{t("emptyCart")}</p>
+                <button className={styles.shopButton}>{t("continueShopping")}</button>
               </div>
             )}
 
             {currentStep === 2 && (
               <div className={styles.checkoutState}>
-                <p className={styles.panelEyebrow}>Checkout</p>
-                <h1 className={styles.panelTitle}>Complete your details</h1>
-                <p className={styles.panelText}>
-                  This sample checkout view is ready for future billing,
-                  delivery, and payment integrations.
-                </p>
+                <p className={styles.panelEyebrow}>{t("checkoutEyebrow")}</p>
+                <h1 className={styles.panelTitle}>{t("checkoutTitle")}</h1>
+                <p className={styles.panelText}>{t("checkoutText")}</p>
 
                 <div className={styles.checkoutGrid}>
                   <label className={styles.fieldLabel}>
-                    Email
-                    <input
-                      className={styles.fieldInput}
-                      type="email"
-                      placeholder="collector@example.com"
-                    />
+                    {t("emailLabel")}
+                    <input className={styles.fieldInput} type="email" placeholder={t("emailPlaceholder")} />
                   </label>
                   <label className={styles.fieldLabel}>
-                    Full name
-                    <input
-                      className={styles.fieldInput}
-                      type="text"
-                      placeholder="Your name"
-                    />
+                    {t("fullNameLabel")}
+                    <input className={styles.fieldInput} type="text" placeholder={t("fullNamePlaceholder")} />
                   </label>
                   <label className={styles.fieldLabel}>
-                    Delivery address
-                    <input
-                      className={styles.fieldInput}
-                      type="text"
-                      placeholder="Street address"
-                    />
+                    {t("addressLabel")}
+                    <input className={styles.fieldInput} type="text" placeholder={t("addressPlaceholder")} />
                   </label>
                   <label className={styles.fieldLabel}>
-                    City
-                    <input
-                      className={styles.fieldInput}
-                      type="text"
-                      placeholder="Montréal"
-                    />
+                    {t("cityLabel")}
+                    <input className={styles.fieldInput} type="text" placeholder={t("cityPlaceholder")} />
                   </label>
                 </div>
               </div>
@@ -125,30 +94,22 @@ export default function CartSection() {
                 <div className={styles.confirmationMark} aria-hidden="true">
                   <span />
                 </div>
-                <p className={styles.panelEyebrow}>Confirmation</p>
-                <h1 className={styles.panelTitle}>Request received</h1>
-                <p className={styles.panelText}>
-                  This sample confirmation page shows where order details,
-                  receipt information, and next steps will appear.
-                </p>
-
+                <p className={styles.panelEyebrow}>{t("confirmationEyebrow")}</p>
+                <h1 className={styles.panelTitle}>{t("confirmationTitle")}</h1>
+                <p className={styles.panelText}>{t("confirmationText")}</p>
                 <div className={styles.confirmationSummary}>
-                  <span>Demo order</span>
+                  <span>{t("demoOrder")}</span>
                   <strong>AG-2026-001</strong>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right side */}
           <aside className={styles.servicePanel}>
-            <div className={styles.serviceHeader}>Customer Service</div>
-
+            <div className={styles.serviceHeader}>{t("customerService")}</div>
             <div className={styles.serviceBody}>
-              <p>Monday to Saturday 9am - 6pm EST :</p>
-              <a href="tel:18557708626" className={styles.servicePhone}>
-                1-855-770-8626
-              </a>
+              <p>{t("serviceHours")}</p>
+              <a href="tel:18557708626" className={styles.servicePhone}>1-855-770-8626</a>
             </div>
 
             <div className={styles.serviceFeatures}>
@@ -159,13 +120,8 @@ export default function CartSection() {
                   <circle cx="7" cy="18" r="1.7" />
                   <circle cx="18" cy="18" r="1.7" />
                 </svg>
-                <span>
-                  Free standard
-                  <br />
-                  delivery
-                </span>
+                <span>{t("freeDelivery")}</span>
               </div>
-
               <div className={styles.featureItem}>
                 <svg viewBox="0 0 24 24" className={styles.featureIcon}>
                   <path d="M7 7H21" />
@@ -173,20 +129,15 @@ export default function CartSection() {
                   <path d="M17 17H3" />
                   <path d="M7 13l-4 4 4 4" />
                 </svg>
-                <span>
-                  Returns &
-                  <br />
-                  exchanges
-                </span>
+                <span>{t("returnsExchanges")}</span>
               </div>
-
               <div className={styles.featureItem}>
                 <svg viewBox="0 0 24 24" className={styles.featureIcon}>
                   <path d="M7 10V7a5 5 0 0 1 10 0v3" />
                   <rect x="5" y="10" width="14" height="10" rx="1" />
                   <path d="M12 14v3" />
                 </svg>
-                <span>Shop securely</span>
+                <span>{t("shopSecurely")}</span>
               </div>
             </div>
           </aside>
@@ -194,7 +145,7 @@ export default function CartSection() {
 
         <div className={styles.demoFlowControls}>
           <button type="button" className={styles.nextButton} onClick={handleNextStep}>
-            {getNextButtonLabel(currentStep)}
+            {getNextButtonLabel()}
           </button>
         </div>
       </div>

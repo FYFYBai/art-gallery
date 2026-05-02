@@ -1,31 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./FilterPanel.module.css";
 
-const ARTWORK_TYPES = [
-  "Oil Painting",
-  "Watercolor",
-  "Drawing",
-  "Charcoal",
-];
-
-const MEDIUMS = [
-  "Canvas",
-  "Paper",
-  "Wood Panel",
-  "Mixed Media",
-];
-
-const YEARS = [2024, 2025, 2026];
+const ARTWORK_TYPE_KEYS = ["oilPaintings", "watercolors", "drawings", "charcoal"];
+const MEDIUM_KEYS       = ["canvas", "paper", "woodPanel", "mixedMedia"];
+const YEARS             = [2024, 2025, 2026];
 
 export default function FilterPanel({ isOpen, onClose, onApply }) {
-  const [selectedTypes, setSelectedTypes]   = useState([]);
-  const [selectedMediums, setSelectedMediums] = useState([]);
-  const [maxPrice, setMaxPrice]             = useState(5000);
-  const [selectedYears, setSelectedYears]   = useState([]);
+  const t       = useTranslations("filterPanel");
+  const tTypes  = useTranslations("artworkTypes");
+  const tMediums = useTranslations("mediums");
 
-  const toggleItem = (list, setList, value) => {
+  const [selectedTypes,   setSelectedTypes]   = useState([]);
+  const [selectedMediums, setSelectedMediums] = useState([]);
+  const [maxPrice,        setMaxPrice]        = useState(5000);
+  const [selectedYears,   setSelectedYears]   = useState([]);
+
+  const toggleItem = (setList, value) => {
     setList((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
@@ -45,24 +38,22 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
   return (
     <>
-      {/* backdrop */}
       {isOpen && (
         <div className={styles.backdrop} onClick={onClose} aria-hidden="true" />
       )}
 
-      {/* panel */}
       <aside
         className={`${styles.panel} ${isOpen ? styles.isOpen : ""}`}
-        aria-label="Filter artworks"
+        aria-label={t("title")}
         role="dialog"
         aria-modal="true"
       >
         <div className={styles.panelHeader}>
-          <h2 className={styles.panelTitle}>Filters</h2>
+          <h2 className={styles.panelTitle}>{t("title")}</h2>
           <button
             type="button"
             className={styles.closeButton}
-            aria-label="Close filters"
+            aria-label={t("title")}
             onClick={onClose}
           >
             ×
@@ -73,18 +64,18 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
           {/* Artwork Type */}
           <section className={styles.filterSection}>
-            <h3 className={styles.sectionTitle}>Artwork Type</h3>
+            <h3 className={styles.sectionTitle}>{t("artworkType")}</h3>
             <ul className={styles.checkList}>
-              {ARTWORK_TYPES.map((type) => (
-                <li key={type}>
+              {ARTWORK_TYPE_KEYS.map((key) => (
+                <li key={key}>
                   <label className={styles.checkLabel}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
-                      checked={selectedTypes.includes(type)}
-                      onChange={() => toggleItem(selectedTypes, setSelectedTypes, type)}
+                      checked={selectedTypes.includes(key)}
+                      onChange={() => toggleItem(setSelectedTypes, key)}
                     />
-                    {type}
+                    {tTypes(key)}
                   </label>
                 </li>
               ))}
@@ -93,18 +84,18 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
           {/* Medium */}
           <section className={styles.filterSection}>
-            <h3 className={styles.sectionTitle}>Medium</h3>
+            <h3 className={styles.sectionTitle}>{t("medium")}</h3>
             <ul className={styles.checkList}>
-              {MEDIUMS.map((medium) => (
-                <li key={medium}>
+              {MEDIUM_KEYS.map((key) => (
+                <li key={key}>
                   <label className={styles.checkLabel}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
-                      checked={selectedMediums.includes(medium)}
-                      onChange={() => toggleItem(selectedMediums, setSelectedMediums, medium)}
+                      checked={selectedMediums.includes(key)}
+                      onChange={() => toggleItem(setSelectedMediums, key)}
                     />
-                    {medium}
+                    {tMediums(key)}
                   </label>
                 </li>
               ))}
@@ -113,7 +104,7 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
           {/* Price Range */}
           <section className={styles.filterSection}>
-            <h3 className={styles.sectionTitle}>Price Range</h3>
+            <h3 className={styles.sectionTitle}>{t("priceRange")}</h3>
             <div className={styles.sliderWrap}>
               <input
                 type="range"
@@ -123,14 +114,14 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className={styles.slider}
-                aria-label="Maximum price"
+                aria-label={t("priceRange")}
               />
               <div className={styles.sliderLabels}>
                 <span>CA$0</span>
                 <span>
                   {maxPrice === 10000
-                    ? "CA$10,000+"
-                    : `Up to CA$${maxPrice.toLocaleString("en-CA")}`}
+                    ? t("priceMax")
+                    : `CA$${maxPrice.toLocaleString("en-CA")}`}
                 </span>
               </div>
             </div>
@@ -138,7 +129,7 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
           {/* Year */}
           <section className={styles.filterSection}>
-            <h3 className={styles.sectionTitle}>Year</h3>
+            <h3 className={styles.sectionTitle}>{t("year")}</h3>
             <ul className={styles.checkList}>
               {YEARS.map((year) => (
                 <li key={year}>
@@ -147,7 +138,7 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
                       type="checkbox"
                       className={styles.checkbox}
                       checked={selectedYears.includes(year)}
-                      onChange={() => toggleItem(selectedYears, setSelectedYears, year)}
+                      onChange={() => toggleItem(setSelectedYears, year)}
                     />
                     {year}
                   </label>
@@ -160,10 +151,10 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
 
         <div className={styles.panelFooter}>
           <button type="button" className={styles.resetButton} onClick={handleReset}>
-            Reset
+            {t("reset")}
           </button>
           <button type="button" className={styles.applyButton} onClick={handleApply}>
-            Apply
+            {t("apply")}
           </button>
         </div>
       </aside>

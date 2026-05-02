@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "../../../i18n/IntlContext";
 import styles from "./Hero.module.css";
 import heroSlides from "./heroSlides";
 
 export default function Hero() {
+  const t = useTranslations("hero");
   const [activeIndex, setActiveIndex] = useState(0);
   const timerRef = useRef(null);
 
@@ -44,7 +46,7 @@ export default function Hero() {
   }, [activeIndex, startSlideTimer, clearSlideTimer]);
 
   return (
-    <section className={styles.hero} aria-label="Featured gallery highlights">
+    <section className={styles.hero} aria-label={t("ariaLabel")}>
       <div className={styles.slidesWrapper}>
         {heroSlides.map((slide, index) => {
           const isActive = index === activeIndex;
@@ -80,7 +82,7 @@ export default function Hero() {
         type="button"
         className={`${styles.sideControl} ${styles.leftControl}`}
         onClick={goToPrevious}
-        aria-label="Previous slide"
+        aria-label={t("previousSlide")}
       >
         <span className={styles.arrow}>&lsaquo;</span>
       </button>
@@ -89,7 +91,7 @@ export default function Hero() {
         type="button"
         className={`${styles.sideControl} ${styles.rightControl}`}
         onClick={goToNext}
-        aria-label="Next slide"
+        aria-label={t("nextSlide")}
       >
         <span className={styles.arrow}>&rsaquo;</span>
       </button>
