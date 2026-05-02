@@ -38,13 +38,24 @@ npm.cmd run dev
 
 Run frontend commands from `frontend/`. Use `npm.cmd` on Windows PowerShell if `npm` is blocked by execution policy.
 
+Backend demo commands:
+
+```powershell
+docker compose up -d
+cd backend
+mvn test
+mvn spring-boot:run
+```
+
+The backend uses PostgreSQL from `docker-compose.yml` and defaults to `http://localhost:8080`.
+
 ## Important Working Notes
 
 - Ignore `.next` and `node_modules` unless absolutely necessary.
 - The shell may display some UTF-8/French/Chinese characters incorrectly as mojibake. Do not “fix” text just because shell output looks corrupted. The user confirmed these strings display fine in the IDE and live server.
 - Do not use emojis unless the user explicitly asks for them.
 - Current lint result: `npm.cmd run lint` passes with `0 errors`, but has warnings about raw `<img>` usage. These warnings are accepted for now because image handling is temporary.
-- Many images are currently hardcoded external placeholders from Unsplash or Picsum. This is intentional for now.
+- Many images are still temporary, but several homepage sections now use local files under `frontend/public/images/...`.
 - The user may later ask to reverse the recent animation/performance optimization pass. Those changes are primarily CSS-only and listed below.
 
 ## Backend Status
@@ -82,6 +93,34 @@ The following layers are scaffolded but not yet implemented:
 
 The repository layer (`com.artgallery.repository`) is already present with all necessary JpaRepository interfaces.
 
+### Current Backend Demo Slice
+
+The backend is no longer purely scaffolded. A narrow registration demo has been implemented end-to-end:
+
+- `POST /api/auth/register`
+- Validates email, password length, and password confirmation.
+- Normalizes email to lowercase.
+- Rejects duplicate emails with `409 Conflict`.
+- Hashes passwords with BCrypt before storing `users.password_hash`.
+- Saves a `User` through `UserRepository`.
+- CORS is configured for local frontend dev origins such as `http://localhost:*` and `http://127.0.0.1:*`.
+- `mvn test` passes with 4 registration validation tests.
+
+Registration demo files:
+
+```txt
+backend/src/main/java/com/artgallery/controller/AuthController.java
+backend/src/main/java/com/artgallery/service/AuthService.java
+backend/src/main/java/com/artgallery/config/SecurityConfig.java
+backend/src/main/java/com/artgallery/dto/request/RegisterRequest.java
+backend/src/main/java/com/artgallery/dto/response/RegisterResponse.java
+backend/src/main/java/com/artgallery/dto/response/ApiErrorResponse.java
+backend/src/main/java/com/artgallery/exception/DuplicateEmailException.java
+backend/src/main/java/com/artgallery/exception/GlobalExceptionHandler.java
+backend/src/test/java/com/artgallery/dto/request/RegisterRequestValidationTest.java
+REGISTRATION_DEMO_FLOW.txt
+```
+
 ### For Future Sessions
 
 When implementing the service/controller layer:
@@ -108,6 +147,7 @@ frontend/eslint.config.mjs
 backend/
 docker-compose.yml
 CODEX_PROJECT_CONTEXT.md
+REGISTRATION_DEMO_FLOW.txt
 ```
 
 Path alias:
@@ -306,6 +346,7 @@ User rule:
 
 - `Noto Serif` for titles/headings.
 - Sans-serif for body text, UI, labels, buttons, forms, navigation.
+- Refined homepage editorial sections may use the local Playfair Display font via `--font-display`.
 
 Implemented through `next/font/google` in `frontend/app/layout.js`:
 
@@ -319,6 +360,8 @@ Global aliases in `frontend/app/globals.css`:
 ```css
 --font-body: var(--font-sans);
 --font-title: var(--font-serif);
+--font-logo: "Sylvaine Didot", serif;
+--font-display: "Sylvaine Playfair", serif;
 ```
 
 Use:
@@ -426,7 +469,9 @@ The search bar is a real input inside a form.
 
 Behavior:
 
-- Rotating search text is now placeholder filler only.
+- Rotating search text is an animated overlay placeholder, not a native input placeholder.
+- The fixed prefix `Search for` stays in place while only the keyword moves up/out and the next keyword enters from below.
+- Header search animation uses `searchTermIndex`, `previousSearchTermIndex`, `searchTermAnimating`, and CSS keyframes in `Header.module.css`.
 - User can type normally.
 - A custom `×` clear button appears when input has content.
 - A right-arrow submit button appears when input has content.
@@ -448,16 +493,17 @@ Behavior:
 - Closes on outside click.
 - Closes on Escape.
 - Closes via `×` button.
-- Front-end only.
+- Login UI is mostly presentational, but registration now talks to the Spring Boot demo endpoint.
 
 Content:
 
-- Email input.
-- Password input.
-- Forgot password link.
-- Register account link.
-- Login button.
-- Social login buttons: Google, Facebook, Instagram.
+- Login mode: email, password, forgot password link, register account link, login button.
+- Register mode: email, password, password confirmation, back-to-login link, create account button.
+- Register mode calls `POST /api/auth/register` through `handleAccountSubmit`.
+- Frontend registration validation checks required fields, minimum password length, and password confirmation.
+- A temporary `accountToast` success/failure message appears inside the modal.
+- The frontend uses `NEXT_PUBLIC_API_BASE_URL` if set, otherwise `http://localhost:8080`.
+- Social login buttons: Google, Facebook, Instagram. These remain visible under both login and registration modes.
 
 CSS classes are in `Header.module.css`, including:
 
@@ -466,6 +512,7 @@ CSS classes are in `Header.module.css`, including:
 .accountModal
 .accountModalClose
 .loginForm
+.accountToast
 .socialButtons
 ```
 
@@ -528,9 +575,16 @@ Peinture, entre mémoire et paysage.
 À propos
 ```
 
-Images are hardcoded remote placeholders in `heroSlides.js`.
+Older note: images used to be hardcoded remote placeholders in `heroSlides.js`; current hero images are local files under `frontend/public/images/hero/`.
 
 Styling uses a content card over a background image, with warm overlay and animated entry.
+
+Current hero refinement notes:
+
+- Hero images are now local files under `frontend/public/images/hero/` named `1.png`, `2.png`, and `3.png`.
+- `heroSlides.js` points to `/images/hero/1.png`, `/images/hero/2.png`, and `/images/hero/3.png`.
+- The supplied hero PNGs are treated as designed banner comps. CSS uses `background-size: 100% 100%` to avoid both cropping and letterboxing.
+- The text layer was restyled toward an editorial hero: no content card, navbar-style logo font for `SYLVAINE ART`, Playfair/Didot-like headline treatment, divider, CTA arrow, and non-selectable hero text.
 
 ### Display Sample
 
@@ -543,11 +597,20 @@ frontend/components/home/display-sample/DisplaySample.module.css
 
 Homepage section with four sample artwork/category cards.
 
-Uses hardcoded remote images.
+Older note: this section used to use hardcoded remote images; it now uses local files under `frontend/public/images/display-sample/`.
 
 Titles use `Noto Serif`.
 
 Action links use animated underline hover.
+
+Current display-sample refinement notes:
+
+- Images are now local files under `frontend/public/images/display-sample/` named `display1.png` through `display4.png`.
+- `DisplaySample.js` contains French editorial card content and uses proper French ligatures where added in the IDE/browser source.
+- The section heading/subheading is editorial and the subheading is kept one line on desktop.
+- `DisplaySample.module.css` uses Playfair Display via `--font-display` for section and card titles.
+- Supporting text in this section uses serif.
+- Cards have thin borders, tall image ratios, subtle whole-card hover lift, and CTA underline animation.
 
 ### Why Original
 
@@ -563,9 +626,18 @@ Interactive client section with custom sticky/fixed behavior for the left text c
 
 Right side uses cards from `whyOriginalData.js`.
 
-Images are temporary hardcoded remote placeholders.
+Older note: images used to be temporary remote placeholders; this section now uses local files under `frontend/public/images/why-original/`.
 
 Important: This component manually calculates sticky behavior with scroll/resize listeners. Be careful editing this logic.
+
+Current why-original refinement notes:
+
+- Images are now local files under `frontend/public/images/why-original/` named `1.png` through `5.png`.
+- `whyOriginalData.js` contains five French cards; reference numbering was intentionally removed.
+- Card descriptions use real `\n` sentence breaks and `.cardDescription { white-space: pre-line; }`.
+- Left copy is now French editorial copy similar to: `L'ART DANS VOTRE QUOTIDIEN` and `Habiter une œuvre, c'est habiter une sensation.`
+- Left heading uses Playfair Display via `--font-display`.
+- Card spacing was tightened, the image column was made larger, images fill the card height on desktop/tablet, and corners are only subtly rounded.
 
 ### Curator Favorites
 
@@ -702,7 +774,11 @@ Current image implementation is temporary:
 - Many sections use external URLs from Unsplash or Picsum.
 - Some components use raw `<img>`.
 - Hero uses CSS background images.
-- `frontend/public/` currently contains the favicon, local font files, and legal-policy document placeholders, but not real artwork.
+- `frontend/public/` now contains the favicon, local font files, legal-policy document placeholders, and local demo artwork/images.
+- Local demo image folders currently include:
+  - `frontend/public/images/hero/`
+  - `frontend/public/images/display-sample/`
+  - `frontend/public/images/why-original/`
 
 Do not invest heavily in image optimization unless the user asks, because real image implementation is planned later.
 
@@ -757,6 +833,18 @@ accountOpen;
 searchQuery;
 searchTermIndex;
 ```
+
+### Inspect language switching
+
+Current language UI lives in:
+
+```txt
+frontend/components/header/Header.js
+frontend/components/header/headerData.js
+frontend/components/header/Header.module.css
+```
+
+As of this context update, language options only open as a menu and do not switch site content. The next planned task is to inspect how the user's colleague implements language switching and decide how to integrate it with the current frontend structure.
 
 ### Change global palette or typography
 
@@ -842,7 +930,9 @@ frontend/components/header/NavDropdown.js
 
 - Cart flow is temporary demo state only. It does not persist cart data and has no checkout backend.
 - Search submit logic is placeholder hash routing only.
-- Account modal form and social login buttons are front-end only.
+- Account modal login and social buttons are still presentational.
+- Account modal registration is a real demo path connected to `POST /api/auth/register`.
+- Language switching is not yet implemented beyond the language menu UI. The user plans to inspect how a colleague handles language switching next.
 
 ## Suggested Next Cleanup
 
@@ -865,8 +955,18 @@ If the user asks to make structure cleaner:
 ## Session Notes (May 1, 2026)
 
 - Backend database schema is finalized and solid. Flyway migrations are complete (V1–V10).
-- Backend service/controller layer is pending implementation.
+- Backend service/controller layer was pending at the start of the session; the registration demo slice is now implemented, while broader auth/user/artwork/cart/order APIs remain pending.
 - **Today's focus**: Refining the homepage layout and sections.
   - Review and adjust existing homepage sections (Hero, DisplaySample, WhyOriginal, CuratorFavorites, CuratedExperience).
   - Consider polish, spacing, and visual hierarchy.
   - Sections not rendered (ShopCategory, WhyShop, FeaturedRows) remain available for future use.
+
+## Session Update (May 2026)
+
+- Backend service/controller layer is no longer entirely pending: registration demo slice is implemented and documented in `REGISTRATION_DEMO_FLOW.txt`.
+- Hero now uses local banner images and editorial overlay text.
+- DisplaySample now uses local card images, Playfair titles, French editorial copy, bordered cards, and whole-card hover motion.
+- WhyOriginal now uses local card images, French editorial left copy, updated card copy, tighter card spacing, larger image column, and sentence-broken descriptions.
+- Header search placeholder animates only the changing keyword while `Search for` stays fixed.
+- Header account modal supports a demo registration flow against the Spring Boot backend.
+- Next area to inspect: language switching implementation from the user's colleague.
