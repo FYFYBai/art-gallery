@@ -1,5 +1,5 @@
 .section {
-  padding: 56px 32px 72px;
+  padding: 30px 32px 42px;
   background: var(--surface-main);
 }
 
@@ -10,19 +10,27 @@
 
 .headerRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
 .title {
-  font-family: var(--font-title), serif;
-  font-size: 1.95rem;
-  line-height: 1.08;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), serif;
+  font-size: 2.05rem;
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: 0;
   color: var(--text-main);
+}
+
+.subtitle {
+  margin-top: 8px;
+  font-family: var(--font-title), serif;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-muted);
 }
 
 .controls {
@@ -96,7 +104,7 @@
 
 .pageGrid {
   display: grid;
-  gap: 22px;
+  gap: 24px;
 }
 
 .card {
@@ -110,10 +118,10 @@
 
 .imageWrap {
   width: 100%;
-  aspect-ratio: 1.42 / 1;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   background: var(--surface-strong);
-  border-radius: var(--radius-sm);
+  border-radius: 7px;
   contain: paint;
 }
 
@@ -133,11 +141,11 @@
 
 .cardTitleLink {
   display: inline-block;
-  margin-top: 12px;
-  font-family: var(--font-title), serif;
-  font-size: 1rem;
+  margin-top: 14px;
+  font-family: var(--font-display), serif;
+  font-size: 1.05rem;
   line-height: 1.35;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-main);
   text-decoration: none;
   transition: color 0.25s ease;
@@ -163,14 +171,25 @@
   transform: scaleX(1);
 }
 
+.cardDescription {
+  margin-top: 10px;
+  max-width: 31ch;
+  font-family: var(--font-title), serif;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  white-space: pre-line;
+}
+
 @media (max-width: 900px) {
   .section {
-    padding: 48px 24px 60px;
+    padding: 34px 24px 48px;
   }
 }
 
 @media (max-width: 640px) {
   .headerRow {
+    align-items: flex-start;
     margin-bottom: 22px;
   }
 
@@ -180,7 +199,11 @@
   }
 
   .title {
-    font-size: 1.35rem;
+    font-size: 1.55rem;
     line-height: 1.12;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
   }
 }

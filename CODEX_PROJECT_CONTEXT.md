@@ -359,4 +359,3 @@ frontend/components/header/Header.js
 frontend/components/header/headerData.js
 frontend/components/header/Header.module.css
 ```
-
