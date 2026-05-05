@@ -12,79 +12,37 @@ const AUTOPLAY_DELAY_MS = 10000;
 
 const curatorItems = [
   {
-    id: "best-of-2026",
-    title: "Best Of 2026",
-    image: "https://picsum.photos/seed/curator-1/900/640",
+    id: "presence-urbaine",
+    title: "Présence urbaine",
+    description: "Entre mouvement et lumière,\nla ville devient sensation.",
+    image: "/images/curator-favorites/1.jpg",
   },
   {
-    id: "arresting-abstracts",
-    title: "Arresting Abstracts",
-    image: "https://picsum.photos/seed/curator-2/900/640",
+    id: "paysage-ouvert",
+    title: "Paysage ouvert",
+    description:
+      "Un espace extérieur où la lumière\nse reflète et s'étire dans le temps.",
+    image: "/images/curator-favorites/2.jpg",
+    imagePosition: "center 3%",
   },
   {
-    id: "featured-sculptures",
-    title: "Featured Sculptures",
-    image: "https://picsum.photos/seed/curator-3/900/640",
+    id: "interiorite",
+    title: "Intériorité",
+    description: "Une présence fragile,\nentre regard et transformation.",
+    image: "/images/curator-favorites/3.jpg",
   },
   {
-    id: "powerful-portraits",
-    title: "Powerful Portraits",
-    image: "https://picsum.photos/seed/curator-4/900/640",
+    id: "lumiere-vibrante",
+    title: "Lumière vibrante",
+    description: "La couleur devient énergie,\net transforme le paysage.",
+    image: "/images/curator-favorites/4.jpg",
+    imagePosition: "center 12%",
   },
   {
-    id: "vibrant-landscapes",
-    title: "Vibrant Landscapes",
-    image: "https://picsum.photos/seed/curator-5/900/640",
-  },
-  {
-    id: "studio-selections",
-    title: "Studio Selections",
-    image: "https://picsum.photos/seed/curator-6/900/640",
-  },
-  {
-    id: "quiet-interiors",
-    title: "Quiet Interiors",
-    image: "https://picsum.photos/seed/curator-7/900/640",
-  },
-  {
-    id: "monochrome-moments",
-    title: "Monochrome Moments",
-    image: "https://picsum.photos/seed/curator-8/900/640",
-  },
-  {
-    id: "colour-and-light",
-    title: "Colour and Light",
-    image: "https://picsum.photos/seed/curator-9/900/640",
-  },
-  {
-    id: "textural-works",
-    title: "Textural Works",
-    image: "https://picsum.photos/seed/curator-10/900/640",
-  },
-  {
-    id: "gestural-series",
-    title: "Gestural Series",
-    image: "https://picsum.photos/seed/curator-11/900/640",
-  },
-  {
-    id: "framed-favorites",
-    title: "Framed Favorites",
-    image: "https://picsum.photos/seed/curator-12/900/640",
-  },
-  {
-    id: "earth-tone-edit",
-    title: "Earth Tone Edit",
-    image: "https://picsum.photos/seed/curator-13/900/640",
-  },
-  {
-    id: "collectors-choice",
-    title: "Collector's Choice",
-    image: "https://picsum.photos/seed/curator-14/900/640",
-  },
-  {
-    id: "new-perspectives",
-    title: "New Perspectives",
-    image: "https://picsum.photos/seed/curator-15/900/640",
+    id: "silence-nocturne",
+    title: "Silence nocturne",
+    description: "La ville s'apaise,\net la lumière reste.",
+    image: "/images/curator-favorites/5.png",
   },
 ];
 
@@ -207,7 +165,12 @@ export default function CuratorFavoritesSection() {
     >
       <div className={styles.inner}>
         <div className={styles.headerRow}>
-          <h2 className={styles.title}>{t("curatorFavorites")}</h2>
+          <div>
+            <h2 className={styles.title}>Regards choisis</h2>
+            <p className={styles.subtitle}>
+              Cinq façons de ressentir le monde, à travers mes œuvres.
+            </p>
+          </div>
 
           <div className={styles.controls}>
             <button
@@ -260,6 +223,11 @@ export default function CuratorFavoritesSection() {
                             src={item.image}
                             alt={item.title}
                             className={styles.image}
+                            style={
+                              item.imagePosition
+                                ? { objectPosition: item.imagePosition }
+                                : undefined
+                            }
                           />
                         </div>
                       </a>
@@ -267,6 +235,9 @@ export default function CuratorFavoritesSection() {
                       <a href="#" className={styles.cardTitleLink}>
                         {item.title}
                       </a>
+                      <p className={styles.cardDescription}>
+                        {item.description}
+                      </p>
                     </article>
                   ))}
                 </div>
