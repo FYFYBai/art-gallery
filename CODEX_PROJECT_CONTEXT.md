@@ -1,161 +1,110 @@
 # Codex Project Context
 
-This file is a handoff guide for future Codex sessions working on this repository. Read this before making changes. It captures the current structure, conventions, design direction, and feature locations so future sessions can avoid rediscovering the project from scratch.
+This file is for Codex handoff only. Keep it compact and current. Do not treat it as user-facing documentation.
 
-## Project Overview
+## Current Focus
 
-This is a Next.js frontend for an art gallery / artist portfolio-style ecommerce site. The project uses the Next.js App Router and React client components where interactivity is needed.
+- Frontend homepage refinement is in progress.
+- Next planned area: inspect how the user's colleague implements language switching and decide how to integrate it with the current header/language menu.
 
-Primary goals so far:
-
-- Build a warm, refined art-gallery frontend.
-- Use a French-facing navigation/content direction.
-- Keep the global header and footer persistent across route pages.
-- Keep page sections modular, with one component folder per feature section.
-- Use temporary hardcoded image URLs for now, while leaving the structure ready for future real image implementation.
-
-## Stack
-
-- Next.js `^16.2.4`
-- React `19.2.3`
-- React DOM `19.2.3`
-- ESLint `9`
-- `eslint-config-next` `16.1.6`
-- `babel-plugin-react-compiler` `1.0.0`
-- JavaScript, not TypeScript
-- CSS Modules for component styling
-- `next/font/google` for typography
-
-Useful commands:
-
-```powershell
-cd frontend
-npm.cmd run lint
-npm.cmd run build
-npm.cmd run start
-npm.cmd run dev
-```
-
-Run frontend commands from `frontend/`. Use `npm.cmd` on Windows PowerShell if `npm` is blocked by execution policy.
-
-## Important Working Notes
-
-- Ignore `.next` and `node_modules` unless absolutely necessary.
-- The shell may display some UTF-8/French/Chinese characters incorrectly as mojibake. Do not “fix” text just because shell output looks corrupted. The user confirmed these strings display fine in the IDE and live server.
-- Do not use emojis unless the user explicitly asks for them.
-- Current lint result: `npm.cmd run lint` passes with `0 errors`, but has warnings about raw `<img>` usage. These warnings are accepted for now because image handling is temporary.
-- Many images are currently hardcoded external placeholders from Unsplash or Picsum. This is intentional for now.
-- The user may later ask to reverse the recent animation/performance optimization pass. Those changes are primarily CSS-only and listed below.
-
-## Backend Status
-
-### Database Layer (✅ Complete)
-
-The Spring Boot backend has a complete and robust PostgreSQL database schema via Flyway migrations:
-
-- **Migrations**: 10 SQL files under `backend/src/main/resources/db/migration/`
-- **Tables**: All core domain tables present (users, user_auth_providers, user_addresses, payment_methods, artworks, artwork_images, carts, cart_items, orders, order_items)
-- **Schema highlights**:
-  - UUID primary keys using `gen_random_uuid()`
-  - Proper constraints and CHECK conditions for domain values
-  - Indexes on artwork search fields (type, medium, year, sold_out, active)
-  - Unique constraints where needed (email, provider+provider_user_id, cart_id+artwork_id)
-  - Foreign keys with CASCADE delete policies
-  - Monetary fields use `NUMERIC(10,2)`
-  - `artwork_year` limited to 2024, 2025, 2026
-- **Configuration**: `application.yml` correctly enables Flyway with `spring.jpa.hibernate.ddl-auto: none`
-
-### Application Layer (⏳ Pending)
-
-The following layers are scaffolded but not yet implemented:
-
-- `backend/src/main/java/com/artgallery/controller/` — empty (package-info only)
-- `backend/src/main/java/com/artgallery/service/` — empty (package-info only)
-- `backend/src/main/java/com/artgallery/security/` — empty (package-info only)
-
-**Next backend work**:
-
-1. Implement REST controllers for auth, user, artwork, cart, order endpoints
-2. Implement business logic services
-3. Implement JWT security config and OAuth2 integration
-4. Wire repositories into services
-
-The repository layer (`com.artgallery.repository`) is already present with all necessary JpaRepository interfaces.
-
-### For Future Sessions
-
-When implementing the service/controller layer:
-
-- Match endpoint signatures to frontend expectations (Next.js frontend already has placeholder cart flow and auth UI ready)
-- Domain entities are well-modeled in `com.artgallery.domain.*` (User, UserAuthProvider, UserAddress, PaymentMethod, Artwork, Cart, Order, etc.)
-- Use the existing enum types (OAuthProvider, CartStatus, OrderStatus, PaymentType, PaymentProvider)
-- Follow Spring Security + JWT best practices
-- Spring Boot 3.5.0 and Java 24 are configured
-
-## Repository Shape
-
-Top-level important files:
+## Repo Shape
 
 ```txt
-frontend/app/
-frontend/components/
-frontend/public/
-frontend/color_pallet.txt
-frontend/package.json
-frontend/jsconfig.json
-frontend/next.config.mjs
-frontend/eslint.config.mjs
+frontend/
 backend/
 docker-compose.yml
 CODEX_PROJECT_CONTEXT.md
+REGISTRATION_DEMO_FLOW.txt
 ```
 
-Path alias:
+Frontend source is under `frontend/`. Backend source is under `backend/`.
+
+Path alias in `frontend/jsconfig.json`:
 
 ```js
 "@/*": ["./*"]
 ```
 
-So imports commonly use `@/components/...`.
+## Commands
 
-## App Router Structure
+Frontend:
 
-Routes live under `frontend/app`.
+```powershell
+cd frontend
+npm.cmd run lint
+npm.cmd run dev
+npm.cmd run build
+```
 
-Current routes:
+Backend demo:
+
+```powershell
+docker compose up -d
+cd backend
+mvn test
+mvn spring-boot:run
+```
+
+Use `npm.cmd` in PowerShell if `npm` is blocked by execution policy.
+
+## Working Notes
+
+- Shell output may show French/Chinese text as mojibake. Do not "fix" encoding based only on shell output if IDE/browser display is fine.
+- Raw `<img>` warnings are currently accepted because image strategy is temporary.
+- Avoid broad image optimization unless explicitly requested.
+- Prefer existing CSS Modules and feature-folder organization.
+- Use existing palette/font tokens.
+- Do not introduce emoji unless asked.
+
+## Frontend Stack
+
+- Next.js `^16.2.4`
+- React `19.2.3`
+- JavaScript, not TypeScript
+- CSS Modules
+- React Compiler enabled in `frontend/next.config.mjs`
+
+## Global Styling
+
+Important files:
+
+```txt
+frontend/app/layout.js
+frontend/app/globals.css
+frontend/color_pallet.txt
+frontend/public/fonts/
+```
+
+Font tokens in `globals.css`:
+
+```css
+--font-body: var(--font-sans);
+--font-title: var(--font-serif);
+--font-logo: "Sylvaine Didot", serif;
+--font-display: "Sylvaine Playfair", serif;
+```
+
+Current conventions:
+
+- `--font-logo`: navbar/hero logo-style text.
+- `--font-display`: refined editorial titles in selected homepage sections.
+- `--font-title`: general serif text/headings.
+- `--font-body`: UI, labels, forms, nav, buttons unless a section explicitly uses serif.
+
+Palette tokens live in `globals.css`; prefer those over hardcoded colors.
+
+## Routes
 
 ```txt
 frontend/app/layout.js
 frontend/app/page.js
 frontend/app/a-propos/page.js
-frontend/app/a-propos/AProposPage.module.css
 frontend/app/cart/page.js
-frontend/app/globals.css
 ```
 
-### `frontend/app/layout.js`
+`layout.js` wraps pages with persistent `Header`, main `.pageContent`, and `Footer`.
 
-Global shell. Imports:
-
-- `frontend/app/globals.css`
-- `Header`
-- `Footer`
-- `Noto_Sans`
-- `Noto_Serif`
-
-This layout wraps all pages with:
-
-```jsx
-<Header />
-<main className="pageContent">{children}</main>
-<Footer />
-```
-
-Because of this, route pages such as `/a-propos` and `/cart` automatically persist the header and footer.
-
-### `frontend/app/page.js`
-
-Homepage composition route. It imports and renders homepage sections in this order:
+Homepage render order in `frontend/app/page.js`:
 
 ```jsx
 <Hero />
@@ -164,205 +113,6 @@ Homepage composition route. It imports and renders homepage sections in this ord
 <CuratorFavoritesSection />
 <CuratedExperienceSection />
 ```
-
-Previously removed from homepage but files remain:
-
-- `ShopCategorySection`
-- `WhyShopSection`
-- `FeaturedRowsSection`
-
-These still exist in `frontend/components/home/...` but are not currently rendered in `frontend/app/page.js`.
-
-### `frontend/app/a-propos`
-
-Route for `/a-propos`.
-
-Files:
-
-```txt
-frontend/app/a-propos/page.js
-frontend/app/a-propos/AProposPage.module.css
-```
-
-The page currently has two demo main-content sections:
-
-- A text-only section.
-- A text-plus-sample-image section.
-
-Both sections use the same text:
-
-```txt
-Sylvaine
-
-Sylvaine est une artiste peintre basée à Montréal.
-
-Son travail explore la lumière, la perception et la mémoire du paysage à travers la peinture à l’huile et le dessin.
-```
-
-These are demo alternatives. User said one will eventually be deleted, so treat each section as a standalone possible main design for the page.
-
-Current implementation uses a raw `<img>` placeholder and therefore triggers a Next lint warning. This is acceptable for now.
-
-Future cleanup option:
-
-- If this page grows, keep `frontend/app/a-propos/page.js` as a route composer.
-- Move reusable sections into `frontend/components/a-propos/`.
-
-### `frontend/app/cart`
-
-Route for `/cart`.
-
-Files:
-
-```txt
-frontend/app/cart/page.js
-frontend/components/cart/CartSection.js
-frontend/components/cart/CartSection.module.css
-```
-
-`frontend/app/cart/page.js` only renders `<CartSection />`.
-
-## Component Organization
-
-Main convention:
-
-- Shared/global components live directly under `frontend/components/<feature>/`.
-- Homepage-only sections live under `frontend/components/home/<section-name>/`.
-- Each section usually has:
-  - PascalCase component file
-  - matching CSS module
-  - optional data file when content is list-like
-
-Examples:
-
-```txt
-frontend/components/header/Header.js
-frontend/components/header/Header.module.css
-frontend/components/header/headerData.js
-frontend/components/header/icons.js
-
-frontend/components/footer/Footer.js
-frontend/components/footer/Footer.module.css
-
-frontend/components/hero/Hero.js
-frontend/components/hero/Hero.module.css
-frontend/components/hero/heroSlides.js
-
-frontend/components/home/display-sample/DisplaySample.js
-frontend/components/home/display-sample/DisplaySample.module.css
-
-frontend/components/home/why-original/WhyOriginalSection.js
-frontend/components/home/why-original/WhyOriginalSection.module.css
-frontend/components/home/why-original/whyOriginalData.js
-
-frontend/components/home/curator-favorites/CuratorFavoritesSection.js
-frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
-
-frontend/components/home/curated-experience/CuratedExperienceSection.js
-frontend/components/home/curated-experience/CuratedExperienceSection.module.css
-
-frontend/components/cart/CartSection.js
-frontend/components/cart/CartSection.module.css
-```
-
-## Design System And Styling Rules
-
-### Color Palette
-
-Palette source: `frontend/color_pallet.txt`
-
-```txt
-Primary Background: #F5F0E6
-Secondary Background: #FCFAF5
-Soft Neutral / Border: #D8CBB8
-Accent: #B89B72
-Text / Dark Neutral: #4E4338
-```
-
-These are represented in `frontend/app/globals.css` as tokens:
-
-```css
---page-bg: #f5f0e6;
---surface-main: #fcfaf5;
---surface-muted: #f4ecdf;
---surface-strong: #eadfce;
---surface-dark: #4e4338;
---text-main: #4e4338;
---text-soft: #6a5b4d;
---text-faint: #8f7f6f;
---accent: #b89b72;
---accent-strong: #9f8157;
---accent-soft: #ddceb7;
---line-soft: rgba(216, 203, 184, 0.58);
---line-mid: rgba(216, 203, 184, 0.9);
---white: #fcfaf5;
-```
-
-Prefer these tokens over hardcoded colors.
-
-### Typography
-
-User rule:
-
-- `Noto Serif` for titles/headings.
-- Sans-serif for body text, UI, labels, buttons, forms, navigation.
-
-Implemented through `next/font/google` in `frontend/app/layout.js`:
-
-```js
-Noto_Sans -> --font-sans
-Noto_Serif -> --font-serif
-```
-
-Global aliases in `frontend/app/globals.css`:
-
-```css
---font-body: var(--font-sans);
---font-title: var(--font-serif);
-```
-
-Use:
-
-```css
-font-family: var(--font-title), serif;
-font-family: var(--font-body), sans-serif;
-```
-
-### Interaction Style
-
-Links and CTAs commonly use:
-
-- Warm accent color on hover.
-- Animated underline via `::after` with `transform: scaleX(...)`.
-- Subtle transform on button active state.
-- Rounded but not pill-shaped buttons for forms and CTAs, usually `border-radius: 8px`.
-
-Avoid purple/dark-mode generic styling. Keep warm, muted, gallery-like.
-
-### Animation Performance Notes
-
-The site recently received a conservative performance optimization pass because animations felt low-framerate. Changes were intentionally small and reversible.
-
-Touched files:
-
-```txt
-frontend/components/header/Header.module.css
-frontend/components/hero/Hero.module.css
-frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
-frontend/components/home/featured-rows/FeaturedRowsSection.module.css
-```
-
-Optimization types:
-
-- Reduced blur slightly:
-  - Header `backdrop-filter: blur(14px)` to `10px`
-  - Account modal overlay `blur(6px)` to `4px`
-  - Hero content outer `blur(4px)` to `3px`
-- Added `will-change` / `backface-visibility` / `translateZ(0)` to animated layers.
-- Added `contain: paint` to carousel image containers.
-- Added `translate3d(0, 0, 0)` base transform to carousel tracks.
-
-If the user asks to reverse this optimization pass, inspect the diff around those four CSS files.
 
 ## Header
 
@@ -375,136 +125,47 @@ frontend/components/header/headerData.js
 frontend/components/header/icons.js
 ```
 
-### Header Layout
+Current header behavior:
 
-Current layout:
-
-- Logo on the left.
-- Navigation on the right, next to search.
-- Then language, account, cart icon buttons.
-
-Navigation items currently intended:
-
-```txt
-Œuvres
-Séries
-À propos
-Expositions
-Contact
-```
-
-Again, shell may display these as mojibake. Do not change encoding unless the user sees a real issue in IDE/browser.
-
-### Header Data
-
-`headerData.js` controls nav labels, links, dropdown columns, promo text, rotating search terms, and language options.
-
-Important:
-
-- `À propos` link points to `/a-propos`.
-- `Œuvres`, `Séries`, and `Expositions` have dropdowns.
-- `À propos` is a direct link only, no dropdown.
-- `Contact` is currently a plain link.
-
-### Header Dropdown Behavior
-
-`Header.js` has hover logic for dropdowns:
-
-- Dropdown opens when hovering a nav item with `columns`.
-- It closes when pointer leaves the nav item and dropdown panel.
-- It has a short delayed close and fade-out animation.
-- `visibleDropdown`, `activeDropdown`, and `isDropdownClosing` manage open/close lifecycle.
-
-CSS animation:
-
-- `dropdownFadeIn`
-- `dropdownFadeOut`
-
-### Search Bar
-
-The search bar is a real input inside a form.
-
-Behavior:
-
-- Rotating search text is now placeholder filler only.
-- User can type normally.
-- A custom `×` clear button appears when input has content.
-- A right-arrow submit button appears when input has content.
-- Pressing Enter or clicking arrow triggers placeholder logic:
+- Left logo, nav/search/actions on right.
+- Nav dropdowns for items with `columns`.
+- Language menu opens but does not switch content yet.
+- Cart icon links to `/cart`.
+- Search is a real form, but submit only writes URL hash:
 
 ```js
 window.location.hash = `search=${encodeURIComponent(trimmedSearchQuery)}`;
 ```
 
-This is temporary until a real search route/page exists.
+Search placeholder:
 
-### Account Modal
+- Custom animated overlay, not native placeholder.
+- `Search for` stays fixed.
+- Only the keyword rolls upward/out and new keyword enters from below.
+- Controlled by `searchTermIndex`, `previousSearchTermIndex`, `searchTermAnimating`.
 
-The account button opens a floating modal over the whole page, not a dropdown.
+Account modal:
 
-Behavior:
+- Opens from account icon.
+- Closes on outside click, Escape, or close button.
+- Login UI is mostly presentational.
+- Register mode is a real demo flow.
+- `Register account` switches in-place to email/password/password-confirmation form.
+- `Back to login` returns to login mode.
+- Social buttons remain visible under both login and register modes.
+- Registration calls `POST /api/auth/register`.
+- Frontend validates required fields, password length, and password match.
+- `accountToast` shows temporary success/failure.
+- Backend URL is `NEXT_PUBLIC_API_BASE_URL` or `http://localhost:8080`.
 
-- Opens from account icon button.
-- Closes on outside click.
-- Closes on Escape.
-- Closes via `×` button.
-- Front-end only.
-
-Content:
-
-- Email input.
-- Password input.
-- Forgot password link.
-- Register account link.
-- Login button.
-- Social login buttons: Google, Facebook, Instagram.
-
-CSS classes are in `Header.module.css`, including:
-
-```css
-.accountModalOverlay
-.accountModal
-.accountModalClose
-.loginForm
-.socialButtons
-```
-
-### Icons
-
-Shared SVG icon components are in `frontend/components/header/icons.js`.
-
-Important:
-
-- `CartIcon` is a purse-like shopping bag icon.
-- It is used both in the navbar and on the cart page empty state.
-- If updating the cart/purse icon, update this shared component, not separate inline SVGs.
-
-Current `CartIcon` design direction:
-
-- Refined purse/bag outline.
-- Rounded body.
-- Handles dip into main body slightly.
-- Stroke weight intended to fit other header icons.
-
-## Footer
-
-Files:
+If header grows further, likely extract:
 
 ```txt
-frontend/components/footer/Footer.js
-frontend/components/footer/Footer.module.css
+SearchBar.js
+AccountModal.js
+HeaderNav.js
+NavDropdown.js
 ```
-
-Footer currently contains:
-
-- Subscription form replacing old brand/tagline.
-- Nav links matching header labels.
-- `À propos` links to `/a-propos`.
-- Warm dark gradient background using project palette.
-
-Subscription form is presentational only.
-
-Footer nav links have animated underline hover.
 
 ## Homepage Sections
 
@@ -516,21 +177,16 @@ Files:
 frontend/components/hero/Hero.js
 frontend/components/hero/Hero.module.css
 frontend/components/hero/heroSlides.js
+frontend/public/images/hero/
 ```
 
-`Hero.js` is a client component with carousel state and previous/next side controls.
+Current state:
 
-First slide text:
-
-```txt
-Sylvaine
-Peinture, entre mémoire et paysage.
-À propos
-```
-
-Images are hardcoded remote placeholders in `heroSlides.js`.
-
-Styling uses a content card over a background image, with warm overlay and animated entry.
+- Uses local banner images: `1.png`, `2.png`, `3.png`.
+- Images are CSS backgrounds with `background-size: 100% 100%` to avoid cropping/letterboxing.
+- Text is an editorial overlay, not a card.
+- `SYLVAINE ART` uses `--font-logo`.
+- Hero text is non-selectable.
 
 ### Display Sample
 
@@ -539,15 +195,18 @@ Files:
 ```txt
 frontend/components/home/display-sample/DisplaySample.js
 frontend/components/home/display-sample/DisplaySample.module.css
+frontend/public/images/display-sample/
 ```
 
-Homepage section with four sample artwork/category cards.
+Current state:
 
-Uses hardcoded remote images.
-
-Titles use `Noto Serif`.
-
-Action links use animated underline hover.
+- Uses `display1.png` through `display4.png`.
+- French editorial heading/subheading.
+- Subheading stays one line on desktop and wraps on mobile.
+- Cards have thin borders, tall image ratios, and whole-card hover lift.
+- Card CTA has underline animation.
+- Titles use `--font-display`.
+- Supporting text uses serif in this section.
 
 ### Why Original
 
@@ -557,15 +216,22 @@ Files:
 frontend/components/home/why-original/WhyOriginalSection.js
 frontend/components/home/why-original/WhyOriginalSection.module.css
 frontend/components/home/why-original/whyOriginalData.js
+frontend/public/images/why-original/
 ```
 
-Interactive client section with custom sticky/fixed behavior for the left text column.
+Important:
 
-Right side uses cards from `whyOriginalData.js`.
+- This is a client component with custom sticky/fixed behavior for the left column.
+- Be careful editing scroll/resize logic.
 
-Images are temporary hardcoded remote placeholders.
+Current state:
 
-Important: This component manually calculates sticky behavior with scroll/resize listeners. Be careful editing this logic.
+- Uses local images `1.png` through `5.png`.
+- Left copy is French editorial, with Playfair title.
+- Cards use French copy from `whyOriginalData.js`.
+- Reference numbering was intentionally removed.
+- Card descriptions use `\n` between sentences and CSS `white-space: pre-line`.
+- Cards have tighter spacing, larger image column, image fills card height on desktop/tablet, and subtle rounded corners.
 
 ### Curator Favorites
 
@@ -576,21 +242,12 @@ frontend/components/home/curator-favorites/CuratorFavoritesSection.js
 frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
 ```
 
-Client carousel with 15 hardcoded placeholder items.
+Current state:
 
-Behavior:
-
-- Responsive items per view:
-  - Desktop: 5
-  - Tablet: 3
-  - Mobile: 2
-  - Small mobile: 1
-- Autoplays every 10 seconds.
-- Pauses on hover.
-- Previous/next controls wrap infinitely.
-- Uses `safePageIndex` directly to avoid React lint set-state-in-effect errors.
-
-If modifying carousel state, run lint. React Compiler rules are strict.
+- Client carousel with 15 placeholder items.
+- Responsive items per view: desktop 5, tablet 3, mobile 2, small mobile 1.
+- Autoplay every 10 seconds, pauses on hover.
+- Uses `safePageIndex` to satisfy strict React Compiler lint rules.
 
 ### Curated Experience
 
@@ -601,23 +258,47 @@ frontend/components/home/curated-experience/CuratedExperienceSection.js
 frontend/components/home/curated-experience/CuratedExperienceSection.module.css
 ```
 
-Full-width background-image CTA section.
+Current state:
 
-Uses warm overlay and a CTA button.
+- Full-width background-image CTA section.
+- Uses warm overlay and CTA button.
 
-### Sections Not Currently Rendered
+## Backend Registration Demo
 
-These still exist but are not currently included in `frontend/app/page.js`:
+Root walkthrough:
 
 ```txt
-frontend/components/home/shop-category/ShopCategorySection.js
-frontend/components/home/why-shop/WhyShopSection.js
-frontend/components/home/featured-rows/FeaturedRowsSection.js
+REGISTRATION_DEMO_FLOW.txt
 ```
 
-`FeaturedRowsSection` is a product carousel with two rows and sample product data. It still passes lint and may be reused later.
+Files:
 
-## Cart Page
+```txt
+backend/src/main/java/com/artgallery/controller/AuthController.java
+backend/src/main/java/com/artgallery/service/AuthService.java
+backend/src/main/java/com/artgallery/config/SecurityConfig.java
+backend/src/main/java/com/artgallery/dto/request/RegisterRequest.java
+backend/src/main/java/com/artgallery/dto/response/RegisterResponse.java
+backend/src/main/java/com/artgallery/dto/response/ApiErrorResponse.java
+backend/src/main/java/com/artgallery/exception/DuplicateEmailException.java
+backend/src/main/java/com/artgallery/exception/GlobalExceptionHandler.java
+backend/src/test/java/com/artgallery/dto/request/RegisterRequestValidationTest.java
+```
+
+Behavior:
+
+- `POST /api/auth/register`.
+- Validates email, password length, and password confirmation.
+- Normalizes email to lowercase.
+- Rejects duplicates with `409 Conflict`.
+- Hashes password with BCrypt into `users.password_hash`.
+- Saves through `UserRepository`.
+- CORS allows local frontend dev origins such as `http://localhost:*` and `http://127.0.0.1:*`.
+- Validation tests pass with `mvn test`.
+
+The broader backend service/controller/JWT/OAuth work is still pending beyond this demo slice.
+
+## Cart
 
 Files:
 
@@ -629,244 +310,53 @@ frontend/components/cart/CartSection.module.css
 
 Current state:
 
-- Client component.
-- Three-stage temporary demo:
-  - Cart
-  - Checkout
-  - Confirmation
-- Temporary forward-flow button:
-  - `Proceed to Checkout`
-  - `Place Demo Order`
-  - `Back to Cart`
-- Stepper progress bar updates based on `currentStep`.
-- Current/completed nodes are solid.
-- Future nodes are hollow.
+- Temporary client-side demo flow only.
+- Stages: cart, checkout, confirmation.
+- No backend persistence yet.
 
-Cart stage:
+## Image Strategy
 
-- Empty cart display.
-- Shared purse icon from `CartIcon`.
-- `Continue Shopping` button.
-
-Checkout stage:
-
-- Sample checkout form fields:
-  - Email
-  - Full name
-  - Delivery address
-  - City
-
-Confirmation stage:
-
-- Sample confirmation message.
-- Demo order summary.
-
-Customer service panel appears on the right for all stages.
-
-## Linting Notes
-
-Run:
-
-```powershell
-cd frontend
-npm.cmd run lint
-```
-
-Current lint status:
-
-- `0 errors`
-- Warnings only for raw `<img>` usage
-
-Warning locations include:
+Current local image folders:
 
 ```txt
-frontend/app/a-propos/page.js
-frontend/components/home/curator-favorites/CuratorFavoritesSection.js
-frontend/components/home/display-sample/DisplaySample.js
-frontend/components/home/featured-rows/FeaturedRowsSection.js
-frontend/components/home/why-original/WhyOriginalSection.js
+frontend/public/images/hero/
+frontend/public/images/display-sample/
+frontend/public/images/why-original/
 ```
 
-These warnings are accepted for now because image assets and image strategy are temporary.
+Other sections still use external placeholders or raw `<img>`.
 
-Future improvement:
+Future image cleanup:
 
-- Move important images into `frontend/public/`.
-- Use Next `<Image />` for local/remote optimized images.
-- Configure remote domains if needed.
+- Move finalized artwork assets into `frontend/public/`.
+- Consider Next `<Image />` once image strategy is settled.
+- Configure remote domains only if remote/CDN strategy is chosen.
 
-## Image Strategy Current State
+## Lint/Test Status
 
-Current image implementation is temporary:
+Frontend:
 
-- Many sections use external URLs from Unsplash or Picsum.
-- Some components use raw `<img>`.
-- Hero uses CSS background images.
-- `frontend/public/` currently contains the favicon, local font files, and legal-policy document placeholders, but not real artwork.
+- `npm.cmd run lint` passes with warnings only for raw `<img>`.
 
-Do not invest heavily in image optimization unless the user asks, because real image implementation is planned later.
+Backend:
 
-## Routing And Links
+- `mvn test` passes for registration validation tests.
 
-Current meaningful routes:
+Known accepted warnings:
 
 ```txt
-/
-/a-propos
-/cart
+@next/next/no-img-element
 ```
 
-Header/footer links:
+## Next Likely Task
 
-- `À propos` -> `/a-propos`
-- Cart button links to `/cart` in `frontend/components/header/Header.js`.
-- Search currently writes URL hash only, no real search page yet.
+Inspect language switching. Current language options are only a menu in the header. They do not switch content yet.
 
-## Common Future Tasks And Where To Work
-
-### Change nav labels/dropdowns
-
-Look in:
-
-```txt
-frontend/components/header/headerData.js
-```
-
-Then adjust dropdown styling if needed in:
-
-```txt
-frontend/components/header/Header.module.css
-```
-
-### Change header behavior
-
-Look in:
+Relevant files:
 
 ```txt
 frontend/components/header/Header.js
+frontend/components/header/headerData.js
+frontend/components/header/Header.module.css
 ```
 
-Important state:
-
-```js
-activeDropdown;
-visibleDropdown;
-isDropdownClosing;
-languageOpen;
-accountOpen;
-searchQuery;
-searchTermIndex;
-```
-
-### Change global palette or typography
-
-Look in:
-
-```txt
-frontend/app/globals.css
-frontend/app/layout.js
-```
-
-### Change homepage section order
-
-Look in:
-
-```txt
-frontend/app/page.js
-```
-
-### Add a new route page
-
-Add a folder under `frontend/app`:
-
-```txt
-frontend/app/<route-name>/page.js
-frontend/app/<route-name>/<RouteName>.module.css
-```
-
-If the page gets complex, place reusable sections in:
-
-```txt
-frontend/components/<route-name>/
-```
-
-### Work on cart flow
-
-Look in:
-
-```txt
-frontend/components/cart/CartSection.js
-frontend/components/cart/CartSection.module.css
-```
-
-### Update shared icons
-
-Look in:
-
-```txt
-frontend/components/header/icons.js
-```
-
-Important: `CartIcon` is shared between header and cart page.
-
-## Code Style Preferences
-
-- Prefer CSS Modules for component styling.
-- Keep files colocated by feature.
-- Keep data arrays separate when they become large or reusable.
-- Use existing global tokens rather than hardcoded values.
-- Use serif only for title-like text.
-- Use sans-serif for UI, forms, buttons, labels, and body text.
-- Preserve existing component separation and naming pattern.
-- Avoid adding comments unless the code is unusually complex.
-- Do not introduce emoji unless explicitly requested.
-
-## Known Issues / Technical Debt
-
-- Raw `<img>` warnings remain.
-- Some shell outputs show mojibake for valid source text.
-- Header has quite a bit of responsibility now:
-  - nav dropdowns
-  - search
-  - language menu
-  - account modal
-  - cart button
-
-  If it grows further, consider extracting:
-
-```txt
-frontend/components/header/SearchBar.js
-frontend/components/header/AccountModal.js
-frontend/components/header/NavDropdown.js
-```
-
-- Cart flow is temporary demo state only. It does not persist cart data and has no checkout backend.
-- Search submit logic is placeholder hash routing only.
-- Account modal form and social login buttons are front-end only.
-
-## Suggested Next Cleanup
-
-If the user asks to make structure cleaner:
-
-1. Extract header subcomponents:
-   - `SearchBar`
-   - `AccountModal`
-   - `HeaderNav`
-2. Move large data arrays into data files:
-   - `curatorFavoritesData.js`
-   - cart sample data if needed
-3. Move `a-propos` sections into `frontend/components/a-propos/` if the route gets more complex.
-4. Decide image strategy:
-   - Local public assets
-   - Next Image
-   - CDN / CMS later
-5. Convert placeholder buttons/links to actual routes only when routing plan is clear.
-
-## Session Notes (May 1, 2026)
-
-- Backend database schema is finalized and solid. Flyway migrations are complete (V1–V10).
-- Backend service/controller layer is pending implementation.
-- **Today's focus**: Refining the homepage layout and sections.
-  - Review and adjust existing homepage sections (Hero, DisplaySample, WhyOriginal, CuratorFavorites, CuratedExperience).
-  - Consider polish, spacing, and visual hierarchy.
-  - Sections not rendered (ShopCategory, WhyShop, FeaturedRows) remain available for future use.
