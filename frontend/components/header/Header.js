@@ -38,6 +38,9 @@ export default function Header() {
   const [accountMode, setAccountMode] = useState("login");
   const [accountToast, setAccountToast] = useState(null);
   const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
+  const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
+  const loginSubmittingRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const [previousSearchTermIndex, setPreviousSearchTermIndex] = useState(null);
@@ -109,7 +112,54 @@ export default function Header() {
     };
   }, []);
 
+  // Rehydrate auth state from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("auth");
+      if (stored) {
+        setCurrentUser(JSON.parse(stored));
+      }
+    } catch {
+      // ignore malformed data
+    }
+
+    // Sync auth state when another tab or the profile page clears localStorage
+    const onStorage = (e) => {
+      if (e.key === "auth") {
+        try {
+          setCurrentUser(e.newValue ? JSON.parse(e.newValue) : null);
+        } catch {
+          setCurrentUser(null);
+        }
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const saveAuth = (user) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem("auth", JSON.stringify(user));
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const clearAuth = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem("auth");
+    } catch {
+      // ignore storage errors
+    }
+  };
+
   const handleLanguageSelect = (code) => {
+    // Persist the chosen locale in a cookie so the middleware uses it
+    // for any path that doesn't already have a locale prefix
+    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; SameSite=Lax`;
+
     // Replace the locale segment in the current path
     const segments = window.location.pathname.split("/");
     segments[1] = code; // segments[0] is "", segments[1] is the locale
@@ -164,6 +214,54 @@ export default function Header() {
 
   const handleAccountSubmit = async (event) => {
     event.preventDefault();
+
+    if (accountMode === "login") {
+      if (loginSubmittingRef.current) return;
+
+      const formElement = event.currentTarget;
+      const formData = new FormData(formElement);
+      const email = String(formData.get("email") || "").trim();
+      const password = String(formData.get("password") || "");
+
+      if (!email || !password) {
+        showAccountToast({ type: "error", message: "Please enter your email and password." });
+        return;
+      }
+
+      loginSubmittingRef.current = true;
+      setIsLoginSubmitting(true);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          const message =
+            response.status === 401
+              ? "Incorrect email or password."
+              : response.status === 403
+                ? "Your account is disabled. Please contact support."
+                : result?.message || "Login failed. Please try again.";
+          showAccountToast({ type: "error", message });
+          return;
+        }
+
+        saveAuth({ email: result.email, role: result.role, token: result.token });
+        formElement.reset();
+        closeAccountModal();
+      } catch {
+        showAccountToast({ type: "error", message: "Login request failed. Please check your connection." });
+      } finally {
+        loginSubmittingRef.current = false;
+        setIsLoginSubmitting(false);
+      }
+      return;
+    }
 
     if (accountMode !== "register") {
       return;
@@ -251,6 +349,23 @@ export default function Header() {
     } finally {
       registerSubmittingRef.current = false;
       setIsRegisterSubmitting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const token = currentUser?.token;
+    clearAuth();
+    setAccountOpen(false);
+
+    if (token) {
+      try {
+        await fetch(`${API_BASE_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        // best-effort — token is already cleared locally
+      }
     }
   };
 
@@ -464,15 +579,26 @@ export default function Header() {
 
               {/* Account */}
               <div className={styles.accountMenuWrap}>
-                <button
-                  type="button"
-                  className={`${styles.iconButton} ${accountOpen ? styles.isActive : ""}`}
-                  aria-label={t("header.accountLabel")}
-                  aria-expanded={accountOpen}
-                  onClick={handleAccountToggle}
-                >
-                  <UserIcon className={styles.headerIconSvg} />
-                </button>
+                {currentUser ? (
+                  <Link
+                    href={`/${locale}/profile`}
+                    className={`${styles.iconButton} ${styles.isActive}`}
+                    aria-label="Go to profile"
+                    title={currentUser.email}
+                  >
+                    <UserIcon className={`${styles.headerIconSvg} ${styles.loggedInIcon}`} />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${styles.iconButton} ${accountOpen ? styles.isActive : ""}`}
+                    aria-label={t("header.accountLabel")}
+                    aria-expanded={accountOpen}
+                    onClick={handleAccountToggle}
+                  >
+                    <UserIcon className={styles.headerIconSvg} />
+                  </button>
+                )}
               </div>
 
               {/* Cart */}
@@ -644,10 +770,15 @@ export default function Header() {
               <button
                 type="submit"
                 className={styles.loginButton}
-                disabled={accountMode === "register" && isRegisterSubmitting}
+                disabled={
+                  (accountMode === "register" && isRegisterSubmitting) ||
+                  (accountMode === "login" && isLoginSubmitting)
+                }
               >
                 {accountMode === "login"
-                  ? t("account.loginButton")
+                  ? isLoginSubmitting
+                    ? "Logging in..."
+                    : t("account.loginButton")
                   : isRegisterSubmitting
                     ? "Creating..."
                     : "Create account"}

@@ -879,3 +879,8 @@
     width: 220px;
   }
 }
+
+/* Logged-in state — accent-coloured user icon */
+.loggedInIcon {
+  color: var(--accent-strong);
+}
