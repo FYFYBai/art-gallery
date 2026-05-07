@@ -495,6 +495,44 @@
     box-shadow 0.22s ease;
 }
 
+.passwordInputWrap {
+  position: relative;
+}
+
+.passwordInputWrap .loginInput {
+  padding-right: 44px;
+}
+
+.passwordToggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease;
+}
+
+.passwordToggle:hover {
+  background: rgba(184, 155, 114, 0.14);
+  color: var(--text-main);
+}
+
+.passwordIcon {
+  width: 18px;
+  height: 18px;
+}
+
 .loginInput::placeholder {
   color: var(--text-faint);
 }
@@ -503,6 +541,28 @@
   background: var(--white);
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(184, 155, 114, 0.16);
+}
+
+.loginInputError,
+.loginInputError:focus {
+  border-color: rgba(154, 74, 58, 0.72);
+  box-shadow: 0 0 0 3px rgba(154, 74, 58, 0.12);
+}
+
+.passwordHint {
+  margin: -2px 0 4px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.fieldError {
+  margin: -4px 0 4px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #7c382c;
 }
 
 .accountLinksRow {
@@ -591,6 +651,29 @@
   font-size: 0.86rem;
   line-height: 1.45;
   animation: accountToastIn 0.22s ease both;
+}
+
+.accountToastMessage {
+  margin: 0;
+}
+
+.accountToastAction {
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: currentColor;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.accountToastAction:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 .accountToastSuccess {

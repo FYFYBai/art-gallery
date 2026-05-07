@@ -29,7 +29,7 @@ class RegisterRequestValidationTest {
 
     @Test
     void validRequestPassesValidation() {
-        RegisterRequest request = request("artist@example.com", "password123", "password123");
+        RegisterRequest request = request("artist@example.com", "StrongPass!1", "StrongPass!1");
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -38,7 +38,7 @@ class RegisterRequestValidationTest {
 
     @Test
     void invalidEmailFailsValidation() {
-        RegisterRequest request = request("not-an-email", "password123", "password123");
+        RegisterRequest request = request("not-an-email", "StrongPass!1", "StrongPass!1");
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -59,8 +59,30 @@ class RegisterRequestValidationTest {
     }
 
     @Test
+    void passwordWithoutUppercaseFailsValidation() {
+        RegisterRequest request = request("artist@example.com", "lowercase!1", "lowercase!1");
+
+        Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
+
+        assertThat(violations)
+                .extracting(violation -> violation.getPropertyPath().toString())
+                .contains("password");
+    }
+
+    @Test
+    void passwordWithoutSpecialCharacterFailsValidation() {
+        RegisterRequest request = request("artist@example.com", "NoSpecial123", "NoSpecial123");
+
+        Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
+
+        assertThat(violations)
+                .extracting(violation -> violation.getPropertyPath().toString())
+                .contains("password");
+    }
+
+    @Test
     void passwordMismatchFailsValidation() {
-        RegisterRequest request = request("artist@example.com", "password123", "different123");
+        RegisterRequest request = request("artist@example.com", "StrongPass!1", "DifferentPass!1");
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 

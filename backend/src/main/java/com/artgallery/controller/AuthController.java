@@ -1,8 +1,11 @@
 package com.artgallery.controller;
 
+import com.artgallery.dto.request.ForgotPasswordRequest;
 import com.artgallery.dto.request.LoginRequest;
 import com.artgallery.dto.request.OAuthLoginRequest;
 import com.artgallery.dto.request.RegisterRequest;
+import com.artgallery.dto.request.ResendVerificationEmailRequest;
+import com.artgallery.dto.request.ResetPasswordRequest;
 import com.artgallery.dto.response.LoginResponse;
 import com.artgallery.dto.response.RegisterResponse;
 import com.artgallery.service.AuthService;
@@ -10,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +46,33 @@ public class AuthController {
     @PostMapping("/oauth/login")
     public ResponseEntity<LoginResponse> oauthLogin(@Valid @RequestBody OAuthLoginRequest request) {
         return ResponseEntity.ok(authService.oauthLogin(request));
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam("token") String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+    }
+
+    @PostMapping("/resend-verification-email")
+    public ResponseEntity<Map<String, String>> resendVerificationEmail(
+            @Valid @RequestBody ResendVerificationEmailRequest request) {
+        authService.resendVerificationEmail(request);
+        return ResponseEntity.ok(Map.of("message", "Verification email sent"));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request);
+        return ResponseEntity.ok(Map.of("message", "If an account exists for this email, a reset link has been sent"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
     }
 
     @PostMapping("/logout")

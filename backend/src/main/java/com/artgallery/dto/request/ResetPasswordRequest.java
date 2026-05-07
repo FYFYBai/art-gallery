@@ -1,16 +1,14 @@
 package com.artgallery.dto.request;
 
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class RegisterRequest {
+public class ResetPasswordRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email must be valid")
-    private String email;
+    @NotBlank(message = "Reset token is required")
+    private String token;
 
     @NotBlank(message = "Password is required")
     @Size(min = 11, max = 100, message = "Password must be more than 10 characters")
@@ -23,15 +21,12 @@ public class RegisterRequest {
     @NotBlank(message = "Password confirmation is required")
     private String passwordConfirmation;
 
-    @Pattern(regexp = "^(fr|en|zh)$", message = "Locale must be fr, en, or zh")
-    private String locale = "fr";
-
-    public String getEmail() {
-        return email;
+    public String getToken() {
+        return token;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getPassword() {
@@ -48,14 +43,6 @@ public class RegisterRequest {
 
     public void setPasswordConfirmation(String passwordConfirmation) {
         this.passwordConfirmation = passwordConfirmation;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String locale) {
-        this.locale = locale;
     }
 
     @AssertTrue(message = "Passwords must match")

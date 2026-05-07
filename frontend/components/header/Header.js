@@ -44,6 +44,66 @@ function getLocalizedHref(href, locale) {
   return href.startsWith("/") ? `/${locale}${href}` : href;
 }
 
+function isStrongRegistrationPassword(password) {
+  return (
+    password.length > 10 &&
+    /[A-Z]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.passwordIcon}>
+      <path
+        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="2.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.passwordIcon}>
+      <path
+        d="m3 3 18 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M9.2 5.4A10.6 10.6 0 0 1 12 5c6 0 9.5 7 9.5 7a18.2 18.2 0 0 1-2.9 3.7M6.2 6.9C3.8 8.7 2.5 12 2.5 12s3.5 7 9.5 7a9.7 9.7 0 0 0 4.3-1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.2 10.4a2.8 2.8 0 0 0 3.4 3.4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -66,8 +126,20 @@ export default function Header() {
   const [accountToast, setAccountToast] = useState(null);
   const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
+  const [isForgotPasswordSubmitting, setIsForgotPasswordSubmitting] =
+    useState(false);
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [registerPasswordConfirmation, setRegisterPasswordConfirmation] =
+    useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [currentUser, setCurrentUser] = useState(readStoredAuth); // { email, role, token }
   const loginSubmittingRef = useRef(false);
+  const forgotPasswordSubmittingRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
   const [previousSearchTermIndex, setPreviousSearchTermIndex] = useState(null);
@@ -78,6 +150,8 @@ export default function Header() {
   const searchAnimationTimerRef = useRef(null);
   const accountToastTimerRef = useRef(null);
   const registerSubmittingRef = useRef(false);
+  const resendSubmittingRef = useRef(false);
+  const previousPathnameRef = useRef(pathname);
 
   const activeItem = useMemo(() => {
     return navItems.find((item) => item.labelKey === visibleDropdown) || null;
@@ -199,6 +273,7 @@ export default function Header() {
       if (nextOpen) {
         setAccountMode("login");
         setAccountToast(null);
+        resetAccountFormState();
       }
 
       return nextOpen;
@@ -210,6 +285,7 @@ export default function Header() {
     setAccountOpen(false);
     setAccountMode("login");
     setAccountToast(null);
+    resetAccountFormState();
   };
 
   const showAccountToast = (nextToast) => {
@@ -219,19 +295,135 @@ export default function Header() {
 
     setAccountToast(nextToast);
 
-    accountToastTimerRef.current = setTimeout(() => {
-      setAccountToast(null);
-      accountToastTimerRef.current = null;
-    }, 3600);
+    if (!nextToast?.persistent) {
+      accountToastTimerRef.current = setTimeout(() => {
+        setAccountToast(null);
+        accountToastTimerRef.current = null;
+      }, 3600);
+    }
+  };
+
+  const resetAccountFormState = () => {
+    setRegisterPassword("");
+    setRegisterPasswordConfirmation("");
+    setShowPassword(false);
+    setShowPasswordConfirmation(false);
+    setVerificationEmail("");
+    setResendCooldown(0);
+    setIsResendingVerification(false);
+    resendSubmittingRef.current = false;
+    forgotPasswordSubmittingRef.current = false;
   };
 
   const switchAccountMode = (nextMode) => {
     setAccountMode(nextMode);
     setAccountToast(null);
+    resetAccountFormState();
+  };
+
+  const handleResendVerificationEmail = async () => {
+    if (!verificationEmail || resendCooldown > 0 || resendSubmittingRef.current) {
+      return;
+    }
+
+    resendSubmittingRef.current = true;
+    setIsResendingVerification(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/auth/resend-verification-email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: verificationEmail, locale }),
+        },
+      );
+
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        showAccountToast({
+          type: "error",
+          message:
+            result?.errors?.[0] ||
+            result?.message ||
+            t("account.resendVerificationFailed"),
+        });
+        return;
+      }
+
+      setResendCooldown(60);
+      showAccountToast({
+        type: "success",
+        message: t("account.verificationEmailResent"),
+        persistent: true,
+        resendVerification: true,
+      });
+    } catch {
+      showAccountToast({
+        type: "error",
+        message: t("account.resendVerificationFailed"),
+      });
+    } finally {
+      resendSubmittingRef.current = false;
+      setIsResendingVerification(false);
+    }
   };
 
   const handleAccountSubmit = async (event) => {
     event.preventDefault();
+
+    if (accountMode === "forgot") {
+      if (forgotPasswordSubmittingRef.current) return;
+
+      const formElement = event.currentTarget;
+      const formData = new FormData(formElement);
+      const email = String(formData.get("email") || "").trim();
+
+      if (!email) {
+        showAccountToast({ type: "error", message: t("account.emailRequired") });
+        return;
+      }
+
+      forgotPasswordSubmittingRef.current = true;
+      setIsForgotPasswordSubmitting(true);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, locale }),
+        });
+
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          showAccountToast({
+            type: "error",
+            message:
+              result?.errors?.[0] ||
+              result?.message ||
+              t("account.passwordResetRequestFailed"),
+          });
+          return;
+        }
+
+        formElement.reset();
+        showAccountToast({
+          type: "success",
+          message: t("account.passwordResetEmailSent"),
+          persistent: true,
+        });
+      } catch {
+        showAccountToast({
+          type: "error",
+          message: t("account.passwordResetRequestFailed"),
+        });
+      } finally {
+        forgotPasswordSubmittingRef.current = false;
+        setIsForgotPasswordSubmitting(false);
+      }
+      return;
+    }
 
     if (accountMode === "login") {
       if (loginSubmittingRef.current) return;
@@ -242,7 +434,7 @@ export default function Header() {
       const password = String(formData.get("password") || "");
 
       if (!email || !password) {
-        showAccountToast({ type: "error", message: "Please enter your email and password." });
+        showAccountToast({ type: "error", message: t("account.loginMissingFields") });
         return;
       }
 
@@ -261,10 +453,12 @@ export default function Header() {
         if (!response.ok) {
           const message =
             response.status === 401
-              ? "Incorrect email or password."
+              ? t("account.invalidCredentials")
               : response.status === 403
-                ? "Your account is disabled. Please contact support."
-                : result?.message || "Login failed. Please try again.";
+                ? result?.message === "Email verification required"
+                  ? t("account.emailVerificationRequired")
+                  : t("account.accountDisabled")
+                : result?.message || t("account.loginFailed");
           showAccountToast({ type: "error", message });
           return;
         }
@@ -273,7 +467,7 @@ export default function Header() {
         formElement.reset();
         closeAccountModal();
       } catch {
-        showAccountToast({ type: "error", message: "Login request failed. Please check your connection." });
+        showAccountToast({ type: "error", message: t("account.loginRequestFailed") });
       } finally {
         loginSubmittingRef.current = false;
         setIsLoginSubmitting(false);
@@ -305,10 +499,10 @@ export default function Header() {
       return;
     }
 
-    if (password.length < 8) {
+    if (!isStrongRegistrationPassword(password)) {
       showAccountToast({
         type: "error",
-        message: t("account.passwordTooShort"),
+        message: t("account.passwordRequirements"),
       });
       return;
     }
@@ -334,6 +528,7 @@ export default function Header() {
           email,
           password,
           passwordConfirmation,
+          locale,
         }),
       });
 
@@ -342,21 +537,26 @@ export default function Header() {
       if (!response.ok) {
         const fallbackMessage = t("account.registrationFailed");
         const apiMessage = result?.errors?.[0] || result?.message;
-        const duplicateEmail = response.status === 409;
 
         showAccountToast({
-          type: duplicateEmail ? "success" : "error",
-          message: duplicateEmail
-            ? t("account.duplicateEmailSuccess")
-            : apiMessage || fallbackMessage,
+          type: "error",
+          message: apiMessage || fallbackMessage,
         });
         return;
       }
 
       formElement.reset();
+      setRegisterPassword("");
+      setRegisterPasswordConfirmation("");
+      setShowPassword(false);
+      setShowPasswordConfirmation(false);
+      setVerificationEmail(email);
+      setResendCooldown(60);
       showAccountToast({
         type: "success",
         message: t("account.registrationSucceeded"),
+        persistent: true,
+        resendVerification: true,
       });
     } catch {
       showAccountToast({
@@ -439,6 +639,15 @@ export default function Header() {
       ? null
       : rotatingTerms[previousSearchTermIndex];
   const isOverlayVisible = Boolean(activeDropdown);
+  const isRegisterMode = accountMode === "register";
+  const isRegisterPasswordInvalid =
+    isRegisterMode &&
+    registerPassword.length > 0 &&
+    !isStrongRegistrationPassword(registerPassword);
+  const isRegisterConfirmationInvalid =
+    isRegisterMode &&
+    registerPasswordConfirmation.length > 0 &&
+    registerPassword !== registerPasswordConfirmation;
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -458,6 +667,32 @@ export default function Header() {
       registerSubmittingRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return undefined;
+
+    const intervalId = setInterval(() => {
+      setResendCooldown((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [resendCooldown]);
+
+  useEffect(() => {
+    if (previousPathnameRef.current === pathname) return;
+
+    previousPathnameRef.current = pathname;
+    setAccountToast(null);
+    setRegisterPassword("");
+    setRegisterPasswordConfirmation("");
+    setShowPassword(false);
+    setShowPasswordConfirmation(false);
+    setVerificationEmail("");
+    setResendCooldown(0);
+    setIsResendingVerification(false);
+    resendSubmittingRef.current = false;
+    forgotPasswordSubmittingRef.current = false;
+  }, [pathname]);
 
   return (
     <>
@@ -722,9 +957,15 @@ export default function Header() {
               <h2 id="account-login-title" className={styles.accountTitle}>
                 {accountMode === "login"
                   ? t("account.title")
-                  : t("account.createTitle")}
+                  : accountMode === "register"
+                    ? t("account.createTitle")
+                    : t("account.forgotTitle")}
               </h2>
-              <p className={styles.accountText}>{t("account.description")}</p>
+              <p className={styles.accountText}>
+                {accountMode === "forgot"
+                  ? t("account.forgotDescription")
+                  : t("account.description")}
+              </p>
             </div>
 
             <form
@@ -743,16 +984,66 @@ export default function Header() {
                 placeholder={t("account.emailPlaceholder")}
               />
 
-              <label className={styles.loginLabel} htmlFor="login-password">
-                {t("account.passwordLabel")}
-              </label>
-              <input
-                id="login-password"
-                name="password"
-                type="password"
-                className={styles.loginInput}
-                placeholder={t("account.passwordPlaceholder")}
-              />
+              {accountMode !== "forgot" && (
+                <>
+                  <label className={styles.loginLabel} htmlFor="login-password">
+                    {t("account.passwordLabel")}
+                  </label>
+                  <div className={styles.passwordInputWrap}>
+                    <input
+                      id="login-password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      className={`${styles.loginInput} ${
+                        isRegisterPasswordInvalid ? styles.loginInputError : ""
+                      }`}
+                      placeholder={t("account.passwordPlaceholder")}
+                      value={isRegisterMode ? registerPassword : undefined}
+                      onChange={
+                        isRegisterMode
+                          ? (event) => setRegisterPassword(event.target.value)
+                          : undefined
+                      }
+                      aria-invalid={isRegisterPasswordInvalid}
+                      aria-describedby={
+                        isRegisterPasswordInvalid
+                          ? "register-password-error"
+                          : isRegisterMode
+                            ? "register-password-hint"
+                            : undefined
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      aria-label={
+                        showPassword
+                          ? t("account.hidePassword")
+                          : t("account.showPassword")
+                      }
+                      onClick={() => setShowPassword((current) => !current)}
+                    >
+                      {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
+                  {accountMode === "register" && (
+                    <p
+                      id="register-password-hint"
+                      className={styles.passwordHint}
+                    >
+                      {t("account.passwordRequirements")}
+                    </p>
+                  )}
+                  {isRegisterPasswordInvalid && (
+                    <p
+                      id="register-password-error"
+                      className={styles.fieldError}
+                    >
+                      {t("account.passwordInvalidInline")}
+                    </p>
+                  )}
+                </>
+              )}
 
               {accountMode === "register" && (
                 <>
@@ -762,21 +1053,65 @@ export default function Header() {
                   >
                     {t("account.passwordConfirmationLabel")}
                   </label>
-                  <input
-                    id="register-password-confirmation"
-                    name="passwordConfirmation"
-                    type="password"
-                    className={styles.loginInput}
-                    placeholder={t("account.passwordConfirmationPlaceholder")}
-                  />
+                  <div className={styles.passwordInputWrap}>
+                    <input
+                      id="register-password-confirmation"
+                      name="passwordConfirmation"
+                      type={showPasswordConfirmation ? "text" : "password"}
+                      className={`${styles.loginInput} ${
+                        isRegisterConfirmationInvalid
+                          ? styles.loginInputError
+                          : ""
+                      }`}
+                      placeholder={t(
+                        "account.passwordConfirmationPlaceholder",
+                      )}
+                      value={registerPasswordConfirmation}
+                      onChange={(event) =>
+                        setRegisterPasswordConfirmation(event.target.value)
+                      }
+                      aria-invalid={isRegisterConfirmationInvalid}
+                      aria-describedby={
+                        isRegisterConfirmationInvalid
+                          ? "register-password-confirmation-error"
+                          : undefined
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      aria-label={
+                        showPasswordConfirmation
+                          ? t("account.hidePasswordConfirmation")
+                          : t("account.showPasswordConfirmation")
+                      }
+                      onClick={() =>
+                        setShowPasswordConfirmation((current) => !current)
+                      }
+                    >
+                      {showPasswordConfirmation ? <EyeOffIcon /> : <EyeIcon />}
+                    </button>
+                  </div>
+                  {isRegisterConfirmationInvalid && (
+                    <p
+                      id="register-password-confirmation-error"
+                      className={styles.fieldError}
+                    >
+                      {t("account.passwordConfirmationMismatchInline")}
+                    </p>
+                  )}
                 </>
               )}
 
               {accountMode === "login" ? (
                 <div className={styles.accountLinksRow}>
-                  <a href="#" className={styles.accountTextLink}>
+                  <button
+                    type="button"
+                    className={styles.accountTextLink}
+                    onClick={() => switchAccountMode("forgot")}
+                  >
                     {t("account.forgotPassword")}
-                  </a>
+                  </button>
                   <button
                     type="button"
                     className={styles.accountTextLink}
@@ -802,13 +1137,18 @@ export default function Header() {
                 className={styles.loginButton}
                 disabled={
                   (accountMode === "register" && isRegisterSubmitting) ||
-                  (accountMode === "login" && isLoginSubmitting)
+                  (accountMode === "login" && isLoginSubmitting) ||
+                  (accountMode === "forgot" && isForgotPasswordSubmitting)
                 }
               >
                 {accountMode === "login"
                   ? isLoginSubmitting
                     ? "Logging in..."
                     : t("account.loginButton")
+                  : accountMode === "forgot"
+                    ? isForgotPasswordSubmitting
+                      ? t("account.sendingReset")
+                      : t("account.sendResetLink")
                   : isRegisterSubmitting
                     ? t("account.creating")
                     : t("account.createButton")}
@@ -824,7 +1164,30 @@ export default function Header() {
                 }`}
                 role="status"
               >
-                {accountToast.message}
+                <p className={styles.accountToastMessage}>
+                  {accountToast.message}
+                </p>
+                {accountToast.resendVerification && (
+                  <button
+                    type="button"
+                    className={styles.accountToastAction}
+                    onClick={handleResendVerificationEmail}
+                    disabled={
+                      resendCooldown > 0 ||
+                      isResendingVerification ||
+                      !verificationEmail
+                    }
+                  >
+                    {resendCooldown > 0
+                      ? t("account.resendVerificationCooldown").replace(
+                          "{seconds}",
+                          String(resendCooldown),
+                        )
+                      : isResendingVerification
+                        ? t("account.resendingVerification")
+                        : t("account.resendVerification")}
+                  </button>
+                )}
               </div>
             )}
 

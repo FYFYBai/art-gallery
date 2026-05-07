@@ -50,6 +50,27 @@ public class GlobalExceptionHandler {
                 .body(ApiErrorResponse.of("Account is disabled", List.of()));
     }
 
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailNotVerified(EmailNotVerifiedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.of("Email verification required", List.of(ex.getMessage())));
+    }
+
+    @ExceptionHandler(EmailVerificationException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailVerification(EmailVerificationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of("Email verification failed", List.of(ex.getMessage())));
+    }
+
+    @ExceptionHandler(PasswordResetException.class)
+    public ResponseEntity<ApiErrorResponse> handlePasswordReset(PasswordResetException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of("Password reset failed", List.of(ex.getMessage())));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         String message = "Unsupported OAuth provider".equals(ex.getMessage())

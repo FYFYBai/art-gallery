@@ -26,6 +26,9 @@ public class User extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;
@@ -52,6 +55,8 @@ public class User extends BaseEntity {
     public void setPhone(String phone) { this.phone = phone; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
     public List<UserAuthProvider> getAuthProviders() { return authProviders; }
