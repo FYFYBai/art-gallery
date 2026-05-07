@@ -3,28 +3,28 @@ import { NextResponse } from "next/server";
 const locales = ["en", "fr", "zh"];
 const defaultLocale = "fr";
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // Skip Next.js internals and static files
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.includes(".") // static files like favicon.png, fonts, etc.
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // Check if pathname already has a locale prefix
   const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  if (pathnameHasLocale) return NextResponse.next();
+  if (pathnameHasLocale) {
+    return NextResponse.next();
+  }
 
-  // Redirect to default locale
   const url = request.nextUrl.clone();
   url.pathname = `/${defaultLocale}${pathname}`;
+
   return NextResponse.redirect(url);
 }
 

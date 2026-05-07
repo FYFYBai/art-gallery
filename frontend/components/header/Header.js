@@ -184,7 +184,7 @@ export default function Header() {
     if (!email || !password || !passwordConfirmation) {
       showAccountToast({
         type: "error",
-        message: "Please fill in all registration fields.",
+        message: t("account.fillAllFields"),
       });
       return;
     }
@@ -192,7 +192,7 @@ export default function Header() {
     if (password.length < 8) {
       showAccountToast({
         type: "error",
-        message: "Password must be at least 8 characters.",
+        message: t("account.passwordTooShort"),
       });
       return;
     }
@@ -200,7 +200,7 @@ export default function Header() {
     if (password !== passwordConfirmation) {
       showAccountToast({
         type: "error",
-        message: "Passwords must match.",
+        message: t("account.passwordMismatch"),
       });
       return;
     }
@@ -224,14 +224,14 @@ export default function Header() {
       const result = await response.json().catch(() => null);
 
       if (!response.ok) {
-        const fallbackMessage = "Registration failed. Please try again.";
+        const fallbackMessage = t("account.registrationFailed");
         const apiMessage = result?.errors?.[0] || result?.message;
         const duplicateEmail = response.status === 409;
 
         showAccountToast({
           type: duplicateEmail ? "success" : "error",
           message: duplicateEmail
-            ? "An account already exists for this email. If you just registered, it was created successfully."
+            ? t("account.duplicateEmailSuccess")
             : apiMessage || fallbackMessage,
         });
         return;
@@ -240,13 +240,12 @@ export default function Header() {
       formElement.reset();
       showAccountToast({
         type: "success",
-        message: result?.message || "Registration succeeded.",
+        message: t("account.registrationSucceeded"),
       });
     } catch {
       showAccountToast({
         type: "error",
-        message:
-          "Registration response was interrupted. If retry says the account already exists, the first request succeeded.",
+        message: t("account.registrationInterrupted"),
       });
     } finally {
       registerSubmittingRef.current = false;
@@ -329,7 +328,9 @@ export default function Header() {
 
   return (
     <>
-      <header className={styles.siteHeader}>
+      <header
+        className={`${styles.siteHeader} ${accountOpen ? styles.accountModalActive : ""}`}
+      >
         <div className={styles.headerShell}>
           <Link
             href="/"
@@ -340,7 +341,7 @@ export default function Header() {
           </Link>
 
           <div className={styles.headerRight}>
-            <nav className={styles.mainNav} aria-label="Main navigation">
+            <nav className={styles.mainNav} aria-label={t("header.mainNav")}>
               <ul className={styles.navList}>
                 {navItems.map((item) => {
                   const hasDropdown = Boolean(item.columns);
@@ -386,7 +387,7 @@ export default function Header() {
                 {!searchQuery && (
                   <span className={styles.searchPlaceholder}>
                     <span className={styles.searchPlaceholderPrefix}>
-                      Search for&nbsp;
+                      {t("search.searchFor")}{" "}
                     </span>
                     <span className={styles.searchTermSlot}>
                       {searchTermAnimating && previousSearchTerm && (
@@ -413,7 +414,7 @@ export default function Header() {
                 <button
                   type="button"
                   className={styles.searchClearButton}
-                  aria-label="Clear search"
+                  aria-label={t("search.clear")}
                   onClick={() => setSearchQuery("")}
                 >
                   <span className={styles.searchClearIcon}>×</span>
@@ -423,7 +424,7 @@ export default function Header() {
               <button
                 type="submit"
                 className={`${styles.searchSubmitButton} ${trimmedSearchQuery ? styles.searchSubmitVisible : ""}`}
-                aria-label="Submit search"
+                aria-label={t("search.submit")}
                 tabIndex={trimmedSearchQuery ? 0 : -1}
               >
                 <ArrowRightIcon className={styles.searchSubmitIcon} />
@@ -517,7 +518,9 @@ export default function Header() {
               </div>
 
               <aside className={styles.dropdownPromo}>
-                <div className={styles.promoImagePlaceholder}>Future Image</div>
+                <div className={styles.promoImagePlaceholder}>
+                  {t("promo.futureImage")}
+                </div>
                 <p className={styles.promoEyebrow}>
                   {activeItem.promo.eyebrow}
                 </p>
@@ -555,7 +558,7 @@ export default function Header() {
             <button
               type="button"
               className={styles.accountModalClose}
-              aria-label="Close account login"
+              aria-label={t("account.close")}
               onClick={closeAccountModal}
             >
               ×
@@ -566,7 +569,7 @@ export default function Header() {
               <h2 id="account-login-title" className={styles.accountTitle}>
                 {accountMode === "login"
                   ? t("account.title")
-                  : "Create account"}
+                  : t("account.createTitle")}
               </h2>
               <p className={styles.accountText}>{t("account.description")}</p>
             </div>
@@ -604,14 +607,14 @@ export default function Header() {
                     className={styles.loginLabel}
                     htmlFor="register-password-confirmation"
                   >
-                    Password confirmation
+                    {t("account.passwordConfirmationLabel")}
                   </label>
                   <input
                     id="register-password-confirmation"
                     name="passwordConfirmation"
                     type="password"
                     className={styles.loginInput}
-                    placeholder="Confirm your password"
+                    placeholder={t("account.passwordConfirmationPlaceholder")}
                   />
                 </>
               )}
@@ -636,7 +639,7 @@ export default function Header() {
                     className={styles.accountTextLink}
                     onClick={() => switchAccountMode("login")}
                   >
-                    Back to login
+                    {t("account.backToLogin")}
                   </button>
                 </div>
               )}
@@ -649,8 +652,8 @@ export default function Header() {
                 {accountMode === "login"
                   ? t("account.loginButton")
                   : isRegisterSubmitting
-                    ? "Creating..."
-                    : "Create account"}
+                    ? t("account.creating")
+                    : t("account.createButton")}
               </button>
             </form>
 

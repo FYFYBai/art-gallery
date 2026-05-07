@@ -8,6 +8,10 @@
   transform: translateZ(0);
 }
 
+.accountModalActive {
+  backdrop-filter: none;
+}
+
 .headerShell {
   min-height: var(--header-height);
   display: flex;
@@ -374,7 +378,10 @@
   padding: 24px;
   background: rgba(78, 67, 56, 0.38);
   backdrop-filter: blur(4px);
-  animation: accountOverlayIn 0.22s ease;
+  -webkit-backdrop-filter: blur(4px);
+  animation: accountOverlayIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateZ(0);
+  contain: paint;
   will-change: opacity;
 }
 
@@ -388,9 +395,9 @@
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
-  animation: accountModalIn 0.24s ease;
+  animation: accountModalIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   will-change: opacity, transform;
 }
 
@@ -821,11 +828,11 @@
 @keyframes accountModalIn {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translate3d(0, 14px, 0) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

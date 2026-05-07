@@ -112,17 +112,16 @@ export default function WhyOriginalSection() {
               <div className={styles.cardImageWrap}>
                 <img
                   src={card.image}
-                  alt={card.title}
+                  alt={t(card.titleKey)}
                   className={styles.cardImage}
                 />
               </div>
 
               <div className={styles.cardTextBlock}>
-                {card.eyebrow && (
-                  <p className={styles.cardEyebrow}>{card.eyebrow}</p>
-                )}
-                <h3 className={styles.cardTitle}>{card.title}</h3>
-                <p className={styles.cardDescription}>{card.description}</p>
+                <h3 className={styles.cardTitle}>{t(card.titleKey)}</h3>
+                <p className={styles.cardDescription}>
+                  {t(card.descriptionKey)}
+                </p>
               </div>
             </article>
           ))}
