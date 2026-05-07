@@ -6,24 +6,27 @@ import { useRouter, useParams } from "next/navigation";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function readStoredAuth() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const stored = window.localStorage.getItem("auth");
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { locale } = useParams();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(readStoredAuth);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("auth");
-      if (stored) {
-        setUser(JSON.parse(stored));
-      } else {
-        // Not logged in — redirect to home
-        router.replace(`/${locale}`);
-      }
-    } catch {
+    if (!user) {
       router.replace(`/${locale}`);
     }
-  }, [locale, router]);
+  }, [locale, router, user]);
 
   const handleLogout = async () => {
     const token = user?.token;

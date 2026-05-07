@@ -17,6 +17,17 @@ import {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+function readStoredAuth() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const stored = window.localStorage.getItem("auth");
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -39,7 +50,7 @@ export default function Header() {
   const [accountToast, setAccountToast] = useState(null);
   const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
+  const [currentUser, setCurrentUser] = useState(readStoredAuth); // { email, role, token }
   const loginSubmittingRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTermIndex, setSearchTermIndex] = useState(0);
@@ -112,17 +123,7 @@ export default function Header() {
     };
   }, []);
 
-  // Rehydrate auth state from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("auth");
-      if (stored) {
-        setCurrentUser(JSON.parse(stored));
-      }
-    } catch {
-      // ignore malformed data
-    }
-
     // Sync auth state when another tab or the profile page clears localStorage
     const onStorage = (e) => {
       if (e.key === "auth") {
@@ -158,7 +159,8 @@ export default function Header() {
   const handleLanguageSelect = (code) => {
     // Persist the chosen locale in a cookie so the middleware uses it
     // for any path that doesn't already have a locale prefix
-    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; SameSite=Lax`;
+    // eslint-disable-next-line react-hooks/immutability
+    window.document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; SameSite=Lax`;
 
     // Replace the locale segment in the current path
     const segments = window.location.pathname.split("/");
