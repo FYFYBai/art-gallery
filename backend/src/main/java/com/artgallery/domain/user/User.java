@@ -4,7 +4,6 @@ import com.artgallery.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
@@ -26,6 +25,10 @@ public class User extends BaseEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAuthProvider> authProviders = new ArrayList<>();
@@ -49,6 +52,8 @@ public class User extends BaseEntity {
     public void setPhone(String phone) { this.phone = phone; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
     public List<UserAuthProvider> getAuthProviders() { return authProviders; }
     public List<UserAddress> getAddresses() { return addresses; }
     public List<PaymentMethod> getPaymentMethods() { return paymentMethods; }

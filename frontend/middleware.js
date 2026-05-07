@@ -22,9 +22,15 @@ export function middleware(request) {
 
   if (pathnameHasLocale) return NextResponse.next();
 
-  // Redirect to default locale
+  // Use the locale stored in the cookie, fall back to default
+  const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  const locale =
+    cookieLocale && locales.includes(cookieLocale)
+      ? cookieLocale
+      : defaultLocale;
+
   const url = request.nextUrl.clone();
-  url.pathname = `/${defaultLocale}${pathname}`;
+  url.pathname = `/${locale}${pathname}`;
   return NextResponse.redirect(url);
 }
 

@@ -2,6 +2,7 @@ package com.artgallery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Entry point for the Art Gallery e-commerce backend.
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * </ul>
  */
 @SpringBootApplication
+@EnableScheduling
 public class ArtGalleryApplication {
 
     public static void main(String[] args) {

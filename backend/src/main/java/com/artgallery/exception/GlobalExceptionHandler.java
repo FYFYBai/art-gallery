@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.ArrayList;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,13 +27,37 @@ public class GlobalExceptionHandler {
                 .toList();
 
         if (!globalErrors.isEmpty()) {
-            errors = new java.util.ArrayList<>(errors);
+            errors = new ArrayList<>(errors);
             errors.addAll(globalErrors);
         }
 
         return ResponseEntity
                 .badRequest()
-                .body(ApiErrorResponse.of("Registration failed", errors));
+                .body(ApiErrorResponse.of("Validation failed", errors));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse.of("Login failed", List.of()));
+    }
+
+    @ExceptionHandler(AccountDisabledException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountDisabled(AccountDisabledException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.of("Account is disabled", List.of()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        String message = "Unsupported OAuth provider".equals(ex.getMessage())
+                ? "Unsupported OAuth provider"
+                : "Bad request";
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(message, List.of()));
     }
 
     @ExceptionHandler(DuplicateEmailException.class)

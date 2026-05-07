@@ -196,3 +196,6 @@ dist
 .github
 .kiro
 .vscode
+backend/.jqwik-database
+backend/package-lock.json
+backend/package.json

@@ -33,7 +33,7 @@ export default async function LocaleLayout({ children, params }) {
 
   return (
     <html lang={locale}>
-      <body className={`${notoSans.variable} ${notoSerif.variable}`}>
+      <body className={`${notoSans.variable} ${notoSerif.variable}`} suppressHydrationWarning>
         <IntlProvider locale={locale} messages={messages}>
           <Header />
           <main className="pageContent">{children}</main>
