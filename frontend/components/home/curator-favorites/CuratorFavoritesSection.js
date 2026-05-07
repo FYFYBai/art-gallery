@@ -9,40 +9,46 @@ const TABLET_ITEMS_PER_VIEW = 3;
 const MOBILE_ITEMS_PER_VIEW = 2;
 const SMALL_MOBILE_ITEMS_PER_VIEW = 1;
 const AUTOPLAY_DELAY_MS = 10000;
+const CARD_GAP_PX = 24;
 
 const curatorItems = [
   {
     id: "presence-urbaine",
-    title: "Présence urbaine",
-    description: "Entre mouvement et lumière,\nla ville devient sensation.",
+    titleKey: "curatorFavorite1Title",
+    descriptionKey: "curatorFavorite1Description",
     image: "/images/curator-favorites/1.jpg",
   },
   {
     id: "paysage-ouvert",
-    title: "Paysage ouvert",
-    description:
-      "Un espace extérieur où la lumière\nse reflète et s'étire dans le temps.",
+    titleKey: "curatorFavorite2Title",
+    descriptionKey: "curatorFavorite2Description",
     image: "/images/curator-favorites/2.jpg",
     imagePosition: "center 3%",
   },
   {
     id: "interiorite",
-    title: "Intériorité",
-    description: "Une présence fragile,\nentre regard et transformation.",
+    titleKey: "curatorFavorite3Title",
+    descriptionKey: "curatorFavorite3Description",
     image: "/images/curator-favorites/3.jpg",
   },
   {
     id: "lumiere-vibrante",
-    title: "Lumière vibrante",
-    description: "La couleur devient énergie,\net transforme le paysage.",
+    titleKey: "curatorFavorite4Title",
+    descriptionKey: "curatorFavorite4Description",
     image: "/images/curator-favorites/4.jpg",
     imagePosition: "center 12%",
   },
   {
     id: "silence-nocturne",
-    title: "Silence nocturne",
-    description: "La ville s'apaise,\net la lumière reste.",
+    titleKey: "curatorFavorite5Title",
+    descriptionKey: "curatorFavorite5Description",
     image: "/images/curator-favorites/5.png",
+  },
+  {
+    id: "lumiere-apaisante",
+    titleKey: "curatorFavorite6Title",
+    descriptionKey: "curatorFavorite6Description",
+    image: "/images/curator-favorites/6.png",
   },
 ];
 
@@ -83,21 +89,32 @@ function getItemsPerView(width) {
   return DESKTOP_ITEMS_PER_VIEW;
 }
 
-function chunkItems(items, size) {
-  const pages = [];
+function getPageOffsets(itemCount, itemsPerView) {
+  const maxOffset = Math.max(itemCount - itemsPerView, 0);
+  const offsets = [0];
 
-  for (let i = 0; i < items.length; i += size) {
-    pages.push(items.slice(i, i + size));
+  for (
+    let offset = itemsPerView;
+    offset <= maxOffset;
+    offset += itemsPerView
+  ) {
+    offsets.push(offset);
   }
 
-  return pages;
+  if (!offsets.includes(maxOffset)) {
+    offsets.push(maxOffset);
+  }
+
+  return offsets;
 }
 
 export default function CuratorFavoritesSection() {
   const t = useTranslations("home");
   const [pageIndex, setPageIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(DESKTOP_ITEMS_PER_VIEW);
+  const [slideDistance, setSlideDistance] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const carouselTrackRef = useRef(null);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -113,14 +130,14 @@ export default function CuratorFavoritesSection() {
     };
   }, []);
 
-  const pages = useMemo(() => {
-    return chunkItems(curatorItems, itemsPerView);
+  const pageOffsets = useMemo(() => {
+    return getPageOffsets(curatorItems.length, itemsPerView);
   }, [itemsPerView]);
-
-  const totalPages = pages.length;
-  const safePageIndex = Math.min(pageIndex, Math.max(totalPages - 1, 0));
+  const safePageIndex = Math.min(pageIndex, Math.max(pageOffsets.length - 1, 0));
+  const activeOffset = pageOffsets[safePageIndex] ?? 0;
+  const canSlide = pageOffsets.length > 1;
   const canGoPrev = safePageIndex > 0;
-  const canGoNext = safePageIndex < totalPages - 1;
+  const canGoNext = safePageIndex < pageOffsets.length - 1;
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -129,15 +146,39 @@ export default function CuratorFavoritesSection() {
     }
   }, []);
 
+  const measureSlideDistance = useCallback(() => {
+    const firstCard = carouselTrackRef.current?.querySelector(
+      "[data-curator-card]",
+    );
+
+    if (firstCard) {
+      setSlideDistance(firstCard.getBoundingClientRect().width + CARD_GAP_PX);
+    }
+  }, []);
+
+  useEffect(() => {
+    measureSlideDistance();
+
+    window.addEventListener("resize", measureSlideDistance);
+
+    return () => {
+      window.removeEventListener("resize", measureSlideDistance);
+    };
+  }, [measureSlideDistance]);
+
+  useEffect(() => {
+    measureSlideDistance();
+  }, [itemsPerView, measureSlideDistance]);
+
   useEffect(() => {
     clearTimer();
 
-    if (!isHovered && totalPages > 1) {
+    if (!isHovered && canSlide) {
       timerRef.current = setTimeout(() => {
         setPageIndex((prev) => {
-          const safePrev = Math.min(prev, Math.max(totalPages - 1, 0));
+          const safePrev = Math.min(prev, Math.max(pageOffsets.length - 1, 0));
 
-          return safePrev + 1 >= totalPages ? 0 : safePrev + 1;
+          return safePrev >= pageOffsets.length - 1 ? 0 : safePrev + 1;
         });
       }, AUTOPLAY_DELAY_MS);
     }
@@ -145,16 +186,20 @@ export default function CuratorFavoritesSection() {
     return () => {
       clearTimer();
     };
-  }, [clearTimer, safePageIndex, isHovered, totalPages]);
+  }, [canSlide, clearTimer, isHovered, pageOffsets.length, safePageIndex]);
 
   const goPrev = () => {
     clearTimer();
-    setPageIndex(safePageIndex === 0 ? totalPages - 1 : safePageIndex - 1);
+    setPageIndex(
+      safePageIndex === 0 ? pageOffsets.length - 1 : safePageIndex - 1,
+    );
   };
 
   const goNext = () => {
     clearTimer();
-    setPageIndex(safePageIndex + 1 >= totalPages ? 0 : safePageIndex + 1);
+    setPageIndex(
+      safePageIndex >= pageOffsets.length - 1 ? 0 : safePageIndex + 1,
+    );
   };
 
   return (
@@ -166,9 +211,9 @@ export default function CuratorFavoritesSection() {
       <div className={styles.inner}>
         <div className={styles.headerRow}>
           <div>
-            <h2 className={styles.title}>Regards choisis</h2>
+            <h2 className={styles.title}>{t("curatorFavoritesTitle")}</h2>
             <p className={styles.subtitle}>
-              Cinq façons de ressentir le monde, à travers mes œuvres.
+              {t("curatorFavoritesSubtitle")}
             </p>
           </div>
 
@@ -177,7 +222,7 @@ export default function CuratorFavoritesSection() {
               type="button"
               className={styles.arrowButton}
               onClick={goPrev}
-              disabled={!canGoPrev && totalPages <= 1}
+              disabled={!canGoPrev && !canSlide}
               aria-label={t("previousCurator")}
             >
               <ArrowLeftIcon />
@@ -187,7 +232,7 @@ export default function CuratorFavoritesSection() {
               type="button"
               className={styles.arrowButton}
               onClick={goNext}
-              disabled={!canGoNext && totalPages <= 1}
+              disabled={!canGoNext && !canSlide}
               aria-label={t("nextCurator")}
             >
               <ArrowRightIcon />
@@ -197,51 +242,39 @@ export default function CuratorFavoritesSection() {
 
         <div className={styles.carouselViewport}>
           <div
+            ref={carouselTrackRef}
             className={styles.carouselTrack}
             style={{
-              width: `${totalPages * 100}%`,
-              transform: `translateX(-${safePageIndex * (100 / totalPages)}%)`,
+              "--items-per-view": itemsPerView,
+              "--card-gap": `${CARD_GAP_PX}px`,
+              "--visible-gap-total": `${(itemsPerView - 1) * CARD_GAP_PX}px`,
+              transform: `translate3d(-${activeOffset * slideDistance}px, 0, 0)`,
             }}
           >
-            {pages.map((pageItems, pageNumber) => (
-              <div
-                key={`curator-page-${pageNumber}`}
-                className={styles.carouselPage}
-                style={{ width: `${100 / totalPages}%` }}
-              >
-                <div
-                  className={styles.pageGrid}
-                  style={{
-                    gridTemplateColumns: `repeat(${itemsPerView}, minmax(0, 1fr))`,
-                  }}
-                >
-                  {pageItems.map((item) => (
-                    <article key={item.id} className={styles.card}>
-                      <a href="#" className={styles.imageLink}>
-                        <div className={styles.imageWrap}>
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className={styles.image}
-                            style={
-                              item.imagePosition
-                                ? { objectPosition: item.imagePosition }
-                                : undefined
-                            }
-                          />
-                        </div>
-                      </a>
+            {curatorItems.map((item) => (
+              <article key={item.id} className={styles.card} data-curator-card>
+                <a href="#" className={styles.imageLink}>
+                  <div className={styles.imageWrap}>
+                    <img
+                      src={item.image}
+                      alt={t(item.titleKey)}
+                      className={styles.image}
+                      style={
+                        item.imagePosition
+                          ? { objectPosition: item.imagePosition }
+                          : undefined
+                      }
+                    />
+                  </div>
+                </a>
 
-                      <a href="#" className={styles.cardTitleLink}>
-                        {item.title}
-                      </a>
-                      <p className={styles.cardDescription}>
-                        {item.description}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </div>
+                <a href="#" className={styles.cardTitleLink}>
+                  {t(item.titleKey)}
+                </a>
+                <p className={styles.cardDescription}>
+                  {t(item.descriptionKey)}
+                </p>
+              </article>
             ))}
           </div>
         </div>

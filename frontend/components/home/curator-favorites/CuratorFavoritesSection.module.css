@@ -93,21 +93,14 @@
 
 .carouselTrack {
   display: flex;
+  gap: var(--card-gap);
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   transform: translate3d(0, 0, 0);
   will-change: transform;
 }
 
-.carouselPage {
-  flex: 0 0 auto;
-}
-
-.pageGrid {
-  display: grid;
-  gap: 24px;
-}
-
 .card {
+  flex: 0 0 calc((100% - var(--visible-gap-total)) / var(--items-per-view));
   min-width: 0;
 }
 
@@ -173,7 +166,7 @@
 
 .cardDescription {
   margin-top: 10px;
-  max-width: 31ch;
+  max-width: 38ch;
   font-family: var(--font-title), serif;
   font-size: 0.82rem;
   line-height: 1.65;
