@@ -1,12 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "../../i18n/IntlContext";
+import { useLocale, useTranslations } from "../../i18n/IntlContext";
 import styles from "./Footer.module.css";
+
+function getLocalizedHref(href, locale) {
+  if (!href || href.startsWith("#") || /^https?:\/\//.test(href)) {
+    return href;
+  }
+
+  if (href === "/") {
+    return `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
 
 export default function Footer() {
   const t = useTranslations("footer");
   const tNav = useTranslations("nav");
+  const locale = useLocale();
 
   return (
     <footer className={styles.footer}>
@@ -33,9 +50,9 @@ export default function Footer() {
           </div>
 
           <nav className={styles.nav} aria-label={t("navLabel")}>
-            <Link href="/artworks" className={styles.link}>{tNav("artworks")}</Link>
-            <Link href="/artworks" className={styles.link}>{tNav("series")}</Link>
-            <Link href="/a-propos" className={styles.link}>{tNav("about")}</Link>
+            <Link href={getLocalizedHref("/artworks", locale)} className={styles.link}>{tNav("artworks")}</Link>
+            <Link href={getLocalizedHref("/artworks", locale)} className={styles.link}>{tNav("series")}</Link>
+            <Link href={getLocalizedHref("/a-propos", locale)} className={styles.link}>{tNav("about")}</Link>
             <a href="#" className={styles.link}>{tNav("exhibitions")}</a>
             <a href="#" className={styles.link}>{tNav("contact")}</a>
           </nav>

@@ -28,6 +28,22 @@ function readStoredAuth() {
   }
 }
 
+function getLocalizedHref(href, locale) {
+  if (!href || href.startsWith("#") || /^https?:\/\//.test(href)) {
+    return href;
+  }
+
+  if (href === "/") {
+    return `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
+
 export default function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -450,7 +466,7 @@ export default function Header() {
       >
         <div className={styles.headerShell}>
           <Link
-            href="/"
+            href={getLocalizedHref("/", locale)}
             className={styles.logoLink}
             aria-label={t("header.logoLabel")}
           >
@@ -475,7 +491,10 @@ export default function Header() {
                           : undefined
                       }
                     >
-                      <Link href={item.link} className={styles.navLink}>
+                      <Link
+                        href={getLocalizedHref(item.link, locale)}
+                        className={styles.navLink}
+                      >
                         {item.label}
                       </Link>
                     </li>
@@ -606,7 +625,7 @@ export default function Header() {
 
               {/* Cart */}
               <Link
-                href="/cart"
+                href={getLocalizedHref("/cart", locale)}
                 className={styles.iconButton}
                 aria-label={t("header.cartLabel")}
               >
@@ -632,7 +651,10 @@ export default function Header() {
                       {column.items.map((subItem) => (
                         <li key={subItem.slug}>
                           <Link
-                            href={`/artworks?type=${subItem.slug}`}
+                            href={getLocalizedHref(
+                              `/artworks?type=${subItem.slug}`,
+                              locale,
+                            )}
                             className={styles.dropdownItemLink}
                             onClick={hideDropdown}
                           >
@@ -656,7 +678,10 @@ export default function Header() {
                 <p className={styles.promoDescription}>
                   {activeItem.promo.description}
                 </p>
-                <Link href={activeItem.promo.link} className={styles.promoCta}>
+                <Link
+                  href={getLocalizedHref(activeItem.promo.link, locale)}
+                  className={styles.promoCta}
+                >
                   {activeItem.promo.cta}
                 </Link>
               </aside>

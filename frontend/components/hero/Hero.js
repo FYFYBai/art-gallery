@@ -1,12 +1,29 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "../../i18n/IntlContext";
+import { useLocale, useTranslations } from "../../i18n/IntlContext";
 import styles from "./Hero.module.css";
 import heroSlides from "./heroSlides";
 
+function getLocalizedHref(href, locale) {
+  if (!href || href.startsWith("#") || /^https?:\/\//.test(href)) {
+    return href;
+  }
+
+  if (href === "/") {
+    return `/${locale}`;
+  }
+
+  if (href.startsWith(`/${locale}/`) || href === `/${locale}`) {
+    return href;
+  }
+
+  return href.startsWith("/") ? `/${locale}${href}` : href;
+}
+
 export default function Hero() {
   const t = useTranslations("hero");
+  const locale = useLocale();
   const [activeIndex, setActiveIndex] = useState(0);
   const timerRef = useRef(null);
 
@@ -65,7 +82,10 @@ export default function Hero() {
                   <p className={styles.eyebrow}>{t(slide.eyebrowKey)}</p>
                   <h2 className={styles.title}>{t(slide.titleKey)}</h2>
                   <span className={styles.divider} aria-hidden="true" />
-                  <a href={slide.linkHref} className={styles.link}>
+                  <a
+                    href={getLocalizedHref(slide.linkHref, locale)}
+                    className={styles.link}
+                  >
                     {t(slide.linkTextKey)}
                     <span className={styles.linkArrow} aria-hidden="true">
                       →

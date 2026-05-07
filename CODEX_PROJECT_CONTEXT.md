@@ -1,40 +1,24 @@
 # Codex Project Context
 
-This file is for Codex handoff only. Keep it compact and current. Do not treat it as user-facing documentation.
+Codex-only handoff. Keep compact. Do not treat as user-facing docs.
 
-## Current Focus
+## Current State
 
-- Frontend homepage refinement is in progress.
-- Next planned area: inspect how the user's colleague implements language switching and decide how to integrate it with the current header/language menu.
-
-## Repo Shape
-
-```txt
-frontend/
-backend/
-docker-compose.yml
-CODEX_PROJECT_CONTEXT.md
-REGISTRATION_DEMO_FLOW.txt
-```
-
-Frontend source is under `frontend/`. Backend source is under `backend/`.
-
-Path alias in `frontend/jsconfig.json`:
-
-```js
-"@/*": ["./*"]
-```
+- Branch work was merged into `main` and pushed earlier. Current route system is locale-based.
+- Next.js warning about deprecated `middleware.js` was fixed by renaming to `frontend/proxy.js`.
+- `proxy.js` preserves main's `NEXT_LOCALE` cookie behavior: bare paths redirect to the cookie locale, falling back to `fr`.
+- Internal visible navigation should stay in the active locale unless the user uses the language switcher.
 
 ## Commands
-
-Frontend:
 
 ```powershell
 cd frontend
 npm.cmd run lint
-npm.cmd run dev
 npm.cmd run build
+npm.cmd run dev
 ```
+
+Build may need network for Google Fonts (`next/font/google`). Lint passes with raw `<img>` warnings only.
 
 Backend demo:
 
@@ -45,66 +29,65 @@ mvn test
 mvn spring-boot:run
 ```
 
-Use `npm.cmd` in PowerShell if `npm` is blocked by execution policy.
+## Routes And Locale
 
-## Working Notes
-
-- Shell output may show French/Chinese text as mojibake. Do not "fix" encoding based only on shell output if IDE/browser display is fine.
-- Raw `<img>` warnings are currently accepted because image strategy is temporary.
-- Avoid broad image optimization unless explicitly requested.
-- Prefer existing CSS Modules and feature-folder organization.
-- Use existing palette/font tokens.
-- Do not introduce emoji unless asked.
-
-## Frontend Stack
-
-- Next.js `^16.2.4`
-- React `19.2.3`
-- JavaScript, not TypeScript
-- CSS Modules
-- React Compiler enabled in `frontend/next.config.mjs`
-
-## Global Styling
-
-Important files:
+Active app routes:
 
 ```txt
-frontend/app/layout.js
-frontend/app/globals.css
-frontend/color_pallet.txt
-frontend/public/fonts/
+frontend/app/[locale]/page.js
+frontend/app/[locale]/a-propos/page.js
+frontend/app/[locale]/artworks/page.js
+frontend/app/[locale]/cart/page.js
+frontend/app/[locale]/profile/page.js
+frontend/app/[locale]/layout.js
+frontend/proxy.js
 ```
 
-Font tokens in `globals.css`:
+Locales: `fr`, `en`, `zh`. Default: `fr`.
 
-```css
---font-body: var(--font-sans);
---font-title: var(--font-serif);
---font-logo: "Sylvaine Didot", serif;
---font-display: "Sylvaine Playfair", serif;
-```
-
-Current conventions:
-
-- `--font-logo`: navbar/hero logo-style text.
-- `--font-display`: refined editorial titles in selected homepage sections.
-- `--font-title`: general serif text/headings.
-- `--font-body`: UI, labels, forms, nav, buttons unless a section explicitly uses serif.
-
-Palette tokens live in `globals.css`; prefer those over hardcoded colors.
-
-## Routes
+Messages:
 
 ```txt
-frontend/app/layout.js
-frontend/app/page.js
-frontend/app/a-propos/page.js
-frontend/app/cart/page.js
+frontend/messages/fr.json
+frontend/messages/en.json
+frontend/messages/zh.json
 ```
 
-`layout.js` wraps pages with persistent `Header`, main `.pageContent`, and `Footer`.
+`fr`, `en`, and `zh` key sets were audited and match. Homepage/header visible copy was moved into messages where practical.
 
-Homepage render order in `frontend/app/page.js`:
+Locale-aware links currently handled in:
+
+```txt
+frontend/components/header/Header.js
+frontend/components/footer/Footer.js
+frontend/components/hero/Hero.js
+```
+
+Each has a small `getLocalizedHref(href, locale)` helper. It leaves `#`/external links alone and prefixes internal root paths with the active locale.
+
+## Header/Auth
+
+Files:
+
+```txt
+frontend/components/header/Header.js
+frontend/components/header/Header.module.css
+frontend/components/header/headerData.js
+```
+
+Important behavior:
+
+- Language switcher writes `NEXT_LOCALE` cookie and changes the locale path.
+- Header logo/nav/cart/dropdown/promo links are locale-aware.
+- Auth uses `localStorage` key `auth`.
+- Login/register call backend auth endpoints.
+- Profile link is `/${locale}/profile`.
+- Account modal keeps blur, but header blur disables while modal is open to reduce stacked blur cost.
+- `document.cookie` write has a narrow `react-hooks/immutability` eslint disable because it is an intentional event-handler side effect.
+
+## Homepage
+
+Rendered order in `frontend/app/[locale]/page.js`:
 
 ```jsx
 <Hero />
@@ -114,248 +97,74 @@ Homepage render order in `frontend/app/page.js`:
 <CuratedExperienceSection />
 ```
 
-## Header
-
-Files:
-
-```txt
-frontend/components/header/Header.js
-frontend/components/header/Header.module.css
-frontend/components/header/headerData.js
-frontend/components/header/icons.js
-```
-
-Current header behavior:
-
-- Left logo, nav/search/actions on right.
-- Nav dropdowns for items with `columns`.
-- Language menu opens but does not switch content yet.
-- Cart icon links to `/cart`.
-- Search is a real form, but submit only writes URL hash:
-
-```js
-window.location.hash = `search=${encodeURIComponent(trimmedSearchQuery)}`;
-```
-
-Search placeholder:
-
-- Custom animated overlay, not native placeholder.
-- `Search for` stays fixed.
-- Only the keyword rolls upward/out and new keyword enters from below.
-- Controlled by `searchTermIndex`, `previousSearchTermIndex`, `searchTermAnimating`.
-
-Account modal:
-
-- Opens from account icon.
-- Closes on outside click, Escape, or close button.
-- Login UI is mostly presentational.
-- Register mode is a real demo flow.
-- `Register account` switches in-place to email/password/password-confirmation form.
-- `Back to login` returns to login mode.
-- Social buttons remain visible under both login and register modes.
-- Registration calls `POST /api/auth/register`.
-- Frontend validates required fields, password length, and password match.
-- `accountToast` shows temporary success/failure.
-- Backend URL is `NEXT_PUBLIC_API_BASE_URL` or `http://localhost:8080`.
-
-If header grows further, likely extract:
-
-```txt
-SearchBar.js
-AccountModal.js
-HeaderNav.js
-NavDropdown.js
-```
-
-## Homepage Sections
-
 ### Hero
 
-Files:
-
-```txt
-frontend/components/hero/Hero.js
-frontend/components/hero/Hero.module.css
-frontend/components/hero/heroSlides.js
-frontend/public/images/hero/
-```
-
-Current state:
-
-- Uses local banner images: `1.png`, `2.png`, `3.png`.
-- Images are CSS backgrounds with `background-size: 100% 100%` to avoid cropping/letterboxing.
-- Text is an editorial overlay, not a card.
-- `SYLVAINE ART` uses `--font-logo`.
-- Hero text is non-selectable.
+- Files: `frontend/components/hero/*`, images in `frontend/public/images/hero/`.
+- Slide text is localized via message keys.
+- Slide links are locale-aware in `Hero.js`.
 
 ### Display Sample
 
-Files:
-
-```txt
-frontend/components/home/display-sample/DisplaySample.js
-frontend/components/home/display-sample/DisplaySample.module.css
-frontend/public/images/display-sample/
-```
-
-Current state:
-
-- Uses `display1.png` through `display4.png`.
-- French editorial heading/subheading.
-- Subheading stays one line on desktop and wraps on mobile.
-- Cards have thin borders, tall image ratios, and whole-card hover lift.
-- Card CTA has underline animation.
-- Titles use `--font-display`.
-- Supporting text uses serif in this section.
+- Files: `frontend/components/home/display-sample/*`.
+- Images: `frontend/public/images/display-sample/display1.png` through `display4.png`.
+- Titles/descriptions/alts/actions are localized.
+- Uses `--font-display` for titles and serif supporting text.
 
 ### Why Original
 
-Files:
-
-```txt
-frontend/components/home/why-original/WhyOriginalSection.js
-frontend/components/home/why-original/WhyOriginalSection.module.css
-frontend/components/home/why-original/whyOriginalData.js
-frontend/public/images/why-original/
-```
-
-Important:
-
-- This is a client component with custom sticky/fixed behavior for the left column.
-- Be careful editing scroll/resize logic.
-
-Current state:
-
-- Uses local images `1.png` through `5.png`.
-- Left copy is French editorial, with Playfair title.
-- Cards use French copy from `whyOriginalData.js`.
-- Reference numbering was intentionally removed.
-- Card descriptions use `\n` between sentences and CSS `white-space: pre-line`.
-- Cards have tighter spacing, larger image column, image fills card height on desktop/tablet, and subtle rounded corners.
+- Files: `frontend/components/home/why-original/*`.
+- Images: `frontend/public/images/why-original/1.png` through `5.png`.
+- Card text is localized via message keys.
+- Custom sticky/fixed left column logic; edit carefully.
 
 ### Curator Favorites
 
-Files:
-
-```txt
-frontend/components/home/curator-favorites/CuratorFavoritesSection.js
-frontend/components/home/curator-favorites/CuratorFavoritesSection.module.css
-```
-
-Current state:
-
-- Client carousel with 15 placeholder items.
-- Responsive items per view: desktop 5, tablet 3, mobile 2, small mobile 1.
-- Autoplay every 10 seconds, pauses on hover.
-- Uses `safePageIndex` to satisfy strict React Compiler lint rules.
+- Files: `frontend/components/home/curator-favorites/*`.
+- Images: `frontend/public/images/curator-favorites/1.jpg`, `2.jpg`, `3.jpg`, `4.jpg`, `5.png`, `6.png`.
+- Carousel shows 5 desktop items, 3 tablet, 2 mobile, 1 small mobile.
+- Page offsets avoid empty final pages:
+  - 6 items: `1-5` then `2-6`
+  - 8 items: `1-5` then `4-8`
+  - 10 items: `1-5` then `6-10`
+  - 11 items: `1-5`, `6-10`, then `7-11`
+- Text is localized via message keys.
 
 ### Curated Experience
 
-Files:
+- Files: `frontend/components/home/curated-experience/*`.
+- Image: `frontend/public/images/curated-experience/1.png`.
+- Implemented as split layout, not background text overlay: text column plus image column for responsive stability.
+- CTA hover: brown background, white text.
 
-```txt
-frontend/components/home/curated-experience/CuratedExperienceSection.js
-frontend/components/home/curated-experience/CuratedExperienceSection.module.css
+## Styling Notes
+
+Font tokens in `frontend/app/globals.css`:
+
+```css
+--font-body
+--font-title
+--font-logo
+--font-display
 ```
 
-Current state:
+Use existing CSS Modules and tokens. Raw `<img>` warnings are accepted for now. Do not optimize/convert image strategy unless asked.
 
-- Full-width background-image CTA section.
-- Uses warm overlay and CTA button.
+## Backend Auth Demo
 
-## Backend Registration Demo
+Registration/login backend exists from colleague/main work plus prior demo. Keep `REGISTRATION_DEMO_FLOW.txt` for walkthrough context.
 
-Root walkthrough:
+Important frontend auth behavior:
 
-```txt
-REGISTRATION_DEMO_FLOW.txt
-```
+- Register validates required fields, password length, and confirmation.
+- Register success/failure toasts are localized on frontend.
+- Login stores `{ email, role, token }` under `localStorage.auth`.
+- Logout clears local auth and best-effort calls backend logout.
 
-Files:
+## Current Verification
 
-```txt
-backend/src/main/java/com/artgallery/controller/AuthController.java
-backend/src/main/java/com/artgallery/service/AuthService.java
-backend/src/main/java/com/artgallery/config/SecurityConfig.java
-backend/src/main/java/com/artgallery/dto/request/RegisterRequest.java
-backend/src/main/java/com/artgallery/dto/response/RegisterResponse.java
-backend/src/main/java/com/artgallery/dto/response/ApiErrorResponse.java
-backend/src/main/java/com/artgallery/exception/DuplicateEmailException.java
-backend/src/main/java/com/artgallery/exception/GlobalExceptionHandler.java
-backend/src/test/java/com/artgallery/dto/request/RegisterRequestValidationTest.java
-```
-
-Behavior:
-
-- `POST /api/auth/register`.
-- Validates email, password length, and password confirmation.
-- Normalizes email to lowercase.
-- Rejects duplicates with `409 Conflict`.
-- Hashes password with BCrypt into `users.password_hash`.
-- Saves through `UserRepository`.
-- CORS allows local frontend dev origins such as `http://localhost:*` and `http://127.0.0.1:*`.
-- Validation tests pass with `mvn test`.
-
-The broader backend service/controller/JWT/OAuth work is still pending beyond this demo slice.
-
-## Cart
-
-Files:
+Latest verified:
 
 ```txt
-frontend/app/cart/page.js
-frontend/components/cart/CartSection.js
-frontend/components/cart/CartSection.module.css
-```
-
-Current state:
-
-- Temporary client-side demo flow only.
-- Stages: cart, checkout, confirmation.
-- No backend persistence yet.
-
-## Image Strategy
-
-Current local image folders:
-
-```txt
-frontend/public/images/hero/
-frontend/public/images/display-sample/
-frontend/public/images/why-original/
-```
-
-Other sections still use external placeholders or raw `<img>`.
-
-Future image cleanup:
-
-- Move finalized artwork assets into `frontend/public/`.
-- Consider Next `<Image />` once image strategy is settled.
-- Configure remote domains only if remote/CDN strategy is chosen.
-
-## Lint/Test Status
-
-Frontend:
-
-- `npm.cmd run lint` passes with warnings only for raw `<img>`.
-
-Backend:
-
-- `mvn test` passes for registration validation tests.
-
-Known accepted warnings:
-
-```txt
-@next/next/no-img-element
-```
-
-## Next Likely Task
-
-Inspect language switching. Current language options are only a menu in the header. They do not switch content yet.
-
-Relevant files:
-
-```txt
-frontend/components/header/Header.js
-frontend/components/header/headerData.js
-frontend/components/header/Header.module.css
+npm.cmd run lint   # passes; raw img warnings only
+npm.cmd run build  # passes; may need Google Fonts network
 ```
