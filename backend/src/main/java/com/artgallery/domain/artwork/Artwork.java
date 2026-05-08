@@ -19,8 +19,11 @@ public class Artwork extends BaseEntity {
     @Column(name = "artwork_type", length = 50)
     private String artworkType;
 
-    @Column(name = "artwork_medium", length = 100)
-    private String artworkMedium;
+    @Column(length = 100)
+    private String series;
+
+    @Column(name = "artwork_size", length = 100)
+    private String artworkSize;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
@@ -47,8 +50,10 @@ public class Artwork extends BaseEntity {
     public void setDescription(String description) { this.description = description; }
     public String getArtworkType() { return artworkType; }
     public void setArtworkType(String artworkType) { this.artworkType = artworkType; }
-    public String getArtworkMedium() { return artworkMedium; }
-    public void setArtworkMedium(String artworkMedium) { this.artworkMedium = artworkMedium; }
+    public String getSeries() { return series; }
+    public void setSeries(String series) { this.series = series; }
+    public String getArtworkSize() { return artworkSize; }
+    public void setArtworkSize(String artworkSize) { this.artworkSize = artworkSize; }
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getCurrency() { return currency; }

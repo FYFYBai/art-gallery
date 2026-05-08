@@ -50,7 +50,7 @@ const fallbackAddresses = [
   },
 ];
 
-const orders = [
+const fallbackOrders = [
   {
     id: "SA-2026-014",
     date: "April 28, 2026",
@@ -112,6 +112,68 @@ function normalizePostalCode(postalCode) {
   return compact.length === 6 ? `${compact.slice(0, 3)} ${compact.slice(3)}` : postalCode;
 }
 
+function formatCurrency(value, currency = "CAD") {
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(Number(value || 0));
+}
+
+function formatDate(value) {
+  if (!value) return "";
+  return new Intl.DateTimeFormat("en-CA", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function normalizeOrder(order) {
+  const status = order.orderStatus || order.status;
+  const timeline = ["Order received"];
+
+  if (["PAID", "SHIPPED", "DELIVERED", "REFUNDED"].includes(status)) {
+    timeline.push("Payment confirmed");
+  }
+
+  if (["SHIPPED", "DELIVERED"].includes(status)) {
+    timeline.push("Shipped");
+  }
+
+  if (status === "DELIVERED") {
+    timeline.push("Delivered");
+  }
+
+  if (status === "REFUNDED") {
+    timeline.push("Refunded");
+  }
+
+  return {
+    id: order.orderNumber || order.id,
+    uuid: order.id,
+    date: formatDate(order.createdAt),
+    status,
+    total: formatCurrency(order.totalAmount, order.currency),
+    delivery:
+      status === "DELIVERED" && order.deliveredAt
+        ? `Delivered ${formatDate(order.deliveredAt)}`
+        : status === "SHIPPED"
+          ? order.trackingLink || "Shipped"
+          : status === "PAID"
+            ? "Payment confirmed"
+            : status,
+    shippingAddress: order.shippingAddress || "",
+    payment: order.paymentSummary || "",
+    items: (order.items || []).map((item) => ({
+      title: item.title,
+      detail: `Quantity ${item.quantity || 1}`,
+      price: formatCurrency(item.totalPrice || item.unitPrice, order.currency),
+    })),
+    timeline,
+  };
+}
+
 function EyeIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.passwordIcon}>
@@ -137,7 +199,15 @@ export default function ProfilePage() {
   const t = useTranslations("profile");
   const [user, setUser] = useState(readStoredAuth);
   const [activeSection, setActiveSection] = useState("overview");
-  const [selectedOrderId, setSelectedOrderId] = useState(orders[0].id);
+  const [selectedOrderId, setSelectedOrderId] = useState(fallbackOrders[0].id);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState("");
+  const [refundOrder, setRefundOrder] = useState(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [refundContactInfo, setRefundContactInfo] = useState("");
+  const [refundSubmitting, setRefundSubmitting] = useState(false);
+  const [refundMessage, setRefundMessage] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [addressesError, setAddressesError] = useState("");
@@ -152,9 +222,10 @@ export default function ProfilePage() {
   const [securityMessage, setSecurityMessage] = useState(null);
   const [securitySubmitting, setSecuritySubmitting] = useState(false);
 
+  const visibleOrders = orders.length > 0 ? orders : fallbackOrders;
   const selectedOrder = useMemo(
-    () => orders.find((order) => order.id === selectedOrderId) || orders[0],
-    [selectedOrderId],
+    () => visibleOrders.find((order) => order.id === selectedOrderId) || visibleOrders[0],
+    [selectedOrderId, visibleOrders],
   );
   const visibleAddresses = addresses.length > 0 ? addresses : fallbackAddresses;
   const primaryAddress = visibleAddresses.find((address) => address.primary);
@@ -207,6 +278,25 @@ export default function ProfilePage() {
     }
   };
 
+  const fetchOrders = async () => {
+    setOrdersLoading(true);
+    setOrdersError("");
+
+    try {
+      const response = await apiFetch("/api/profile/orders");
+      const result = await response.json();
+      const nextOrders = result.map(normalizeOrder);
+      setOrders(nextOrders);
+      setSelectedOrderId((current) => nextOrders.find((order) => order.id === current)?.id || nextOrders[0]?.id || fallbackOrders[0].id);
+    } catch (error) {
+      if (error.message !== "Session expired") {
+        setOrdersError(t("ordersLoadFailed"));
+      }
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       router.replace(`/${locale}`);
@@ -215,6 +305,7 @@ export default function ProfilePage() {
 
     const timerId = window.setTimeout(() => {
       fetchAddresses();
+      fetchOrders();
     }, 0);
 
     return () => window.clearTimeout(timerId);
@@ -374,6 +465,51 @@ export default function ProfilePage() {
     }
   };
 
+  const openRefundModal = (order) => {
+    setRefundOrder(order);
+    setRefundReason("");
+    setRefundContactInfo(user.email || "");
+    setRefundMessage(null);
+  };
+
+  const closeRefundModal = () => {
+    setRefundOrder(null);
+    setRefundReason("");
+    setRefundContactInfo("");
+    setRefundMessage(null);
+  };
+
+  const submitRefundRequest = async (event) => {
+    event.preventDefault();
+    if (!refundOrder || !refundReason.trim() || !refundContactInfo.trim()) return;
+
+    setRefundSubmitting(true);
+    setRefundMessage(null);
+
+    try {
+      const response = await apiFetch(`/api/profile/orders/${refundOrder.uuid}/refund-request`, {
+        method: "POST",
+        body: JSON.stringify({
+          reason: refundReason,
+          contactInfo: refundContactInfo,
+        }),
+      });
+
+      if (!response.ok) {
+        setRefundMessage({ type: "error", text: t("refundRequestFailed") });
+        return;
+      }
+
+      setRefundMessage({ type: "success", text: t("refundRequestSent") });
+    } catch (error) {
+      if (error.message !== "Session expired") {
+        setRefundMessage({ type: "error", text: t("refundRequestFailed") });
+      }
+    } finally {
+      setRefundSubmitting(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -412,10 +548,10 @@ export default function ProfilePage() {
               <div className={styles.metricsGrid}>
                 <Metric label={t("savedPayments")} value="2" />
                 <Metric label={t("savedAddresses")} value={String(visibleAddresses.length)} />
-                <Metric label={t("ordersThisYear")} value="3" />
+                <Metric label={t("ordersThisYear")} value={String(visibleOrders.length)} />
               </div>
               <div className={styles.previewGrid}>
-                <SummaryBlock title={t("nextDelivery")} body={`${orders[0].id} - ${orders[0].delivery}`} action={t("viewOrder")} onClick={() => { setSelectedOrderId(orders[0].id); setActiveSection("orders"); }} />
+                <SummaryBlock title={t("nextDelivery")} body={`${visibleOrders[0].id} - ${visibleOrders[0].delivery}`} action={t("viewOrder")} onClick={() => { setSelectedOrderId(visibleOrders[0].id); setActiveSection("orders"); }} />
                 <SummaryBlock title={t("defaultPayment")} body={`${paymentMethods[0].label} - ${paymentMethods[0].expiry}`} action={t("managePayments")} onClick={() => setActiveSection("payments")} />
                 <SummaryBlock title={t("primaryAddress")} body={primaryAddress ? formatAddress(primaryAddress) : t("noPrimaryAddress")} action={t("manageAddresses")} onClick={() => setActiveSection("addresses")} />
               </div>
@@ -512,8 +648,10 @@ export default function ProfilePage() {
             <div className={styles.ordersLayout}>
               <div className={styles.sectionStack}>
                 <SectionHeader eyebrow={t("ordersEyebrow")} title={t("ordersTitle")} />
+                {ordersLoading && <p className={styles.mutedText}>{t("loadingOrders")}</p>}
+                {ordersError && <p className={styles.panelError}>{ordersError}</p>}
                 <div className={styles.listStack}>
-                  {orders.map((order) => (
+                  {visibleOrders.map((order) => (
                     <button key={order.id} type="button" className={`${styles.orderButton} ${selectedOrderId === order.id ? styles.selectedOrder : ""}`} onClick={() => setSelectedOrderId(order.id)}>
                       <span><strong>{order.id}</strong><small>{order.date}</small></span>
                       <span>{order.total}</span>
@@ -521,11 +659,25 @@ export default function ProfilePage() {
                   ))}
                 </div>
               </div>
-              <OrderDetail order={selectedOrder} t={t} />
+              <OrderDetail order={selectedOrder} t={t} onRefundRequest={openRefundModal} />
             </div>
           )}
         </section>
       </div>
+      {refundOrder && (
+        <RefundRequestModal
+          order={refundOrder}
+          t={t}
+          reason={refundReason}
+          contactInfo={refundContactInfo}
+          submitting={refundSubmitting}
+          message={refundMessage}
+          onReasonChange={setRefundReason}
+          onContactInfoChange={setRefundContactInfo}
+          onClose={closeRefundModal}
+          onSubmit={submitRefundRequest}
+        />
+      )}
     </main>
   );
 }
@@ -586,7 +738,11 @@ function SummaryBlock({ title, body, action, onClick }) {
   return <article className={styles.summaryBlock}><h3>{title}</h3><p>{body}</p><button type="button" onClick={onClick}>{action}</button></article>;
 }
 
-function OrderDetail({ order, t }) {
+function canRequestRefund(order) {
+  return Boolean(order.uuid) && ["PAID", "SHIPPED", "DELIVERED"].includes(order.status);
+}
+
+function OrderDetail({ order, t, onRefundRequest }) {
   return (
     <article className={styles.orderDetail}>
       <div className={styles.detailHeader}><div><p className={styles.eyebrow}>{t("orderDetail")}</p><h3>{order.id}</h3></div><span className={styles.statusPill}>{order.status}</span></div>
@@ -598,6 +754,62 @@ function OrderDetail({ order, t }) {
       </dl>
       <div className={styles.itemsList}>{order.items.map((item) => <div key={`${order.id}-${item.title}`}><span><strong>{item.title}</strong><small>{item.detail}</small></span><span>{item.price}</span></div>)}</div>
       <ol className={styles.timeline}>{order.timeline.map((step) => <li key={step}>{step}</li>)}</ol>
+      {canRequestRefund(order) && (
+        <div className={styles.refundActionRow}>
+          <button type="button" onClick={() => onRefundRequest(order)}>
+            {t("requestRefund")}
+          </button>
+        </div>
+      )}
     </article>
+  );
+}
+
+function RefundRequestModal({
+  order,
+  t,
+  reason,
+  contactInfo,
+  submitting,
+  message,
+  onReasonChange,
+  onContactInfoChange,
+  onClose,
+  onSubmit,
+}) {
+  return (
+    <div className={styles.modalOverlay} role="presentation" onClick={onClose}>
+      <form className={styles.refundModal} onSubmit={onSubmit} onClick={(event) => event.stopPropagation()}>
+        <div className={styles.detailHeader}>
+          <div>
+            <p className={styles.eyebrow}>{t("refundRequestEyebrow")}</p>
+            <h3>{t("refundRequestTitle")} {order.id}</h3>
+          </div>
+          <button type="button" className={styles.modalCloseButton} onClick={onClose}>
+            {t("cancel")}
+          </button>
+        </div>
+        <p className={styles.mutedText}>{t("refundRequestDescription")}</p>
+        <label>
+          {t("refundReason")}
+          <textarea required value={reason} onChange={(event) => onReasonChange(event.target.value)} />
+        </label>
+        <label>
+          {t("refundContactInfo")}
+          <input required value={contactInfo} onChange={(event) => onContactInfoChange(event.target.value)} />
+        </label>
+        {message && (
+          <p className={message.type === "success" ? styles.panelSuccess : styles.panelError}>
+            {message.text}
+          </p>
+        )}
+        <div className={styles.formActions}>
+          <button type="submit" disabled={submitting || !reason.trim() || !contactInfo.trim()}>
+            {submitting ? t("sending") : t("sendRefundRequest")}
+          </button>
+          <button type="button" onClick={onClose}>{t("cancel")}</button>
+        </div>
+      </form>
+    </div>
   );
 }

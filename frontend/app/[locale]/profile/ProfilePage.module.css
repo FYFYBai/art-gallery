@@ -554,6 +554,83 @@
   line-height: 1.8;
 }
 
+.refundActionRow {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.refundActionRow button,
+.modalCloseButton {
+  width: fit-content;
+  border: 1px solid var(--surface-dark);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 9px 13px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.refundActionRow button:hover,
+.modalCloseButton:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(43, 38, 32, 0.34);
+  backdrop-filter: blur(8px);
+}
+
+.refundModal {
+  width: min(620px, 100%);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 22px;
+  box-shadow: 0 24px 70px rgba(43, 38, 32, 0.18);
+  display: grid;
+  gap: 16px;
+}
+
+.refundModal label {
+  display: grid;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.refundModal input,
+.refundModal textarea {
+  width: 100%;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  color: var(--text-main);
+  outline: none;
+}
+
+.refundModal input {
+  height: 42px;
+  padding: 0 12px;
+}
+
+.refundModal textarea {
+  min-height: 138px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
 @media (max-width: 1100px) {
   .accountHero,
   .accountShell,

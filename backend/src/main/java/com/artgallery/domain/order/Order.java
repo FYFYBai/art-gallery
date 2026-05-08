@@ -6,6 +6,7 @@ import com.artgallery.domain.user.User;
 import com.artgallery.domain.user.UserAddress;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class Order extends BaseEntity {
     @Column(name = "order_status", nullable = false, length = 20)
     private OrderStatus orderStatus = OrderStatus.PENDING;
 
+    @Column(name = "order_number", nullable = false, length = 32, unique = true, insertable = false, updatable = false)
+    private String orderNumber;
+
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal subtotal;
 
@@ -48,6 +52,15 @@ public class Order extends BaseEntity {
     @Column(nullable = false, length = 10)
     private String currency = "CAD";
 
+    @Column(name = "tracking_link", length = 1000)
+    private String trackingLink;
+
+    @Column(name = "shipped_at")
+    private OffsetDateTime shippedAt;
+
+    @Column(name = "delivered_at")
+    private OffsetDateTime deliveredAt;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -61,6 +74,7 @@ public class Order extends BaseEntity {
     public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
     public OrderStatus getOrderStatus() { return orderStatus; }
     public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
+    public String getOrderNumber() { return orderNumber; }
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
     public BigDecimal getTaxAmount() { return taxAmount; }
@@ -71,5 +85,11 @@ public class Order extends BaseEntity {
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
+    public String getTrackingLink() { return trackingLink; }
+    public void setTrackingLink(String trackingLink) { this.trackingLink = trackingLink; }
+    public OffsetDateTime getShippedAt() { return shippedAt; }
+    public void setShippedAt(OffsetDateTime shippedAt) { this.shippedAt = shippedAt; }
+    public OffsetDateTime getDeliveredAt() { return deliveredAt; }
+    public void setDeliveredAt(OffsetDateTime deliveredAt) { this.deliveredAt = deliveredAt; }
     public List<OrderItem> getItems() { return items; }
 }

@@ -2,10 +2,15 @@ package com.artgallery.service;
 
 import com.artgallery.domain.user.User;
 import com.artgallery.domain.user.UserAddress;
+import com.artgallery.domain.order.RefundRequestEntity;
 import com.artgallery.dto.request.AddressRequest;
+import com.artgallery.dto.request.RefundRequest;
 import com.artgallery.dto.request.UpdatePasswordRequest;
 import com.artgallery.dto.response.AddressResponse;
+import com.artgallery.dto.response.ProfileOrderResponse;
 import com.artgallery.exception.ProfileException;
+import com.artgallery.repository.OrderRepository;
+import com.artgallery.repository.RefundRequestRepository;
 import com.artgallery.repository.UserAddressRepository;
 import com.artgallery.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,13 +26,19 @@ public class ProfileService {
 
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
+    private final OrderRepository orderRepository;
+    private final RefundRequestRepository refundRequestRepository;
     private final PasswordEncoder passwordEncoder;
 
     public ProfileService(UserRepository userRepository,
                           UserAddressRepository userAddressRepository,
+                          OrderRepository orderRepository,
+                          RefundRequestRepository refundRequestRepository,
                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userAddressRepository = userAddressRepository;
+        this.orderRepository = orderRepository;
+        this.refundRequestRepository = refundRequestRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -104,6 +115,30 @@ public class ProfileService {
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProfileOrderResponse> listOrders(UUID userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(ProfileOrderResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void requestRefund(UUID userId, UUID orderId, RefundRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ProfileException("User was not found"));
+        var order = orderRepository.findById(orderId)
+                .filter(candidate -> candidate.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ProfileException("Order was not found"));
+
+        RefundRequestEntity refundRequest = new RefundRequestEntity();
+        refundRequest.setOrder(order);
+        refundRequest.setUser(user);
+        refundRequest.setReason(request.getReason().trim());
+        refundRequest.setContactInfo(request.getContactInfo().trim());
+        refundRequestRepository.save(refundRequest);
     }
 
     private UserAddress findOwnedAddress(UUID userId, UUID addressId) {

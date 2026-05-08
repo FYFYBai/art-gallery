@@ -1,8 +1,10 @@
 package com.artgallery.controller;
 
 import com.artgallery.dto.request.AddressRequest;
+import com.artgallery.dto.request.RefundRequest;
 import com.artgallery.dto.request.UpdatePasswordRequest;
 import com.artgallery.dto.response.AddressResponse;
+import com.artgallery.dto.response.ProfileOrderResponse;
 import com.artgallery.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -69,6 +71,19 @@ public class ProfileController {
                                                               @Valid @RequestBody UpdatePasswordRequest request) {
         profileService.updatePassword(currentUserId(authentication), request);
         return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+    }
+
+    @GetMapping("/orders")
+    public List<ProfileOrderResponse> listOrders(Authentication authentication) {
+        return profileService.listOrders(currentUserId(authentication));
+    }
+
+    @PostMapping("/orders/{orderId}/refund-request")
+    public ResponseEntity<Map<String, String>> requestRefund(Authentication authentication,
+                                                             @PathVariable UUID orderId,
+                                                             @Valid @RequestBody RefundRequest request) {
+        profileService.requestRefund(currentUserId(authentication), orderId, request);
+        return ResponseEntity.ok(Map.of("message", "Refund request sent"));
     }
 
     private UUID currentUserId(Authentication authentication) {

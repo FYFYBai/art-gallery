@@ -71,6 +71,9 @@ app:
     resend:
       api-key: ${RESEND_API_KEY:}
 
+  admin:
+    dev-account-delete-enabled: ${ADMIN_DEV_ACCOUNT_DELETE_ENABLED:true}
+
 server:
   port: 8080
 

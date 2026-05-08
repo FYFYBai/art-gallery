@@ -93,4 +93,103 @@ public class ResendEmailService implements EmailService {
                 .retrieve()
                 .toBodilessEntity();
     }
+
+    @Override
+    public void sendOrderShippedEmail(String recipientEmail, String orderNumber, String trackingLink) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("RESEND_API_KEY is required to send shipment email");
+        }
+
+        String text = """
+                Your Sylvaine Art order %s has shipped.
+
+                You can follow the delivery here:
+                %s
+
+                We will mark the order as delivered once the shipment is complete.
+                """.formatted(orderNumber, trackingLink);
+
+        String html = """
+                <p>Your Sylvaine Art order <strong>%s</strong> has shipped.</p>
+                <p>You can follow the delivery here:</p>
+                <p><a href="%s">Track your order</a></p>
+                <p>We will mark the order as delivered once the shipment is complete.</p>
+                """.formatted(orderNumber, trackingLink);
+
+        restClient.post()
+                .uri("/emails")
+                .header("Authorization", "Bearer " + apiKey)
+                .body(Map.of(
+                        "from", fromEmail,
+                        "to", recipientEmail,
+                        "subject", "Your Sylvaine Art order has shipped",
+                        "text", text,
+                        "html", html
+                ))
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    @Override
+    public void sendOrderDeliveredEmail(String recipientEmail, String orderNumber) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("RESEND_API_KEY is required to send delivery email");
+        }
+
+        String text = """
+                Your Sylvaine Art order %s has been marked as delivered.
+
+                Thank you for supporting us and for giving the artwork a place in your home.
+                """.formatted(orderNumber);
+
+        String html = """
+                <p>Your Sylvaine Art order <strong>%s</strong> has been marked as delivered.</p>
+                <p>Thank you for supporting us and for giving the artwork a place in your home.</p>
+                """.formatted(orderNumber);
+
+        restClient.post()
+                .uri("/emails")
+                .header("Authorization", "Bearer " + apiKey)
+                .body(Map.of(
+                        "from", fromEmail,
+                        "to", recipientEmail,
+                        "subject", "Your Sylvaine Art order was delivered",
+                        "text", text,
+                        "html", html
+                ))
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    @Override
+    public void sendOrderRefundedEmail(String recipientEmail, String orderNumber, String refundAmount) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException("RESEND_API_KEY is required to send refund email");
+        }
+
+        String text = """
+                We are sorry to hear that you are unsatisfied with your Sylvaine Art order %s.
+
+                Your refund of %s will be sent to you in 5 business days.
+                """.formatted(orderNumber, refundAmount);
+
+        String html = """
+                <p>We are sorry to hear that you are unsatisfied with your Sylvaine Art order <strong>%s</strong>.</p>
+                <p>Your refund of <strong>%s</strong> will be sent to you in 5 business days.</p>
+                """.formatted(orderNumber, refundAmount);
+
+        restClient.post()
+                .uri("/emails")
+                .header("Authorization", "Bearer " + apiKey)
+                .body(Map.of(
+                        "from", fromEmail,
+                        "to", recipientEmail,
+                        "subject", "Your Sylvaine Art refund is being processed",
+                        "text", text,
+                        "html", html
+                ))
+                .retrieve()
+                .toBodilessEntity();
+    }
+
 }

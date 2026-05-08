@@ -1,0 +1,500 @@
+.adminPage {
+  width: min(1480px, 100%);
+  margin: 0 auto;
+  padding: 68px 32px 96px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+.eyebrow,
+.panelEyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.hero h1 {
+  max-width: 920px;
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(3rem, 6vw, 6rem);
+  line-height: 0.98;
+  font-weight: 400;
+  color: var(--text-main);
+}
+
+.hero p:last-child {
+  max-width: 680px;
+  margin: 18px 0 0;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.adminIdentity,
+.metric,
+.panel,
+.notice {
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(252, 250, 245, 0.72);
+}
+
+.adminIdentity {
+  padding: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.adminIdentity span,
+.adminIdentity small,
+.rowCard span,
+.rowCard small,
+.productCard span,
+.productCard small {
+  color: var(--text-faint);
+}
+
+.adminIdentity strong {
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  color: #315c3e;
+  background: rgba(75, 125, 92, 0.1);
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.metric {
+  min-height: 112px;
+  padding: 18px;
+  display: grid;
+  align-content: space-between;
+}
+
+.metric span {
+  color: var(--text-faint);
+  font-size: 0.82rem;
+}
+
+.metric strong {
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+}
+
+.dashboardGrid,
+.managementGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.productPanel {
+  margin-bottom: 18px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 22px;
+}
+
+.panel h2 {
+  margin: 0 0 18px;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  line-height: 1.05;
+  font-weight: 400;
+}
+
+.barChart {
+  display: grid;
+  gap: 12px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) 120px;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.86rem;
+}
+
+.barRow div {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(216, 203, 184, 0.45);
+}
+
+.barRow i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.weeklyViewsChart {
+  height: 250px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.weeklyViewBar {
+  min-width: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 8px;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+}
+
+.weeklyViewBar div {
+  min-height: 120px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(216, 203, 184, 0.32);
+  overflow: hidden;
+}
+
+.weeklyViewBar i {
+  width: 100%;
+  display: block;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, var(--accent), rgba(184, 155, 114, 0.34));
+}
+
+.weeklyViewBar strong {
+  color: var(--text-main);
+}
+
+.weeklyViewBar small {
+  overflow: hidden;
+  color: var(--text-faint);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchForm {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.searchForm input,
+.productForm input,
+.productForm textarea,
+.rowCard select {
+  width: 100%;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  color: var(--text-main);
+  outline: none;
+}
+
+.searchForm input,
+.productForm input,
+.rowCard select {
+  height: 42px;
+  padding: 0 12px;
+}
+
+.productForm textarea {
+  min-height: 138px;
+  resize: vertical;
+  padding: 12px;
+  line-height: 1.55;
+}
+
+.searchForm button,
+.rowCard button,
+.productForm button,
+.productCard button,
+.productToolbar > button,
+.uploadField label {
+  width: fit-content;
+  border: 1px solid var(--surface-dark);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 9px 13px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.searchForm button:hover,
+.rowCard button:hover,
+.productForm button:hover,
+.productCard button:hover,
+.productToolbar > button:hover,
+.uploadField label:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
+.dangerButton {
+  border-color: rgba(154, 74, 58, 0.55) !important;
+  color: #7c382c !important;
+}
+
+.dangerButton:hover {
+  background: #7c382c !important;
+  color: var(--white) !important;
+}
+
+.listStack {
+  display: grid;
+  gap: 10px;
+}
+
+.rowCard {
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.rowActions {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.rowCard div,
+.productCard div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.rowCard strong,
+.productCard strong {
+  overflow-wrap: anywhere;
+}
+
+.statusPill {
+  width: fit-content;
+  border: 1px solid var(--line-mid);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(245, 240, 230, 0.64);
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.statusPAID {
+  border-color: rgba(49, 92, 62, 0.42);
+  background: rgba(75, 125, 92, 0.14);
+  color: #315c3e;
+}
+
+.statusSHIPPED {
+  border-color: rgba(69, 94, 130, 0.38);
+  background: rgba(82, 119, 168, 0.13);
+  color: #2f4d70;
+}
+
+.statusDELIVERED {
+  border-color: rgba(104, 91, 65, 0.34);
+  background: rgba(184, 155, 114, 0.16);
+  color: #5f5039;
+}
+
+.statusPENDING {
+  border-color: rgba(154, 113, 45, 0.35);
+  background: rgba(197, 143, 48, 0.13);
+  color: #7c5a21;
+}
+
+.statusCANCELLED,
+.statusREFUNDED {
+  border-color: rgba(154, 74, 58, 0.35);
+  background: rgba(154, 74, 58, 0.1);
+  color: #7c382c;
+}
+
+.emptyText {
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.productToolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.productToolbar .searchForm {
+  flex: 1 1 auto;
+  margin-bottom: 0;
+}
+
+.productForm {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.productForm label {
+  display: grid;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.uploadField {
+  display: grid;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.uploadField input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadField small {
+  overflow: hidden;
+  color: var(--text-faint);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.descriptionField {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.productCard {
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.productCard img {
+  width: 100%;
+  aspect-ratio: 1 / 0.72;
+  display: block;
+  object-fit: cover;
+  background: var(--surface-muted);
+}
+
+.productCard div {
+  padding: 14px;
+}
+
+@media (max-width: 1100px) {
+  .hero,
+  .dashboardGrid,
+  .managementGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .productForm,
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .weeklyViewsChart {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    height: auto;
+  }
+
+  .weeklyViewBar div {
+    height: 130px;
+  }
+}
+
+@media (max-width: 680px) {
+  .adminPage {
+    padding: 46px 16px 72px;
+  }
+
+  .metricGrid,
+  .productForm,
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .searchForm,
+  .productToolbar,
+  .rowCard {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .barRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .rowActions {
+    justify-content: flex-start;
+  }
+}

@@ -140,6 +140,7 @@ export default function Header() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountMode, setAccountMode] = useState("login");
   const [accountToast, setAccountToast] = useState(null);
+  const [topLoginToast, setTopLoginToast] = useState(null);
   const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
   const [isForgotPasswordSubmitting, setIsForgotPasswordSubmitting] =
@@ -154,6 +155,8 @@ export default function Header() {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
+  const profileHref =
+    currentUser?.role === "ADMIN" ? `/${locale}/admin` : `/${locale}/profile`;
   const loginSubmittingRef = useRef(false);
   const forgotPasswordSubmittingRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -165,6 +168,7 @@ export default function Header() {
   const searchTermIndexRef = useRef(0);
   const searchAnimationTimerRef = useRef(null);
   const accountToastTimerRef = useRef(null);
+  const topLoginToastTimerRef = useRef(null);
   const registerSubmittingRef = useRef(false);
   const resendSubmittingRef = useRef(false);
   const previousPathnameRef = useRef(pathname);
@@ -325,6 +329,19 @@ export default function Header() {
         accountToastTimerRef.current = null;
       }, 3600);
     }
+  };
+
+  const showTopLoginToast = (message) => {
+    if (topLoginToastTimerRef.current) {
+      clearTimeout(topLoginToastTimerRef.current);
+    }
+
+    setTopLoginToast(message);
+
+    topLoginToastTimerRef.current = setTimeout(() => {
+      setTopLoginToast(null);
+      topLoginToastTimerRef.current = null;
+    }, 3000);
   };
 
   const resetAccountFormState = () => {
@@ -514,6 +531,10 @@ export default function Header() {
         saveAuth({ email: result.email, role: result.role, token: result.token });
         formElement.reset();
         closeAccountModal();
+        showTopLoginToast(t("account.loginSucceeded"));
+        if (result.role === "ADMIN") {
+          router.push(`/${locale}/admin`);
+        }
       } catch {
         showAccountToast({ type: "error", message: t("account.loginRequestFailed") });
       } finally {
@@ -712,6 +733,10 @@ export default function Header() {
         clearTimeout(accountToastTimerRef.current);
       }
 
+      if (topLoginToastTimerRef.current) {
+        clearTimeout(topLoginToastTimerRef.current);
+      }
+
       registerSubmittingRef.current = false;
     };
   }, []);
@@ -744,6 +769,12 @@ export default function Header() {
 
   return (
     <>
+      {topLoginToast && (
+        <div className={styles.topLoginToast} role="status" aria-live="polite">
+          {topLoginToast}
+        </div>
+      )}
+
       <header
         className={`${styles.siteHeader} ${accountOpen ? styles.accountModalActive : ""}`}
       >
@@ -886,9 +917,13 @@ export default function Header() {
               <div className={styles.accountMenuWrap}>
                 {currentUser ? (
                   <Link
-                    href={`/${locale}/profile`}
+                    href={profileHref}
                     className={styles.iconButton}
-                    aria-label="Go to profile"
+                    aria-label={
+                      currentUser.role === "ADMIN"
+                        ? "Go to admin dashboard"
+                        : "Go to profile"
+                    }
                     title={currentUser.email}
                   >
                     <UserIcon className={styles.headerIconSvg} />
@@ -1027,7 +1062,7 @@ export default function Header() {
               <input
                 id="login-email"
                 name="email"
-                type="email"
+                type={accountMode === "login" ? "text" : "email"}
                 className={styles.loginInput}
                 placeholder={t("account.emailPlaceholder")}
               />

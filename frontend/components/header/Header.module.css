@@ -12,6 +12,28 @@
   backdrop-filter: none;
 }
 
+.topLoginToast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 2600;
+  min-width: min(340px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border: 1px solid rgba(75, 125, 92, 0.34);
+  border-radius: 999px;
+  background: rgba(245, 250, 246, 0.96);
+  box-shadow: 0 14px 34px rgba(78, 67, 56, 0.16);
+  color: #315c3e;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: topLoginToastIn 0.24s ease both;
+}
+
 .headerShell {
   min-height: var(--header-height);
   display: flex;
@@ -970,6 +992,17 @@
   }
 }
 
+@keyframes topLoginToastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 @media (max-width: 760px) {
   .siteHeader {
     --header-height: 68px;
@@ -1023,6 +1056,12 @@
     max-height: calc(100vh - 100px);
     padding: 24px 18px;
     border-radius: 14px;
+  }
+
+  .topLoginToast {
+    top: 12px;
+    padding: 11px 14px;
+    font-size: 0.86rem;
   }
 }
 

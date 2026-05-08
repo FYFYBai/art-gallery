@@ -5,6 +5,7 @@ import { routing } from "../../i18n/routing";
 import IntlProvider from "../../i18n/IntlProvider";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
+import PageViewTracker from "../../components/analytics/PageViewTracker";
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default async function LocaleLayout({ children, params }) {
     <html lang={locale}>
       <body className={`${notoSans.variable} ${notoSerif.variable}`} suppressHydrationWarning>
         <IntlProvider locale={locale} messages={messages}>
+          <PageViewTracker />
           <Header />
           <main className="pageContent">{children}</main>
           <Footer />
