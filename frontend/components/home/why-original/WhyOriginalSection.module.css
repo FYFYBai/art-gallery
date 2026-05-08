@@ -204,18 +204,54 @@
 }
 
 @media (max-width: 720px) {
+  .section {
+    padding: 68px 16px 78px;
+  }
+
+  .inner {
+    row-gap: 34px;
+  }
+
+  .eyebrow {
+    margin-bottom: 28px;
+    font-size: 0.82rem;
+  }
+
+  .title {
+    font-size: clamp(2.35rem, 10vw, 3.05rem);
+  }
+
+  .description {
+    max-width: 32ch;
+  }
+
   .card {
     grid-template-columns: 1fr;
     row-gap: 18px;
+    padding: 10px;
   }
 
   .cardImageWrap {
     height: auto;
-    aspect-ratio: 1 / 0.84;
+    aspect-ratio: 1.12 / 1;
     min-height: 0;
   }
 
   .cardTitle {
     max-width: 100%;
+  }
+
+  .cardTextBlock {
+    padding: 2px 6px 16px;
+  }
+
+  .cardTitle {
+    font-size: clamp(1.55rem, 8vw, 2rem);
+  }
+
+  .cardDescription {
+    max-width: 34ch;
+    font-size: 0.9rem;
+    line-height: 1.68;
   }
 }

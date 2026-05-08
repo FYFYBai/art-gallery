@@ -15,18 +15,9 @@ export default function CuratedExperienceSection() {
           <a href="#" className={styles.button}>
             <span>{t("curatedCta")}</span>
             <span aria-hidden="true" className={styles.buttonArrow}>
-              →
+              -&gt;
             </span>
           </a>
-        </div>
-
-        <div className={styles.visual}>
-          <img
-            src="/images/curated-experience/1.png"
-            alt=""
-            aria-hidden="true"
-            className={styles.image}
-          />
         </div>
       </div>
     </section>

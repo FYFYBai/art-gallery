@@ -174,7 +174,7 @@
 
 @media (max-width: 640px) {
   .section {
-    padding: 58px 0 68px;
+    padding: 54px 0 64px;
   }
 
   .inner {
@@ -182,10 +182,15 @@
   }
 
   .heading {
-    font-size: 2.35rem;
+    max-width: 12ch;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: clamp(2.3rem, 10vw, 3rem);
+    line-height: 1.04;
   }
 
   .subheading {
+    max-width: 34ch;
     margin-bottom: 30px;
     font-size: 0.98rem;
     white-space: normal;
@@ -197,11 +202,30 @@
   }
 
   .imageWrapper {
-    aspect-ratio: 1.12 / 1;
+    aspect-ratio: 1.08 / 1;
   }
 
   .textBlock {
-    min-height: 250px;
+    min-height: auto;
     padding: 28px 24px;
+  }
+
+  .description {
+    max-width: 32ch;
+    font-size: 0.98rem;
+  }
+
+  .action {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .cardDivider {
+    margin: 18px 0;
   }
 }

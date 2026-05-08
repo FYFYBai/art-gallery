@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useTranslations } from "../../../i18n/IntlContext";
@@ -15,11 +15,18 @@ export default function VerifyEmailPage() {
   const token = searchParams.get("token");
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState(t("loading"));
+  const verifiedTokenRef = useRef(null);
 
   useEffect(() => {
     if (!token) {
       return;
     }
+
+    if (verifiedTokenRef.current === token) {
+      return;
+    }
+
+    verifiedTokenRef.current = token;
 
     async function verify() {
       try {

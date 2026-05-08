@@ -104,6 +104,22 @@ function EyeOffIcon() {
   );
 }
 
+function getPasswordResetRequestErrorMessage(message, t) {
+  if (message === "No account exists for this email") {
+    return t("account.passwordResetAccountNotFound");
+  }
+
+  if (message === "Account is disabled") {
+    return t("account.accountDisabled");
+  }
+
+  if (message === "Please wait before requesting another password reset email") {
+    return t("account.passwordResetCooldown");
+  }
+
+  return message || t("account.passwordResetRequestFailed");
+}
+
 export default function Header() {
   const t = useTranslations();
   const locale = useLocale();
@@ -137,7 +153,7 @@ export default function Header() {
   const [verificationEmail, setVerificationEmail] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
-  const [currentUser, setCurrentUser] = useState(readStoredAuth); // { email, role, token }
+  const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
   const loginSubmittingRef = useRef(false);
   const forgotPasswordSubmittingRef = useRef(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -211,6 +227,14 @@ export default function Header() {
       window.removeEventListener("click", closeMenus);
       window.removeEventListener("keydown", onKeyDown);
     };
+  }, []);
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      setCurrentUser(readStoredAuth());
+    }, 0);
+
+    return () => window.clearTimeout(timerId);
   }, []);
 
   useEffect(() => {
@@ -341,12 +365,20 @@ export default function Header() {
 
       if (!response.ok) {
         const result = await response.json().catch(() => null);
+        const apiMessage = result?.errors?.[0] || result?.message;
+
+        if (
+          apiMessage ===
+          "Please wait before requesting another verification email"
+        ) {
+          setResendCooldown(60);
+        }
+
         showAccountToast({
           type: "error",
-          message:
-            result?.errors?.[0] ||
-            result?.message ||
-            t("account.resendVerificationFailed"),
+          message: apiMessage || t("account.resendVerificationFailed"),
+          persistent: true,
+          resendVerification: true,
         });
         return;
       }
@@ -399,10 +431,10 @@ export default function Header() {
         if (!response.ok) {
           showAccountToast({
             type: "error",
-            message:
-              result?.errors?.[0] ||
-              result?.message ||
-              t("account.passwordResetRequestFailed"),
+            message: getPasswordResetRequestErrorMessage(
+              result?.errors?.[0] || result?.message,
+              t,
+            ),
           });
           return;
         }
@@ -451,14 +483,30 @@ export default function Header() {
         const result = await response.json().catch(() => null);
 
         if (!response.ok) {
+          const emailVerificationRequired =
+            response.status === 403 &&
+            result?.message === "Email verification required";
           const message =
             response.status === 401
               ? t("account.invalidCredentials")
               : response.status === 403
-                ? result?.message === "Email verification required"
+                ? emailVerificationRequired
                   ? t("account.emailVerificationRequired")
                   : t("account.accountDisabled")
                 : result?.message || t("account.loginFailed");
+
+          if (emailVerificationRequired) {
+            setVerificationEmail(email);
+            setResendCooldown(0);
+            showAccountToast({
+              type: "error",
+              message,
+              persistent: true,
+              resendVerification: true,
+            });
+            return;
+          }
+
           showAccountToast({ type: "error", message });
           return;
         }
@@ -839,11 +887,11 @@ export default function Header() {
                 {currentUser ? (
                   <Link
                     href={`/${locale}/profile`}
-                    className={`${styles.iconButton} ${styles.isActive}`}
+                    className={styles.iconButton}
                     aria-label="Go to profile"
                     title={currentUser.email}
                   >
-                    <UserIcon className={`${styles.headerIconSvg} ${styles.loggedInIcon}`} />
+                    <UserIcon className={styles.headerIconSvg} />
                   </Link>
                 ) : (
                   <button

@@ -970,7 +970,73 @@
   }
 }
 
-/* Logged-in state — accent-coloured user icon */
-.loggedInIcon {
-  color: var(--accent-strong);
+@media (max-width: 760px) {
+  .siteHeader {
+    --header-height: 68px;
+  }
+
+  .headerShell {
+    min-height: var(--header-height);
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .logoLink {
+    max-width: 150px;
+    overflow: hidden;
+    justify-content: flex-start;
+    font-size: 1.02rem;
+    letter-spacing: 0.24em;
+    white-space: nowrap;
+  }
+
+  .mainNav,
+  .searchBar {
+    display: none;
+  }
+
+  .headerRight {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .headerActions {
+    gap: 6px;
+  }
+
+  .iconButton {
+    width: 38px;
+    height: 38px;
+  }
+
+  .languageDropdown {
+    right: -44px;
+  }
+
+  .accountModalOverlay {
+    align-items: flex-start;
+    padding: 82px 12px 18px;
+  }
+
+  .accountModal {
+    width: 100%;
+    max-height: calc(100vh - 100px);
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
 }
+
+@media (max-width: 380px) {
+  .logoLink {
+    max-width: 126px;
+    font-size: 0.94rem;
+    letter-spacing: 0.2em;
+  }
+
+  .iconButton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Logged-in state — accent-coloured user icon */

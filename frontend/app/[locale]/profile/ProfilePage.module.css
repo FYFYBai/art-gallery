@@ -1,0 +1,611 @@
+.accountPage {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 72px 32px 96px;
+}
+
+.accountHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: end;
+  margin-bottom: 42px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.accountHero h1,
+.sectionHeader h2 {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-main);
+}
+
+.accountHero h1 {
+  max-width: 760px;
+  font-size: clamp(2.8rem, 6vw, 5.8rem);
+  line-height: 0.98;
+}
+
+.heroText {
+  max-width: 620px;
+  margin-top: 18px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+.identityPanel {
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(252, 250, 245, 0.68);
+  padding: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.identityPanel span {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.identityPanel strong {
+  overflow-wrap: anywhere;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 500;
+}
+
+.identityPanel button,
+.toolbar button,
+.leftToolbar button,
+.rowActions button,
+.securityForm button,
+.summaryBlock button {
+  width: fit-content;
+  border: 1px solid var(--surface-dark);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 9px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.identityPanel button:hover,
+.toolbar button:hover,
+.leftToolbar button:hover,
+.rowActions button:hover,
+.securityForm button:hover,
+.summaryBlock button:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
+.accountShell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + 24px);
+  border-top: 1px solid var(--line-soft);
+  display: grid;
+}
+
+.sidebar button {
+  min-height: 52px;
+  border: none;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--text-soft);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+}
+
+.sidebar button:hover,
+.sidebar .activeNavItem {
+  color: var(--text-main);
+  padding-left: 10px;
+}
+
+.contentPanel {
+  min-width: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(252, 250, 245, 0.7);
+  padding: 28px;
+}
+
+.sectionStack {
+  display: grid;
+  gap: 22px;
+}
+
+.sectionHeader h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.04;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric,
+.summaryBlock,
+.rowCard,
+.addressBlock,
+.emptyState,
+.orderDetail {
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.metric {
+  min-height: 112px;
+  padding: 18px;
+  display: grid;
+  align-content: space-between;
+}
+
+.metric span,
+.rowMeta,
+.detailGrid dt,
+.orderButton small,
+.itemsList small {
+  color: var(--text-faint);
+  font-size: 0.82rem;
+}
+
+.metric strong {
+  font-family: var(--font-display), serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+}
+
+.previewGrid,
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.addressSection {
+  display: grid;
+  gap: 12px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.summaryBlock,
+.addressBlock {
+  padding: 18px;
+}
+
+.summaryBlock h3,
+.rowTitle,
+.orderDetail h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  color: var(--text-main);
+}
+
+.summaryBlock p,
+.addressBlock p {
+  margin: 0 0 12px;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.leftToolbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.listStack {
+  display: grid;
+  gap: 10px;
+}
+
+.rowCard {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.rowTitle {
+  font-size: 1.25rem;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.securityForm {
+  max-width: 620px;
+  display: grid;
+  gap: 14px;
+}
+
+.securityForm label,
+.addressForm label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.securityForm input,
+.addressForm input,
+.addressForm select {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  padding: 0 13px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.addressForm {
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.32);
+  padding: 18px;
+}
+
+.checkboxLabel {
+  grid-column: 1 / -1;
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 10px !important;
+}
+
+.checkboxLabel input {
+  width: 16px;
+  height: 16px;
+}
+
+.formActions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.formActions button,
+.leftToolbar button {
+  width: fit-content;
+  border: 1px solid var(--surface-dark);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 9px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.formActions button:hover,
+.leftToolbar button:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
+.formActions button:disabled,
+.leftToolbar button:disabled,
+.rowActions button:disabled,
+.securityForm button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mutedText,
+.emptyState p {
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.emptyState {
+  padding: 18px;
+}
+
+.emptyState h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  color: var(--text-main);
+}
+
+.panelError,
+.panelSuccess {
+  margin: 0;
+  padding: 11px 13px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.panelError {
+  border: 1px solid rgba(154, 74, 58, 0.34);
+  background: rgba(154, 74, 58, 0.12);
+  color: #7c382c;
+}
+
+.panelSuccess {
+  border: 1px solid rgba(75, 125, 92, 0.34);
+  background: rgba(75, 125, 92, 0.12);
+  color: #315c3e;
+}
+
+.passwordInputWrap {
+  position: relative;
+}
+
+.passwordInputWrap input {
+  padding-right: 44px;
+}
+
+.passwordToggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease;
+}
+
+.securityForm .passwordToggle:hover {
+  background: rgba(184, 155, 114, 0.14);
+  color: var(--text-main);
+}
+
+.securityForm .passwordToggle {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0;
+  color: var(--text-soft);
+}
+
+.passwordIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.passwordHint {
+  margin: -8px 0 0;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.fieldError {
+  margin: -8px 0 0;
+  color: #7c382c;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.securityForm .inputError,
+.securityForm .inputError:focus,
+.addressForm .inputError,
+.addressForm .inputError:focus {
+  border-color: rgba(154, 74, 58, 0.72);
+  box-shadow: 0 0 0 3px rgba(154, 74, 58, 0.12);
+}
+
+.ordersLayout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+}
+
+.orderButton {
+  width: 100%;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.orderButton span:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.selectedOrder {
+  border-color: var(--accent-strong);
+  background: rgba(184, 155, 114, 0.12);
+}
+
+.orderDetail {
+  padding: 20px;
+  align-self: start;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.statusPill {
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.detailGrid dd {
+  margin: 4px 0 0;
+  color: var(--text-main);
+}
+
+.itemsList {
+  display: grid;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.itemsList div {
+  padding: 14px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.itemsList span:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.timeline {
+  margin: 18px 0 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+
+@media (max-width: 1100px) {
+  .accountHero,
+  .accountShell,
+  .ordersLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .sidebar button {
+    text-align: center;
+    border-bottom: none;
+    border-right: 1px solid var(--line-soft);
+  }
+}
+
+@media (max-width: 760px) {
+  .accountPage {
+    padding: 48px 18px 72px;
+  }
+
+  .contentPanel {
+    padding: 18px;
+  }
+
+  .metricsGrid,
+  .previewGrid,
+  .addressGrid,
+  .detailGrid,
+  .addressForm {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar button {
+    text-align: left;
+    border-right: none;
+    padding-left: 14px;
+  }
+
+  .rowCard,
+  .itemsList div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

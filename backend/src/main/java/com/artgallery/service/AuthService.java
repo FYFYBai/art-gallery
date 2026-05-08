@@ -44,7 +44,6 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -180,7 +179,12 @@ public class AuthService {
         EmailVerificationToken token = emailVerificationTokenRepository.findByTokenHash(hashToken(rawToken))
                 .orElseThrow(() -> new EmailVerificationException("Verification link is invalid"));
 
+        User user = token.getUser();
+
         if (token.getUsedAt() != null) {
+            if (user.isEmailVerified()) {
+                return;
+            }
             throw new EmailVerificationException("Verification link has already been used");
         }
 
@@ -188,7 +192,6 @@ public class AuthService {
             throw new EmailVerificationException("Verification link has expired");
         }
 
-        User user = token.getUser();
         user.setEmailVerified(true);
         token.setUsedAt(OffsetDateTime.now(ZoneOffset.UTC));
     }
@@ -220,24 +223,25 @@ public class AuthService {
     @Transactional
     public void requestPasswordReset(ForgotPasswordRequest request) {
         String normalizedEmail = request.getEmail().trim().toLowerCase();
-        userRepository.findByEmail(normalizedEmail).ifPresent(user -> {
-            if (!user.isActive()) {
-                return;
-            }
+        User user = userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new PasswordResetException("No account exists for this email"));
 
-            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-            passwordResetTokenRepository
-                    .findTopByUserAndUsedAtIsNullOrderByCreatedAtDesc(user)
-                    .ifPresent(token -> {
-                        if (token.getCreatedAt().plus(PASSWORD_RESET_RESEND_COOLDOWN).isAfter(now)) {
-                            throw new PasswordResetException("Please wait before requesting another password reset email");
-                        }
-                    });
+        if (!user.isActive()) {
+            throw new PasswordResetException("Account is disabled");
+        }
 
-            String rawToken = createPasswordResetToken(user);
-            String resetLink = buildPasswordResetLink(rawToken, request.getLocale());
-            emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
-        });
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        passwordResetTokenRepository
+                .findTopByUserAndUsedAtIsNullOrderByCreatedAtDesc(user)
+                .ifPresent(token -> {
+                    if (token.getCreatedAt().plus(PASSWORD_RESET_RESEND_COOLDOWN).isAfter(now)) {
+                        throw new PasswordResetException("Please wait before requesting another password reset email");
+                    }
+                });
+
+        String rawToken = createPasswordResetToken(user);
+        String resetLink = buildPasswordResetLink(rawToken, request.getLocale());
+        emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
     }
 
     @Transactional
@@ -267,9 +271,7 @@ public class AuthService {
     }
 
     private String createVerificationToken(User user) {
-        byte[] tokenBytes = new byte[32];
-        SECURE_RANDOM.nextBytes(tokenBytes);
-        String rawToken = UUID.randomUUID() + "-" + HexFormat.of().formatHex(tokenBytes);
+        String rawToken = createRawToken();
 
         EmailVerificationToken token = new EmailVerificationToken();
         token.setUser(user);
@@ -281,9 +283,7 @@ public class AuthService {
     }
 
     private String createPasswordResetToken(User user) {
-        byte[] tokenBytes = new byte[32];
-        SECURE_RANDOM.nextBytes(tokenBytes);
-        String rawToken = UUID.randomUUID() + "-" + HexFormat.of().formatHex(tokenBytes);
+        String rawToken = createRawToken();
 
         PasswordResetToken token = new PasswordResetToken();
         token.setUser(user);
@@ -292,6 +292,12 @@ public class AuthService {
         passwordResetTokenRepository.save(token);
 
         return rawToken;
+    }
+
+    private String createRawToken() {
+        byte[] tokenBytes = new byte[24];
+        SECURE_RANDOM.nextBytes(tokenBytes);
+        return HexFormat.of().formatHex(tokenBytes);
     }
 
     private String buildVerificationLink(String rawToken, String locale) {

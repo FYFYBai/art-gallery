@@ -71,6 +71,13 @@ public class GlobalExceptionHandler {
                 .body(ApiErrorResponse.of("Password reset failed", List.of(ex.getMessage())));
     }
 
+    @ExceptionHandler(ProfileException.class)
+    public ResponseEntity<ApiErrorResponse> handleProfile(ProfileException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of("Profile update failed", List.of(ex.getMessage())));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         String message = "Unsupported OAuth provider".equals(ex.getMessage())
