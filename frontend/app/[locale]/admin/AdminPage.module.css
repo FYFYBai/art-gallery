@@ -94,10 +94,18 @@
 }
 
 .notice {
-  margin: 0 0 18px;
-  padding: 12px 14px;
-  color: #315c3e;
-  background: rgba(75, 125, 92, 0.1);
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 1200;
+  width: min(calc(100vw - 32px), 460px);
+  padding: 12px 18px;
+  color: var(--text-main);
+  text-align: center;
+  box-shadow: 0 16px 44px rgba(53, 43, 31, 0.16);
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: adminNoticeIn 0.24s ease both;
 }
 
 .metricGrid {
@@ -592,6 +600,18 @@
   flex-wrap: wrap;
   gap: 8px !important;
   padding: 8px 0 0 !important;
+}
+
+@keyframes adminNoticeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 @media (max-width: 1100px) {

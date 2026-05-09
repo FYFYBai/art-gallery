@@ -154,7 +154,7 @@ export default function Header() {
   const [verificationEmail, setVerificationEmail] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => readStoredAuth()); // { email, role, token }
+  const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
   const profileHref =
     currentUser?.role === "ADMIN" ? `/${locale}/admin` : `/${locale}/profile`;
   const loginSubmittingRef = useRef(false);

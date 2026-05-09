@@ -27,7 +27,7 @@ public class Order extends BaseEntity {
     private UserAddress billingAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_method_id", nullable = false)
+    @JoinColumn(name = "payment_method_id")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
@@ -61,6 +61,21 @@ public class Order extends BaseEntity {
     @Column(name = "delivered_at")
     private OffsetDateTime deliveredAt;
 
+    @Column(name = "stripe_checkout_session_id", length = 255)
+    private String stripeCheckoutSessionId;
+
+    @Column(name = "stripe_payment_intent_id", length = 255)
+    private String stripePaymentIntentId;
+
+    @Column(name = "stripe_payment_status", length = 50)
+    private String stripePaymentStatus;
+
+    @Column(name = "paid_at")
+    private OffsetDateTime paidAt;
+
+    @Column(name = "checkout_expires_at")
+    private OffsetDateTime checkoutExpiresAt;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -91,5 +106,15 @@ public class Order extends BaseEntity {
     public void setShippedAt(OffsetDateTime shippedAt) { this.shippedAt = shippedAt; }
     public OffsetDateTime getDeliveredAt() { return deliveredAt; }
     public void setDeliveredAt(OffsetDateTime deliveredAt) { this.deliveredAt = deliveredAt; }
+    public String getStripeCheckoutSessionId() { return stripeCheckoutSessionId; }
+    public void setStripeCheckoutSessionId(String stripeCheckoutSessionId) { this.stripeCheckoutSessionId = stripeCheckoutSessionId; }
+    public String getStripePaymentIntentId() { return stripePaymentIntentId; }
+    public void setStripePaymentIntentId(String stripePaymentIntentId) { this.stripePaymentIntentId = stripePaymentIntentId; }
+    public String getStripePaymentStatus() { return stripePaymentStatus; }
+    public void setStripePaymentStatus(String stripePaymentStatus) { this.stripePaymentStatus = stripePaymentStatus; }
+    public OffsetDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(OffsetDateTime paidAt) { this.paidAt = paidAt; }
+    public OffsetDateTime getCheckoutExpiresAt() { return checkoutExpiresAt; }
+    public void setCheckoutExpiresAt(OffsetDateTime checkoutExpiresAt) { this.checkoutExpiresAt = checkoutExpiresAt; }
     public List<OrderItem> getItems() { return items; }
 }

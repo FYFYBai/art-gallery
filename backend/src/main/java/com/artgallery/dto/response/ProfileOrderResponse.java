@@ -19,21 +19,28 @@ public record ProfileOrderResponse(
         OffsetDateTime createdAt,
         OffsetDateTime shippedAt,
         OffsetDateTime deliveredAt,
+        boolean refundRequestFiled,
         List<Item> items
 ) {
     public static ProfileOrderResponse from(Order order) {
+        return from(order, false);
+    }
+
+    public static ProfileOrderResponse from(Order order, boolean refundRequestFiled) {
         String address = "%s, %s, %s %s".formatted(
                 order.getShippingAddress().getAddressLine1(),
                 order.getShippingAddress().getCity(),
                 order.getShippingAddress().getProvinceState(),
                 order.getShippingAddress().getPostalCode()
         );
-        String payment = order.getPaymentMethod().getCardBrand() == null
-                ? order.getPaymentMethod().getPaymentType().name()
-                : "%s ending in %s".formatted(
-                        order.getPaymentMethod().getCardBrand(),
-                        order.getPaymentMethod().getCardLast4()
-                );
+        String payment = order.getPaymentMethod() == null
+                ? "Stripe Checkout"
+                : order.getPaymentMethod().getCardBrand() == null
+                    ? order.getPaymentMethod().getPaymentType().name()
+                    : "%s ending in %s".formatted(
+                            order.getPaymentMethod().getCardBrand(),
+                            order.getPaymentMethod().getCardLast4()
+                    );
 
         return new ProfileOrderResponse(
                 order.getId(),
@@ -47,6 +54,7 @@ public record ProfileOrderResponse(
                 order.getCreatedAt(),
                 order.getShippedAt(),
                 order.getDeliveredAt(),
+                refundRequestFiled,
                 order.getItems().stream()
                         .map(item -> new Item(
                                 item.getArtworkTitle(),

@@ -139,3 +139,7 @@
   text-transform: uppercase;
   color: var(--accent-strong);
 }
+
+.soldStatus {
+  color: #a33a2b;
+}

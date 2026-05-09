@@ -116,7 +116,7 @@ export default function ArtworkDetailPage() {
           <p className={styles.eyebrow}>{t(bylineKey)}</p>
           <h1>{cleanTypography(artwork.title)}</h1>
           <strong className={styles.uniqueLine}>{t("uniquePiece")}</strong>
-          <p className={styles.availability}>
+          <p className={`${styles.availability} ${artwork.soldOut ? styles.soldAvailability : ""}`}>
             {artwork.soldOut ? t("sold") : t("available")}
           </p>
 

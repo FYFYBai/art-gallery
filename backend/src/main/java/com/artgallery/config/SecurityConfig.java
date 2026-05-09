@@ -55,6 +55,8 @@ public class SecurityConfig {
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
                                 "/api/analytics/page-view",
+                                "/api/checkout/stripe-session/status",
+                                "/api/stripe/webhook",
                                 "/api/artworks",
                                 "/api/artworks/*"
                         ).permitAll()

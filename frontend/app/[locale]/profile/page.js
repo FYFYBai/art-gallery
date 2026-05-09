@@ -8,7 +8,7 @@ import styles from "./ProfilePage.module.css";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
-const accountSections = ["overview", "payments", "addresses", "security", "orders"];
+const accountSections = ["overview", "addresses", "security", "orders"];
 
 const emptyAddressDraft = {
   addressLine1: "",
@@ -21,11 +21,6 @@ const emptyAddressDraft = {
 };
 
 const provinces = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
-
-const paymentMethods = [
-  { id: "pm-1", brand: "Visa", label: "Visa ending in 4242", expiry: "08/2028", status: "Default" },
-  { id: "pm-2", brand: "Mastercard", label: "Mastercard ending in 1188", expiry: "11/2027", status: "Backup" },
-];
 
 const fallbackAddresses = [
   {
@@ -58,7 +53,7 @@ const fallbackOrders = [
     total: "C$1,280",
     delivery: "Estimated May 10, 2026",
     shippingAddress: "248 Rue Saint-Paul Ouest, Montreal",
-    payment: "Visa ending in 4242",
+    payment: "Stripe Checkout",
     items: [
       { title: "Paysage ouvert", detail: "Original oil painting, 40 x 50 cm", price: "C$980" },
       { title: "Framing service", detail: "Natural oak frame", price: "C$300" },
@@ -72,7 +67,7 @@ const fallbackOrders = [
     total: "C$760",
     delivery: "Delivered March 23, 2026",
     shippingAddress: "31 Avenue Laurier Est, Montreal",
-    payment: "Mastercard ending in 1188",
+    payment: "Stripe Checkout",
     items: [{ title: "Silence nocturne", detail: "Study on paper, 24 x 32 cm", price: "C$760" }],
     timeline: ["Order received", "Shipped", "Delivered"],
   },
@@ -83,7 +78,7 @@ const fallbackOrders = [
     total: "C$2,140",
     delivery: "Delivered January 18, 2026",
     shippingAddress: "248 Rue Saint-Paul Ouest, Montreal",
-    payment: "Visa ending in 4242",
+    payment: "Stripe Checkout",
     items: [{ title: "Lumiere apaisante", detail: "Original painting, 60 x 80 cm", price: "C$2,140" }],
     timeline: ["Order received", "Shipped", "Delivered"],
   },
@@ -165,6 +160,7 @@ function normalizeOrder(order) {
             : status,
     shippingAddress: order.shippingAddress || "",
     payment: order.paymentSummary || "",
+    refundRequestFiled: Boolean(order.refundRequestFiled),
     items: (order.items || []).map((item) => ({
       title: item.title,
       detail: `Quantity ${item.quantity || 1}`,
@@ -208,6 +204,7 @@ export default function ProfilePage() {
   const [refundContactInfo, setRefundContactInfo] = useState("");
   const [refundSubmitting, setRefundSubmitting] = useState(false);
   const [refundMessage, setRefundMessage] = useState(null);
+  const [pageNotice, setPageNotice] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(true);
   const [addressesError, setAddressesError] = useState("");
@@ -235,6 +232,12 @@ export default function ProfilePage() {
     securityPasswordConfirmation.length > 0 && securityPassword !== securityPasswordConfirmation;
   const addressPostalInvalid =
     addressDraft.postalCode.length > 0 && !isValidCanadianPostalCode(addressDraft.postalCode);
+
+  useEffect(() => {
+    if (!pageNotice) return;
+    const timerId = window.setTimeout(() => setPageNotice(null), 3000);
+    return () => window.clearTimeout(timerId);
+  }, [pageNotice]);
 
   const handleSessionExpired = () => {
     localStorage.removeItem("auth");
@@ -500,7 +503,13 @@ export default function ProfilePage() {
         return;
       }
 
-      setRefundMessage({ type: "success", text: t("refundRequestSent") });
+      closeRefundModal();
+      setOrders((current) =>
+        current.map((order) =>
+          order.uuid === refundOrder.uuid ? { ...order, refundRequestFiled: true } : order,
+        ),
+      );
+      setPageNotice({ type: "success", text: t("refundRequestSent") });
     } catch (error) {
       if (error.message !== "Session expired") {
         setRefundMessage({ type: "error", text: t("refundRequestFailed") });
@@ -514,6 +523,11 @@ export default function ProfilePage() {
 
   return (
     <main className={styles.accountPage}>
+      {pageNotice && (
+        <div className={`${styles.pageNotice} ${pageNotice.type === "success" ? styles.pageNoticeSuccess : styles.pageNoticeError}`}>
+          {pageNotice.text}
+        </div>
+      )}
       <header className={styles.accountHero}>
         <div>
           <p className={styles.eyebrow}>{t("eyebrow")}</p>
@@ -546,35 +560,12 @@ export default function ProfilePage() {
             <div className={styles.sectionStack}>
               <SectionHeader eyebrow={t("overviewEyebrow")} title={t("overviewTitle")} />
               <div className={styles.metricsGrid}>
-                <Metric label={t("savedPayments")} value="2" />
                 <Metric label={t("savedAddresses")} value={String(visibleAddresses.length)} />
                 <Metric label={t("ordersThisYear")} value={String(visibleOrders.length)} />
               </div>
               <div className={styles.previewGrid}>
                 <SummaryBlock title={t("nextDelivery")} body={`${visibleOrders[0].id} - ${visibleOrders[0].delivery}`} action={t("viewOrder")} onClick={() => { setSelectedOrderId(visibleOrders[0].id); setActiveSection("orders"); }} />
-                <SummaryBlock title={t("defaultPayment")} body={`${paymentMethods[0].label} - ${paymentMethods[0].expiry}`} action={t("managePayments")} onClick={() => setActiveSection("payments")} />
                 <SummaryBlock title={t("primaryAddress")} body={primaryAddress ? formatAddress(primaryAddress) : t("noPrimaryAddress")} action={t("manageAddresses")} onClick={() => setActiveSection("addresses")} />
-              </div>
-            </div>
-          )}
-
-          {activeSection === "payments" && (
-            <div className={styles.sectionStack}>
-              <SectionHeader eyebrow={t("paymentsEyebrow")} title={t("paymentsTitle")} />
-              <div className={styles.leftToolbar}><button type="button">{t("addPayment")}</button></div>
-              <div className={styles.listStack}>
-                {paymentMethods.map((method) => (
-                  <article key={method.id} className={styles.rowCard}>
-                    <div>
-                      <p className={styles.rowTitle}>{method.label}</p>
-                      <p className={styles.rowMeta}>{method.brand} - {t("expires")} {method.expiry} - {method.status}</p>
-                    </div>
-                    <div className={styles.rowActions}>
-                      <button type="button">{t("update")}</button>
-                      <button type="button">{t("remove")}</button>
-                    </div>
-                  </article>
-                ))}
               </div>
             </div>
           )}
@@ -739,7 +730,7 @@ function SummaryBlock({ title, body, action, onClick }) {
 }
 
 function canRequestRefund(order) {
-  return Boolean(order.uuid) && ["PAID", "SHIPPED", "DELIVERED"].includes(order.status);
+  return Boolean(order.uuid) && !order.refundRequestFiled && ["PAID", "SHIPPED", "DELIVERED"].includes(order.status);
 }
 
 function OrderDetail({ order, t, onRefundRequest }) {
@@ -754,10 +745,14 @@ function OrderDetail({ order, t, onRefundRequest }) {
       </dl>
       <div className={styles.itemsList}>{order.items.map((item) => <div key={`${order.id}-${item.title}`}><span><strong>{item.title}</strong><small>{item.detail}</small></span><span>{item.price}</span></div>)}</div>
       <ol className={styles.timeline}>{order.timeline.map((step) => <li key={step}>{step}</li>)}</ol>
-      {canRequestRefund(order) && (
+      {Boolean(order.uuid) && ["PAID", "SHIPPED", "DELIVERED"].includes(order.status) && (
         <div className={styles.refundActionRow}>
-          <button type="button" onClick={() => onRefundRequest(order)}>
-            {t("requestRefund")}
+          <button
+            type="button"
+            onClick={() => onRefundRequest(order)}
+            disabled={order.refundRequestFiled}
+          >
+            {order.refundRequestFiled ? t("refundRequestReceived") : t("requestRefund")}
           </button>
         </div>
       )}

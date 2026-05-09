@@ -11,4 +11,6 @@ public interface RefundRequestRepository extends JpaRepository<RefundRequestEnti
 
     @EntityGraph(attributePaths = {"order", "user", "order.items"})
     List<RefundRequestEntity> findTop20ByStatusOrderByCreatedAtAsc(RefundRequestStatus status);
+
+    boolean existsByOrderIdAndUserId(UUID orderId, UUID userId);
 }

@@ -19,6 +19,8 @@ import com.artgallery.repository.AnalyticsRepository;
 import com.artgallery.repository.OrderRepository;
 import com.artgallery.repository.RefundRequestRepository;
 import com.artgallery.repository.UserRepository;
+import com.artgallery.service.payment.StripePaymentClient;
+import com.stripe.exception.StripeException;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -54,6 +56,7 @@ public class AdminService {
     private final AnalyticsRepository analyticsRepository;
     private final RefundRequestRepository refundRequestRepository;
     private final EmailService emailService;
+    private final StripePaymentClient stripePaymentClient;
     private final boolean devAccountDeleteEnabled;
 
     public AdminService(UserRepository userRepository,
@@ -62,6 +65,7 @@ public class AdminService {
                         AnalyticsRepository analyticsRepository,
                         RefundRequestRepository refundRequestRepository,
                         EmailService emailService,
+                        StripePaymentClient stripePaymentClient,
                         @Value("${app.admin.dev-account-delete-enabled:false}") boolean devAccountDeleteEnabled) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
@@ -69,6 +73,7 @@ public class AdminService {
         this.analyticsRepository = analyticsRepository;
         this.refundRequestRepository = refundRequestRepository;
         this.emailService = emailService;
+        this.stripePaymentClient = stripePaymentClient;
         this.devAccountDeleteEnabled = devAccountDeleteEnabled;
     }
 
@@ -239,7 +244,9 @@ public class AdminService {
             throw new IllegalArgumentException("Only paid, shipped or delivered orders can be refunded");
         }
 
+        refundStripePayment(order);
         order.setOrderStatus(OrderStatus.REFUNDED);
+        unlockOrderArtworks(order);
         AdminOrderResponse response = AdminOrderResponse.from(order);
         emailService.sendOrderRefundedEmail(
                 order.getUser().getEmail(),
@@ -267,7 +274,9 @@ public class AdminService {
             throw new IllegalArgumentException("Only paid, shipped or delivered orders can be refunded");
         }
 
+        refundStripePayment(order);
         order.setOrderStatus(OrderStatus.REFUNDED);
+        unlockOrderArtworks(order);
         refundRequest.setStatus(RefundRequestStatus.APPROVED);
         refundRequest.setApprovedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
@@ -463,5 +472,25 @@ public class AdminService {
         String currency = order.getCurrency() == null ? "CAD" : order.getCurrency();
         BigDecimal amount = order.getTotalAmount() == null ? BigDecimal.ZERO : order.getTotalAmount();
         return amount.toPlainString() + " " + currency;
+    }
+
+    private void refundStripePayment(Order order) {
+        if (order.getStripePaymentIntentId() == null || order.getStripePaymentIntentId().isBlank()) {
+            throw new IllegalArgumentException("This order has no Stripe payment to refund");
+        }
+
+        try {
+            stripePaymentClient.refundPayment(
+                    order.getStripePaymentIntentId(),
+                    order.getTotalAmount(),
+                    order.getCurrency()
+            );
+        } catch (StripeException ex) {
+            throw new IllegalArgumentException("Stripe refund failed");
+        }
+    }
+
+    private void unlockOrderArtworks(Order order) {
+        order.getItems().forEach(item -> item.getArtwork().setSoldOut(false));
     }
 }

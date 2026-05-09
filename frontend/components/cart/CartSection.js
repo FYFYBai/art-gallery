@@ -1,13 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "../../i18n/IntlContext";
 import styles from "./CartSection.module.css";
 import { CartIcon } from "@/components/header/icons";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
+const emptyAddressDraft = {
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  provinceState: "QC",
+  postalCode: "",
+  country: "Canada",
+  primary: true,
+};
+
+const provinces = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
 
 function readStoredAuth() {
   if (typeof window === "undefined") return null;
@@ -34,88 +46,192 @@ function formatPrice(value, currency = "CAD") {
   });
 }
 
+function formatAddress(address) {
+  return [
+    address.addressLine1,
+    address.addressLine2,
+    `${address.city}, ${address.provinceState} ${address.postalCode}`,
+    address.country,
+  ].filter(Boolean).join(", ");
+}
+
+function extractApiError(result, fallback) {
+  if (result?.errors?.length) return result.errors[0];
+  if (result?.message) return result.message;
+  return fallback;
+}
+
 export default function CartSection() {
   const t = useTranslations("cart");
   const locale = useLocale();
   const [currentStep, setCurrentStep] = useState(1);
   const [auth] = useState(() => readStoredAuth());
   const [cart, setCart] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [addressDraft, setAddressDraft] = useState(emptyAddressDraft);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(() => Boolean(readStoredAuth()?.token));
-  const [errorKey, setErrorKey] = useState("");
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [submittingAddress, setSubmittingAddress] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [removingId, setRemovingId] = useState("");
 
-  const STEPS = [t("stepCart"), t("stepCheckout"), t("stepConfirmation")];
+  const steps = useMemo(() => [t("stepCart"), t("stepCheckout")], [t]);
   const items = cart?.items ?? [];
   const hasUnavailableItems = items.some((item) => !item.available);
   const canCheckout = Boolean(cart?.canCheckout);
+  const selectedAddress = addresses.find((address) => address.id === selectedAddressId);
+  const canStartStripeCheckout = canCheckout && selectedAddressId && acceptedTerms && !checkingOut;
 
-  const progressWidth = `${((currentStep - 0.5) / STEPS.length) * 100}%`;
-  const progressTrackWidth = `${((STEPS.length - 0.5) / STEPS.length) * 100}%`;
-
-  const getNextButtonLabel = () => {
-    if (currentStep === 1) return t("proceedToCheckout");
-    if (currentStep === 2) return t("placeDemoOrder");
-    return t("backToCart");
-  };
-
-  const handleNextStep = () => {
-    if (currentStep === 1 && !canCheckout) return;
-    setCurrentStep((prev) => (prev === STEPS.length ? 1 : prev + 1));
-  };
+  const progressWidth = `${((currentStep - 0.5) / steps.length) * 100}%`;
+  const progressTrackWidth = `${((steps.length - 0.5) / steps.length) * 100}%`;
 
   useEffect(() => {
     async function loadCart() {
-      if (!auth?.token) {
-        return;
-      }
+      if (!auth?.token) return;
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/cart`, {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
+          headers: { Authorization: `Bearer ${auth.token}` },
         });
 
-        if (!response.ok) {
-          throw new Error("Could not load cart");
-        }
+        if (!response.ok) throw new Error("Could not load cart");
 
         setCart(await response.json());
       } catch {
-        setErrorKey("loadFailed");
+        setErrorText(t("loadFailed"));
       } finally {
         setLoading(false);
       }
     }
 
     loadCart();
-  }, [auth?.token]);
+  }, [auth?.token, t]);
+
+  useEffect(() => {
+    async function loadAddresses() {
+      if (!auth?.token || currentStep !== 2) return;
+
+      setAddressesLoading(true);
+      setErrorText("");
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/profile/addresses`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+
+        if (!response.ok) throw new Error("Could not load addresses");
+
+        const result = await response.json();
+        setAddresses(result);
+        const primary = result.find((address) => address.primary) || result[0];
+        setSelectedAddressId(primary?.id || "");
+        setShowAddressForm(result.length === 0);
+      } catch {
+        setErrorText(t("addressLoadFailed"));
+      } finally {
+        setAddressesLoading(false);
+      }
+    }
+
+    loadAddresses();
+  }, [auth?.token, currentStep, t]);
 
   const removeItem = async (itemId) => {
     if (!auth?.token || removingId) return;
 
     setRemovingId(itemId);
-    setErrorKey("");
+    setErrorText("");
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/cart/items/${itemId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
+        headers: { Authorization: `Bearer ${auth.token}` },
       });
 
-      if (!response.ok) {
-        throw new Error("Could not remove item");
-      }
+      if (!response.ok) throw new Error("Could not remove item");
 
       setCart(await response.json());
       setCurrentStep(1);
     } catch {
-      setErrorKey("removeFailed");
+      setErrorText(t("removeFailed"));
     } finally {
       setRemovingId("");
     }
+  };
+
+  const saveAddress = async (event) => {
+    event.preventDefault();
+    if (!auth?.token || submittingAddress) return;
+
+    setSubmittingAddress(true);
+    setErrorText("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/profile/addresses`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(addressDraft),
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(extractApiError(result, t("addressSaveFailed")));
+      }
+
+      setAddresses((current) => [result, ...current.filter((address) => address.id !== result.id)]);
+      setSelectedAddressId(result.id);
+      setAddressDraft(emptyAddressDraft);
+      setShowAddressForm(false);
+    } catch (error) {
+      setErrorText(error.message || t("addressSaveFailed"));
+    } finally {
+      setSubmittingAddress(false);
+    }
+  };
+
+  const createStripeCheckout = async () => {
+    if (!auth?.token || !canStartStripeCheckout) return;
+
+    setCheckingOut(true);
+    setErrorText("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/checkout/stripe-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify({
+          addressId: selectedAddressId,
+          acceptedTerms,
+          locale,
+        }),
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(extractApiError(result, t("checkoutFailed")));
+      }
+
+      window.location.href = result.checkoutUrl;
+    } catch (error) {
+      setCheckingOut(false);
+      setErrorText(error.message || t("checkoutFailed"));
+    }
+  };
+
+  const goToCheckout = () => {
+    if (!canCheckout) return;
+    setCurrentStep(2);
+    setErrorText("");
   };
 
   return (
@@ -125,8 +241,8 @@ export default function CartSection() {
           <div className={styles.stepperLine} style={{ width: progressTrackWidth }} />
           <div className={styles.stepperFill} style={{ width: progressWidth }} />
 
-          <div className={styles.stepItems}>
-            {STEPS.map((label, index) => {
+          <div className={styles.stepItems} style={{ gridTemplateColumns: `repeat(${steps.length}, 1fr)` }}>
+            {steps.map((label, index) => {
               const stepNumber = index + 1;
               const stepClassName = [
                 styles.step,
@@ -244,10 +360,6 @@ export default function CartSection() {
                     </div>
                   </div>
                 )}
-
-                {errorKey && (
-                  <p className={styles.errorText}>{t(errorKey)}</p>
-                )}
               </>
             )}
 
@@ -257,40 +369,121 @@ export default function CartSection() {
                 <h1 className={styles.panelTitle}>{t("checkoutTitle")}</h1>
                 <p className={styles.panelText}>{t("checkoutText")}</p>
 
-                <div className={styles.checkoutGrid}>
-                  <label className={styles.fieldLabel}>
-                    {t("emailLabel")}
-                    <input className={styles.fieldInput} type="email" placeholder={t("emailPlaceholder")} />
-                  </label>
-                  <label className={styles.fieldLabel}>
-                    {t("fullNameLabel")}
-                    <input className={styles.fieldInput} type="text" placeholder={t("fullNamePlaceholder")} />
-                  </label>
-                  <label className={styles.fieldLabel}>
-                    {t("addressLabel")}
-                    <input className={styles.fieldInput} type="text" placeholder={t("addressPlaceholder")} />
-                  </label>
-                  <label className={styles.fieldLabel}>
-                    {t("cityLabel")}
-                    <input className={styles.fieldInput} type="text" placeholder={t("cityPlaceholder")} />
-                  </label>
+                <div className={styles.checkoutBlocks}>
+                  <section className={styles.checkoutBlock}>
+                    <div className={styles.checkoutBlockHeader}>
+                      <h2>{t("deliveryAddress")}</h2>
+                      <button type="button" onClick={() => setShowAddressForm((value) => !value)}>
+                        {showAddressForm ? t("cancel") : t("addAddress")}
+                      </button>
+                    </div>
+
+                    {addressesLoading && <p className={styles.statusText}>{t("loadingAddresses")}</p>}
+
+                    {!addressesLoading && addresses.length > 0 && (
+                      <div className={styles.addressList}>
+                        {addresses.map((address) => (
+                          <label key={address.id} className={styles.addressOption}>
+                            <input
+                              type="radio"
+                              name="address"
+                              checked={selectedAddressId === address.id}
+                              onChange={() => setSelectedAddressId(address.id)}
+                            />
+                            <span>
+                              <strong>{address.primary ? t("primaryAddress") : t("savedAddress")}</strong>
+                              {formatAddress(address)}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+
+                    {showAddressForm && (
+                      <form className={styles.addressForm} onSubmit={saveAddress}>
+                        <label className={styles.fieldLabel}>
+                          {t("addressLabel")}
+                          <input
+                            className={styles.fieldInput}
+                            value={addressDraft.addressLine1}
+                            onChange={(event) => setAddressDraft((current) => ({ ...current, addressLine1: event.target.value }))}
+                            required
+                          />
+                        </label>
+                        <label className={styles.fieldLabel}>
+                          {t("addressLine2")}
+                          <input
+                            className={styles.fieldInput}
+                            value={addressDraft.addressLine2}
+                            onChange={(event) => setAddressDraft((current) => ({ ...current, addressLine2: event.target.value }))}
+                          />
+                        </label>
+                        <label className={styles.fieldLabel}>
+                          {t("cityLabel")}
+                          <input
+                            className={styles.fieldInput}
+                            value={addressDraft.city}
+                            onChange={(event) => setAddressDraft((current) => ({ ...current, city: event.target.value }))}
+                            required
+                          />
+                        </label>
+                        <label className={styles.fieldLabel}>
+                          {t("province")}
+                          <select
+                            className={styles.fieldInput}
+                            value={addressDraft.provinceState}
+                            onChange={(event) => setAddressDraft((current) => ({ ...current, provinceState: event.target.value }))}
+                          >
+                            {provinces.map((province) => (
+                              <option key={province} value={province}>{province}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className={styles.fieldLabel}>
+                          {t("postalCode")}
+                          <input
+                            className={styles.fieldInput}
+                            value={addressDraft.postalCode}
+                            onChange={(event) => setAddressDraft((current) => ({ ...current, postalCode: event.target.value }))}
+                            placeholder="H2Y 1G5"
+                            required
+                          />
+                        </label>
+                        <button type="submit" className={styles.secondaryButton} disabled={submittingAddress}>
+                          {submittingAddress ? t("savingAddress") : t("saveAddress")}
+                        </button>
+                      </form>
+                    )}
+                  </section>
+
+                  <section className={styles.checkoutBlock}>
+                    <h2>{t("payment")}</h2>
+                    <p className={styles.panelText}>
+                      {t("stripeRedirectText")}
+                    </p>
+                    {selectedAddress && (
+                      <p className={styles.selectedAddress}>{formatAddress(selectedAddress)}</p>
+                    )}
+                    <label className={styles.termsCheck}>
+                      <input
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        onChange={(event) => setAcceptedTerms(event.target.checked)}
+                      />
+                      <span>
+                        {t("agreePrefix")}{" "}
+                        <Link href={`/${locale}/terms-of-service`}>{t("termsLink")}</Link>{" "}
+                        {t("and")}{" "}
+                        <Link href={`/${locale}/refund-shipping-commission`}>{t("policyLink")}</Link>.
+                      </span>
+                    </label>
+                  </section>
                 </div>
               </div>
             )}
 
-            {currentStep === 3 && (
-              <div className={styles.confirmationState}>
-                <div className={styles.confirmationMark} aria-hidden="true">
-                  <span />
-                </div>
-                <p className={styles.panelEyebrow}>{t("confirmationEyebrow")}</p>
-                <h1 className={styles.panelTitle}>{t("confirmationTitle")}</h1>
-                <p className={styles.panelText}>{t("confirmationText")}</p>
-                <div className={styles.confirmationSummary}>
-                  <span>{t("demoOrder")}</span>
-                  <strong>AG-2026-001</strong>
-                </div>
-              </div>
+            {errorText && (
+              <p className={styles.errorText}>{errorText}</p>
             )}
           </div>
 
@@ -334,16 +527,27 @@ export default function CartSection() {
           </aside>
         </div>
 
-        <div className={styles.demoFlowControls}>
-          <button
-            type="button"
-            className={styles.nextButton}
-            onClick={handleNextStep}
-            disabled={currentStep === 1 && !canCheckout}
-          >
-            {getNextButtonLabel()}
-          </button>
-        </div>
+        {auth?.token && !loading && items.length > 0 && (
+          <div className={styles.demoFlowControls}>
+            {currentStep === 2 && (
+              <button type="button" className={styles.backButton} onClick={() => setCurrentStep(1)}>
+                {t("backToCart")}
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles.nextButton}
+              onClick={currentStep === 1 ? goToCheckout : createStripeCheckout}
+              disabled={currentStep === 1 ? !canCheckout : !canStartStripeCheckout}
+            >
+              {currentStep === 1
+                ? t("proceedToCheckout")
+                : checkingOut
+                  ? t("redirectingToStripe")
+                  : t("payWithStripe")}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

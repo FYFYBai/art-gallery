@@ -121,7 +121,10 @@ public class ProfileService {
     public List<ProfileOrderResponse> listOrders(UUID userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
-                .map(ProfileOrderResponse::from)
+                .map(order -> ProfileOrderResponse.from(
+                        order,
+                        refundRequestRepository.existsByOrderIdAndUserId(order.getId(), userId)
+                ))
                 .toList();
     }
 
@@ -132,6 +135,10 @@ public class ProfileService {
         var order = orderRepository.findById(orderId)
                 .filter(candidate -> candidate.getUser().getId().equals(userId))
                 .orElseThrow(() -> new ProfileException("Order was not found"));
+
+        if (refundRequestRepository.existsByOrderIdAndUserId(orderId, userId)) {
+            throw new ProfileException("Refund request has already been filed");
+        }
 
         RefundRequestEntity refundRequest = new RefundRequestEntity();
         refundRequest.setOrder(order);

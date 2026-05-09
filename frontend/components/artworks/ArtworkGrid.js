@@ -157,7 +157,7 @@ export default function ArtworkGrid({ type }) {
 
                   <div className={styles.info}>
                     <p className={styles.title}>{artwork.title}</p>
-                    <p className={styles.status}>
+                    <p className={`${styles.status} ${artwork.soldOut ? styles.soldStatus : ""}`}>
                       {artwork.soldOut ? t("sold") : t("available")}
                     </p>
                     <p className={styles.price}>

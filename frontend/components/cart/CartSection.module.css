@@ -111,8 +111,10 @@
 .cartPanel {
   min-height: 480px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 18px;
   padding: 48px;
 }
 
@@ -206,6 +208,101 @@
   gap: 16px;
 }
 
+.checkoutBlocks {
+  margin-top: 30px;
+  display: grid;
+  gap: 18px;
+}
+
+.checkoutBlock {
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.34);
+  padding: 18px;
+}
+
+.checkoutBlock h2 {
+  margin: 0 0 14px;
+  font-family: var(--font-title), serif;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.checkoutBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.checkoutBlockHeader h2 {
+  margin: 0;
+}
+
+.checkoutBlockHeader button,
+.secondaryButton,
+.backButton {
+  border: 1px solid var(--surface-dark);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 10px 16px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.checkoutBlockHeader button:hover,
+.secondaryButton:hover,
+.backButton:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.addressList {
+  display: grid;
+  gap: 10px;
+}
+
+.addressOption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border: 1px solid var(--line-soft);
+  background: rgba(245, 240, 230, 0.32);
+  padding: 12px;
+  font-family: var(--font-body), sans-serif;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.addressOption strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-main);
+}
+
+.addressForm {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.addressForm .secondaryButton {
+  align-self: end;
+}
+
 .fieldLabel {
   display: grid;
   gap: 8px;
@@ -245,6 +342,10 @@
   box-shadow: 0 0 0 3px rgba(184, 155, 114, 0.16);
 }
 
+select.fieldInput {
+  appearance: auto;
+}
+
 .confirmationMark {
   width: 58px;
   height: 58px;
@@ -281,6 +382,33 @@
 
 .confirmationSummary strong {
   color: var(--text-main);
+}
+
+.selectedAddress {
+  margin: 14px 0;
+  border-left: 2px solid var(--accent);
+  padding-left: 12px;
+  font-family: var(--font-body), sans-serif;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.termsCheck {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin-top: 16px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+.termsCheck a {
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .shopButton {
@@ -465,6 +593,7 @@
 .demoFlowControls {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
   margin-top: 18px;
 }
 
@@ -639,11 +768,17 @@
     grid-template-columns: 1fr;
   }
 
-  .demoFlowControls {
-    justify-content: stretch;
+  .addressForm {
+    grid-template-columns: 1fr;
   }
 
-  .nextButton {
+  .demoFlowControls {
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .nextButton,
+  .backButton {
     width: 100%;
   }
 

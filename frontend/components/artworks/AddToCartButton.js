@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "../../i18n/IntlContext";
 import { CartIcon } from "../header/icons";
 import styles from "./AddToCartButton.module.css";
@@ -22,7 +22,30 @@ function readStoredAuth() {
 export default function AddToCartButton({ artworkId, soldOut, variant = "card" }) {
   const t = useTranslations("artworkActions");
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
   const [submitting, setSubmitting] = useState(false);
+  const toastTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
+  const showToast = (nextMessage, type = "success") => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+
+    setMessageType(type);
+    setMessage(nextMessage);
+    toastTimerRef.current = setTimeout(() => {
+      setMessage("");
+      toastTimerRef.current = null;
+    }, 3000);
+  };
 
   const addToCart = async (event) => {
     event.preventDefault();
@@ -32,12 +55,11 @@ export default function AddToCartButton({ artworkId, soldOut, variant = "card" }
 
     const auth = readStoredAuth();
     if (!auth?.token) {
-      setMessage(t("loginRequired"));
+      showToast(t("loginRequired"), "error");
       return;
     }
 
     setSubmitting(true);
-    setMessage("");
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/cart/items`, {
@@ -55,9 +77,10 @@ export default function AddToCartButton({ artworkId, soldOut, variant = "card" }
       }
 
       const result = await response.json();
-      setMessage(result.message === "Artwork is already in cart" ? t("alreadyInCart") : t("added"));
+      const alreadyInCart = result.message === "Artwork is already in cart";
+      showToast(alreadyInCart ? t("alreadyInCart") : t("added"), alreadyInCart ? "error" : "success");
     } catch (error) {
-      setMessage(error.message === "Artwork is sold" ? t("sold") : t("failed"));
+      showToast(error.message === "Artwork is sold" ? t("sold") : t("failed"), "error");
     } finally {
       setSubmitting(false);
     }
@@ -74,7 +97,15 @@ export default function AddToCartButton({ artworkId, soldOut, variant = "card" }
         <CartIcon className={styles.icon} />
         <span>{soldOut ? t("sold") : submitting ? t("adding") : t("addToCart")}</span>
       </button>
-      {message && <p className={styles.message}>{message}</p>}
+      {message && (
+        <div
+          className={`${styles.toast} ${messageType === "success" ? styles.toastSuccess : styles.toastError}`}
+          role="status"
+          aria-live="polite"
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }

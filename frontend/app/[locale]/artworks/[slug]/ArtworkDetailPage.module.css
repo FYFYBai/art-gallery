@@ -104,6 +104,10 @@
   color: var(--accent-strong);
 }
 
+.soldAvailability {
+  color: #a33a2b;
+}
+
 .meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

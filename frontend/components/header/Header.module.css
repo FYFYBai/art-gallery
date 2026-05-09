@@ -193,6 +193,7 @@
 
 .searchPlaceholderPrefix {
   flex: 0 0 auto;
+  margin-right: 0.35em;
 }
 
 .searchTermSlot {

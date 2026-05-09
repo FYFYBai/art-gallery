@@ -74,6 +74,10 @@ app:
   admin:
     dev-account-delete-enabled: ${ADMIN_DEV_ACCOUNT_DELETE_ENABLED:true}
 
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+
 server:
   port: 8080
 

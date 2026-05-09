@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
                 : "Bad request";
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiErrorResponse.of(message, List.of()));
+                .body(ApiErrorResponse.of(message, ex.getMessage() == null ? List.of() : List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(DuplicateEmailException.class)

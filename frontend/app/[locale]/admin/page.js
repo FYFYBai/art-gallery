@@ -373,6 +373,16 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth]);
 
+  useEffect(() => {
+    if (!notice) return undefined;
+
+    const timerId = window.setTimeout(() => {
+      setNotice("");
+    }, 3000);
+
+    return () => window.clearTimeout(timerId);
+  }, [notice]);
+
   const searchUsers = async (event) => {
     event.preventDefault();
     if (!auth) return;
@@ -686,7 +696,7 @@ export default function AdminPage() {
         </div>
       </section>
 
-      {notice && <p className={styles.notice}>{notice}</p>}
+      {notice && <div className={styles.notice} role="status" aria-live="polite">{notice}</div>}
 
       <section className={styles.metricGrid} aria-label={t("metrics")}>
         <Metric label={t("users")} value={dashboard.userCount} />

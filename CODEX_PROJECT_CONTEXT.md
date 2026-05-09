@@ -89,18 +89,21 @@ Current behavior:
 - Header artwork/type/series links should route to artworks page with the corresponding filters preselected.
 - Availability is one-of-one only: use `available` / `sold` in UI, backed by `soldOut` boolean.
 - Artwork cards and detail pages show an add-to-cart button. Sold pieces cannot be added.
+- Add-to-cart feedback appears as a fixed top toast for 3 seconds, not inline under artwork cards.
 - Cart is account-backed through backend `carts` / `cart_items`. Items persist for the logged-in account until removed.
 - Cart page calls `GET /api/cart` on access and uses current artwork `soldOut` / `active` state. Unavailable items are clearly marked and block checkout progression.
 
-Seeded product data:
+Seeded product data and uploads:
 
 - User DOCX content was converted into Flyway seed data and product images.
 - DB image paths currently point to `/uploads/products/...`.
 - Local product image files currently live under `backend/uploads/products/`.
-- Decide whether seeded upload images should be committed as repo demo assets or treated as local upload files only:
-  - Commit them if every developer/demo machine should render the seeded artworks immediately after migrations. This keeps DB seed paths valid everywhere, but mixes demo upload content into the repository.
-  - Keep them local-only if uploads should behave like runtime/generated files. Then seeded DB rows may show broken images on another machine unless each developer restores the same files or migrations are changed to point at committed public/demo assets.
-  - For a reliable demo, either commit these six seed images or move seed images to an explicit committed demo-assets path and reserve `backend/uploads/products/` for runtime admin uploads.
+- User chose local VPS storage for production uploads because this is a very small one-person shop on one rented VPS.
+- Deployment should use a persistent VPS upload directory such as `/srv/art-gallery/uploads/products`.
+- Backend upload path should be mapped to that persistent directory, not an ephemeral container folder.
+- Product image URLs can remain `/uploads/products/...` if Caddy/Nginx or backend serves that path.
+- When deploying, migrate/copy current seeded product images into the persistent upload directory so seeded DB image paths keep working.
+- Back up uploads together with PostgreSQL; losing either breaks product/order history.
 
 ## Header/Auth
 
@@ -118,6 +121,7 @@ frontend/components/header/Header.module.css
 - Forgot/reset password verifies account existence before sending a reset link and blocks reusing the same password.
 - Password inputs should use the same eye-toggle style across login/register/reset/profile.
 - Login success shows a top notification for 3 seconds.
+- Header cart icon is blocked for admin users and shows the top toast text `为什么啊，你在管理员账户里买东西吗？`.
 - Profile icon routes admins to `/${locale}/admin`; normal users to `/${locale}/profile`.
 - Internal links should stay in the active locale unless changed through the language switcher.
 
@@ -201,6 +205,8 @@ Dashboard features:
 - Real page view chart from compact analytics data.
 - Product search/update/add with upload button, artwork type, series, name, price, size, year, long description, and availability.
 - Product availability is only `available` / `sold`; there is one piece per artwork.
+- Admin dashboard notices use fixed top toasts that auto-dismiss after 3 seconds.
+- Product management form is hidden until add/edit, uses a clean image-preview/main-fields/series/description layout, and delete is soft-delete (`active=false`).
 - Uploaded product images should use the backend-managed product upload path because those paths will later render real product pages.
 
 Order admin behavior:
@@ -288,8 +294,14 @@ Payment is not implemented yet. Current order/refund logic is demo/admin workflo
 
 Deployment reminder for later:
 
-- User wants to deploy the full repo to a rented VPS/server and connect it to a third-party managed PostgreSQL service.
-- Before production deployment, prepare Dockerfiles/production compose or equivalent, production env vars, CORS/domain settings, HTTPS reverse proxy, database backup plan, and stable object storage for product images/uploads.
+- User wants a single rented VPS for frontend, backend, PostgreSQL, and uploads.
+- Preferred production shape: Docker Compose on one VPS with `frontend`, `backend`, `postgres`, and `caddy` or `nginx`.
+- Route `yourdomain.com` to frontend and either `api.yourdomain.com` or `/api` to backend.
+- Store uploads on a persistent host-mounted path, e.g. `/srv/art-gallery/uploads/products`.
+- Configure backend/container volume so admin uploads are saved to the persistent path.
+- Configure reverse proxy or backend static serving for `/uploads/products/...`.
+- Before production deployment, prepare Dockerfiles/production compose, production env vars, CORS/domain settings, HTTPS reverse proxy, and backup scripts.
+- Minimum backup plan: nightly `pg_dump`, nightly archive/copy of `/srv/art-gallery/uploads`, and keep at least one backup outside the VPS.
 
 When Stripe is added, refine every related workflow:
 
