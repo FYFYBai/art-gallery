@@ -109,22 +109,104 @@
   flex-shrink: 0;
 }
 
-/* Price slider */
-.sliderWrap {
+/* Price range */
+.rangeWrap {
+  position: relative;
+  height: 34px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
 }
 
-.slider {
+.rangeTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      to right,
+      #d8d8d8 0,
+      #d8d8d8 var(--range-start),
+      #1a1a1a var(--range-start),
+      #1a1a1a var(--range-end),
+      #d8d8d8 var(--range-end),
+      #d8d8d8 100%
+    );
+}
+
+.rangeInput {
+  position: absolute;
   width: 100%;
-  accent-color: #1a1a1a;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+}
+
+.rangeInput::-webkit-slider-runnable-track {
+  height: 3px;
+  background: transparent;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: 1px solid #1a1a1a;
+  border-radius: 50%;
+  background: #fff;
   cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+}
+
+.rangeInput::-moz-range-track {
+  height: 3px;
+  background: transparent;
+}
+
+.rangeInput::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #1a1a1a;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.priceFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.priceFields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.priceFields input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 0;
+  font-size: 0.9rem;
+  color: #1a1a1a;
 }
 
 .sliderLabels {
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
   font-size: 0.8125rem;
   color: #555;
 }

@@ -61,8 +61,15 @@ export default function Footer() {
         <div className={styles.bottomRow}>
           <p className={styles.copy}>{t("copyright")}</p>
           <div className={styles.legal}>
-            <a href="#" className={styles.legalLink}>{t("privacy")}</a>
-            <a href="#" className={styles.legalLink}>{t("terms")}</a>
+            <Link href={getLocalizedHref("/privacy-policy", locale)} className={styles.legalLink}>
+              {t("privacy")}
+            </Link>
+            <Link href={getLocalizedHref("/terms-of-service", locale)} className={styles.legalLink}>
+              {t("terms")}
+            </Link>
+            <Link href={getLocalizedHref("/refund-shipping-commission", locale)} className={styles.legalLink}>
+              {t("refundShippingCommission")}
+            </Link>
           </div>
         </div>
       </div>

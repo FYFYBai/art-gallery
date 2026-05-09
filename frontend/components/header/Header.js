@@ -154,7 +154,7 @@ export default function Header() {
   const [verificationEmail, setVerificationEmail] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // { email, role, token }
+  const [currentUser, setCurrentUser] = useState(() => readStoredAuth()); // { email, role, token }
   const profileHref =
     currentUser?.role === "ADMIN" ? `/${locale}/admin` : `/${locale}/profile`;
   const loginSubmittingRef = useRef(false);
@@ -178,6 +178,24 @@ export default function Header() {
   }, [visibleDropdown, navItems]);
 
   const rotatingTermsLength = rotatingTerms.length;
+
+  const saveAuth = (user) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem("auth", JSON.stringify(user));
+    } catch {
+      // ignore storage errors
+    }
+  };
+
+  const clearAuth = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem("auth");
+    } catch {
+      // ignore storage errors
+    }
+  };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -234,11 +252,39 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const timerId = window.setTimeout(() => {
-      setCurrentUser(readStoredAuth());
-    }, 0);
+    const storedAuth = readStoredAuth();
 
-    return () => window.clearTimeout(timerId);
+    if (!storedAuth?.token) {
+      return undefined;
+    }
+
+    const controller = new AbortController();
+
+    async function verifyStoredAuth() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${storedAuth.token}`,
+          },
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Stored auth is no longer valid");
+        }
+
+        const verifiedUser = await response.json();
+        saveAuth(verifiedUser);
+      } catch {
+        if (!controller.signal.aborted) {
+          clearAuth();
+        }
+      }
+    }
+
+    verifyStoredAuth();
+
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -255,24 +301,6 @@ export default function Header() {
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
-
-  const saveAuth = (user) => {
-    setCurrentUser(user);
-    try {
-      localStorage.setItem("auth", JSON.stringify(user));
-    } catch {
-      // ignore storage errors
-    }
-  };
-
-  const clearAuth = () => {
-    setCurrentUser(null);
-    try {
-      localStorage.removeItem("auth");
-    } catch {
-      // ignore storage errors
-    }
-  };
 
   const handleLanguageSelect = (code) => {
     // Persist the chosen locale in a cookie so the middleware uses it
@@ -655,6 +683,13 @@ export default function Header() {
     }
   };
 
+  const handleCartClick = (event) => {
+    if (currentUser?.role !== "ADMIN") return;
+
+    event.preventDefault();
+    showTopLoginToast("为什么啊，你在管理员账户里买东西吗？");
+  };
+
   const stopPropagation = (event) => {
     event.stopPropagation();
   };
@@ -921,8 +956,8 @@ export default function Header() {
                     className={styles.iconButton}
                     aria-label={
                       currentUser.role === "ADMIN"
-                        ? "Go to admin dashboard"
-                        : "Go to profile"
+                        ? t("header.adminLabel")
+                        : t("header.profileLabel")
                     }
                     title={currentUser.email}
                   >
@@ -946,6 +981,7 @@ export default function Header() {
                 href={getLocalizedHref("/cart", locale)}
                 className={styles.iconButton}
                 aria-label={t("header.cartLabel")}
+                onClick={handleCartClick}
               >
                 <CartIcon className={styles.headerIconSvg} />
               </Link>

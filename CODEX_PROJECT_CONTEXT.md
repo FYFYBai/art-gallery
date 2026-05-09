@@ -45,6 +45,7 @@ Active route areas:
 frontend/app/[locale]/page.js
 frontend/app/[locale]/a-propos/page.js
 frontend/app/[locale]/artworks/page.js
+frontend/app/[locale]/artworks/[slug]/page.js
 frontend/app/[locale]/cart/page.js
 frontend/app/[locale]/profile/page.js
 frontend/app/[locale]/admin/page.js
@@ -62,6 +63,44 @@ frontend/messages/zh.json
 ```
 
 Keep key sets aligned across all locales. Base visible text on French first, then translate to English and Chinese.
+
+## Artworks/Product Pages
+
+Files:
+
+```txt
+frontend/app/[locale]/artworks/page.js
+frontend/app/[locale]/artworks/[slug]/page.js
+frontend/components/artworks/ArtworkGrid.js
+frontend/components/artworks/FilterPanel.js
+frontend/components/artworks/AddToCartButton.js
+backend/src/main/java/com/artgallery/controller/ArtworkController.java
+backend/src/main/java/com/artgallery/service/ArtworkService.java
+backend/src/main/java/com/artgallery/domain/artwork/Artwork.java
+```
+
+Current behavior:
+
+- Artworks page fetches products from backend DB, not hardcoded frontend data.
+- Detail pages use clean slugs, e.g. `/${locale}/artworks/vieux-port-de-montreal-hiver`.
+- Filters include artwork type, series, year, and two-sided price range from 0 to 5000 CAD.
+- `MEDIUM` filter/model was removed. Products can have one artwork type and multiple series.
+- If no artwork type, series, or year is selected, that filter group is treated as no filter.
+- Header artwork/type/series links should route to artworks page with the corresponding filters preselected.
+- Availability is one-of-one only: use `available` / `sold` in UI, backed by `soldOut` boolean.
+- Artwork cards and detail pages show an add-to-cart button. Sold pieces cannot be added.
+- Cart is account-backed through backend `carts` / `cart_items`. Items persist for the logged-in account until removed.
+- Cart page calls `GET /api/cart` on access and uses current artwork `soldOut` / `active` state. Unavailable items are clearly marked and block checkout progression.
+
+Seeded product data:
+
+- User DOCX content was converted into Flyway seed data and product images.
+- DB image paths currently point to `/uploads/products/...`.
+- Local product image files currently live under `backend/uploads/products/`.
+- Decide whether seeded upload images should be committed as repo demo assets or treated as local upload files only:
+  - Commit them if every developer/demo machine should render the seeded artworks immediately after migrations. This keeps DB seed paths valid everywhere, but mixes demo upload content into the repository.
+  - Keep them local-only if uploads should behave like runtime/generated files. Then seeded DB rows may show broken images on another machine unless each developer restores the same files or migrations are changed to point at committed public/demo assets.
+  - For a reliable demo, either commit these six seed images or move seed images to an explicit committed demo-assets path and reserve `backend/uploads/products/` for runtime admin uploads.
 
 ## Header/Auth
 
@@ -160,7 +199,8 @@ Dashboard features:
 - User count, order count, revenue cards.
 - Monthly transaction/revenue chart.
 - Real page view chart from compact analytics data.
-- Product search/update/add with upload button, artwork type, series, name, price, size, year, and long description.
+- Product search/update/add with upload button, artwork type, series, name, price, size, year, long description, and availability.
+- Product availability is only `available` / `sold`; there is one piece per artwork.
 - Uploaded product images should use the backend-managed product upload path because those paths will later render real product pages.
 
 Order admin behavior:
@@ -246,10 +286,16 @@ Page views are aggregated to avoid unbounded row growth. Admin dashboard should 
 
 Payment is not implemented yet. Current order/refund logic is demo/admin workflow only.
 
+Deployment reminder for later:
+
+- User wants to deploy the full repo to a rented VPS/server and connect it to a third-party managed PostgreSQL service.
+- Before production deployment, prepare Dockerfiles/production compose or equivalent, production env vars, CORS/domain settings, HTTPS reverse proxy, database backup plan, and stable object storage for product images/uploads.
+
 When Stripe is added, refine every related workflow:
 
 - Store Stripe payment intent/charge/refund IDs.
 - Create `PENDING` orders when checkout starts.
+- Before starting Stripe checkout, require an explicit checkbox confirming agreement to Terms of Service and Refund/Shipping Policy.
 - Mark `PAID` only from verified Stripe webhook events.
 - Keep pending cleanup for abandoned checkout sessions.
 - For refunds, admin approval should call Stripe Refund API first.

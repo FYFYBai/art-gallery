@@ -44,6 +44,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -168,6 +169,16 @@ public class AuthService {
         if (!remainingTtl.isNegative()) {
             tokenDenylist.add(jti, remainingTtl);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse currentUser(UUID userId, String token) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(InvalidCredentialsException::new);
+        if (!user.isActive()) {
+            throw new AccountDisabledException();
+        }
+        return new LoginResponse(user.getId(), user.getEmail(), user.getRole().name(), token);
     }
 
     @Transactional

@@ -51,7 +51,9 @@
     "mainNav": "Navigation principale",
     "cartLabel": "Panier",
     "accountLabel": "Compte",
-    "languageLabel": "Options de langue"
+    "languageLabel": "Options de langue",
+    "adminLabel": "Aller au tableau de bord admin",
+    "profileLabel": "Aller au profil"
   },
   "search": {
     "searchFor": "Rechercher",
@@ -132,18 +134,25 @@
     "filter": "Filtrer",
     "noArtworks": "Aucune œuvre dans cette catégorie.",
     "artworkCount": "{count} œuvre",
-    "artworkCountPlural": "{count} œuvres"
+    "artworkCountPlural": "{count} œuvres",
+    "loading": "Chargement des œuvres...",
+    "loadFailed": "Impossible de charger les œuvres. Veuillez réessayer plus tard.",
+    "available": "Disponible",
+    "sold": "Vendue"
   },
   "filterPanel": {
     "title": "Filtres",
     "artworkType": "Type d'œuvre",
-    "medium": "Médium",
     "priceRange": "Fourchette de prix",
     "year": "Année",
     "reset": "Réinitialiser",
     "apply": "Appliquer",
     "upTo": "Jusqu'à {price}",
-    "priceMax": "CA$10 000+"
+    "priceMax": "CA$5 000",
+    "series": "Séries",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "close": "Fermer les filtres"
   },
   "mediums": {
     "canvas": "Toile",
@@ -160,7 +169,8 @@
     "navLabel": "Navigation du pied de page",
     "copyright": "© 2026 Art Gallery. Tous droits réservés.",
     "privacy": "Confidentialité",
-    "terms": "Conditions"
+    "terms": "Conditions",
+    "refundShippingCommission": "Remboursement, livraison & commissions"
   },
   "hero": {
     "ariaLabel": "Sélection de la galerie",
@@ -201,7 +211,19 @@
     "serviceHours": "Lundi au samedi 9h - 18h EST :",
     "freeDelivery": "Livraison standard gratuite",
     "returnsExchanges": "Retours & échanges",
-    "shopSecurely": "Achat sécurisé"
+    "shopSecurely": "Achat sécurisé",
+    "loading": "Chargement du panier...",
+    "loadFailed": "Impossible de charger votre panier. Veuillez r?essayer.",
+    "removeFailed": "Impossible de retirer cet article. Veuillez r?essayer.",
+    "loginRequired": "Veuillez vous connecter pour voir votre panier.",
+    "loginRequiredBody": "Votre panier est li? ? votre compte afin que les ?uvres s?lectionn?es restent enregistr?es jusqu?? leur retrait.",
+    "cartTitle": "Vos ?uvres s?lectionn?es",
+    "itemCount": "{count} article(s)",
+    "availabilityChanged": "Une ou plusieurs ?uvres de votre panier ne sont plus disponibles. Retirez-les avant de passer ? la caisse.",
+    "itemUnavailable": "Cette ?uvre n?est plus disponible. Retirez-la avant de passer ? la caisse.",
+    "remove": "Retirer",
+    "removing": "Retrait...",
+    "subtotal": "Sous-total"
   },
   "home": {
     "shopByCategory": "Acheter par catégorie",
@@ -491,6 +513,43 @@
     "approveRefund": "Approuver le remboursement",
     "approveRefundConfirm": "Approuver cette demande de remboursement ? Le client recevra l’email de remboursement.",
     "refundApproved": "Remboursement approuvé. L’email de remboursement a été envoyé au client.",
-    "refundApproveFailed": "Impossible d’approuver cette demande de remboursement. Veuillez réessayer."
+    "refundApproveFailed": "Impossible d’approuver cette demande de remboursement. Veuillez réessayer.",
+    "chooseArtworkType": "Choisir le type d’œuvre",
+    "availability": "Disponibilité",
+    "available": "Disponible",
+    "sold": "Vendue",
+    "logout": "D?connexion",
+    "submitProduct": "Soumettre",
+    "newProduct": "Nouveau produit",
+    "editProduct": "Modifier le produit",
+    "deleteProduct": "Supprimer",
+    "deleteProductConfirm": "Supprimer ce produit ? Il sera masqu? des pages publiques des ?uvres.",
+    "productDeleted": "Produit supprim?.",
+    "productDeleteFailed": "Impossible de supprimer le produit."
+  },
+  "artworkDetail": {
+    "loading": "Chargement de l’œuvre...",
+    "loadFailed": "Impossible de charger cette œuvre. Veuillez réessayer plus tard.",
+    "backToArtworks": "Retour aux œuvres",
+    "oilByline": "Peinture originale à l’huile par Sylvaine",
+    "charcoalByline": "Dessin original au fusain par Sylvaine",
+    "uniquePiece": "?uvre originale - pi?ce unique",
+    "price": "Prix",
+    "size": "Dimensions",
+    "year": "Année",
+    "notAvailable": "N/D",
+    "available": "Disponible",
+    "sold": "Vendue",
+    "artworkType": "Type d??uvre",
+    "series": "S?ries"
+  },
+  "artworkActions": {
+    "addToCart": "Ajouter au panier",
+    "adding": "Ajout...",
+    "added": "Ajouté au panier.",
+    "alreadyInCart": "Déjà dans le panier.",
+    "loginRequired": "Veuillez vous connecter avant d’ajouter une œuvre au panier.",
+    "sold": "Vendue",
+    "failed": "Impossible d’ajouter au panier. Veuillez réessayer."
   }
 }

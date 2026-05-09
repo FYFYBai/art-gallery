@@ -68,6 +68,31 @@
   overflow-wrap: anywhere;
 }
 
+.logoutButton {
+  justify-self: start;
+  margin-top: 8px;
+  border: 1px solid var(--surface-dark);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--surface-dark);
+  padding: 8px 14px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.logoutButton:hover {
+  background: var(--surface-dark);
+  color: var(--white);
+}
+
 .notice {
   margin: 0 0 18px;
   padding: 12px 14px;
@@ -359,7 +384,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .productToolbar .searchForm {
@@ -369,9 +394,32 @@
 
 .productForm {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
+  grid-template-columns: 280px minmax(0, 1.4fr) minmax(240px, 0.8fr);
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 20px;
+  border: 1px solid rgba(184, 155, 114, 0.28);
+  border-radius: 8px;
+  background: rgba(252, 250, 245, 0.72);
+}
+
+.productFormHeader {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.productFormHeader h3 {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  line-height: 1.15;
+  font-weight: 400;
+  color: var(--text-main);
 }
 
 .productForm label {
@@ -383,13 +431,43 @@
   text-transform: uppercase;
 }
 
+.productForm select {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  color: var(--text-main);
+  padding: 0 12px;
+  outline: none;
+}
+
 .uploadField {
   display: grid;
-  gap: 7px;
+  align-content: start;
+  gap: 10px;
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.uploadPreview,
+.uploadPreviewPlaceholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  object-fit: cover;
+}
+
+.uploadPreviewPlaceholder {
+  color: var(--text-faint);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
 }
 
 .uploadField input {
@@ -414,15 +492,66 @@
   grid-column: 1 / -1;
 }
 
+.formMainFields {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.compactFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.seriesField {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seriesChecks {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+}
+
+.seriesChecks label {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.seriesChecks input {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0;
+  accent-color: var(--accent-strong);
+}
+
 .formActions {
   grid-column: 1 / -1;
   display: flex;
+  justify-content: flex-start;
   gap: 10px;
 }
 
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 12px;
 }
 
@@ -431,11 +560,13 @@
   border: 1px solid var(--line-soft);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.34);
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 .productCard img {
   width: 100%;
-  aspect-ratio: 1 / 0.72;
+  aspect-ratio: 4 / 3;
   display: block;
   object-fit: cover;
   background: var(--surface-muted);
@@ -443,6 +574,24 @@
 
 .productCard div {
   padding: 14px;
+}
+
+.productCard > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.productCard span,
+.productCard small {
+  line-height: 1.45;
+}
+
+.productActions {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px !important;
+  padding: 8px 0 0 !important;
 }
 
 @media (max-width: 1100px) {
@@ -459,6 +608,12 @@
   .productForm,
   .productGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .uploadField,
+  .seriesField,
+  .formMainFields {
+    grid-column: 1 / -1;
   }
 
   .weeklyViewsChart {
@@ -479,6 +634,14 @@
   .metricGrid,
   .productForm,
   .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .productFormHeader {
+    flex-direction: column;
+  }
+
+  .compactFields {
     grid-template-columns: 1fr;
   }
 

@@ -15,12 +15,27 @@ import java.util.UUID;
 public interface ArtworkRepository extends JpaRepository<Artwork, UUID>, JpaSpecificationExecutor<Artwork> {
     Page<Artwork> findAll(Specification<Artwork> spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = "images")
+    @EntityGraph(attributePaths = {"images", "series"})
+    List<Artwork> findByActiveTrueOrderByCreatedAtDesc();
+
+    @EntityGraph(attributePaths = {"images", "series"})
+    java.util.Optional<Artwork> findByIdAndActiveTrue(UUID id);
+
+    @EntityGraph(attributePaths = {"images", "series"})
+    java.util.Optional<Artwork> findBySlugAndActiveTrue(String slug);
+
+    java.util.Optional<Artwork> findBySlug(String slug);
+
+    @EntityGraph(attributePaths = {"images", "series"})
     @Query("""
             select distinct a from Artwork a
-            where lower(a.title) like lower(concat('%', :query, '%'))
-               or lower(coalesce(a.artworkType, '')) like lower(concat('%', :query, '%'))
-               or lower(coalesce(a.series, '')) like lower(concat('%', :query, '%'))
+            left join a.series series
+            where a.active = true
+              and (
+                lower(a.title) like lower(concat('%', :query, '%'))
+                or lower(coalesce(a.artworkType, '')) like lower(concat('%', :query, '%'))
+                or lower(coalesce(series, '')) like lower(concat('%', :query, '%'))
+              )
             order by a.createdAt desc
             """)
     List<Artwork> searchAdminArtworks(@Param("query") String query);

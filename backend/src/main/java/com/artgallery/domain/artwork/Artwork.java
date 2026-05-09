@@ -4,7 +4,9 @@ import com.artgallery.domain.BaseEntity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "artworks")
@@ -13,14 +15,23 @@ public class Artwork extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String title;
 
+    @Column(nullable = false, length = 255, unique = true)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "artwork_type", length = 50)
     private String artworkType;
 
-    @Column(length = 100)
-    private String series;
+    @ElementCollection
+    @CollectionTable(
+            name = "artwork_series",
+            joinColumns = @JoinColumn(name = "artwork_id")
+    )
+    @Column(name = "series_slug", length = 100, nullable = false)
+    @OrderColumn(name = "display_order")
+    private List<String> series = new ArrayList<>();
 
     @Column(name = "artwork_size", length = 100)
     private String artworkSize;
@@ -46,12 +57,21 @@ public class Artwork extends BaseEntity {
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public String getArtworkType() { return artworkType; }
     public void setArtworkType(String artworkType) { this.artworkType = artworkType; }
-    public String getSeries() { return series; }
-    public void setSeries(String series) { this.series = series; }
+    public List<String> getSeries() { return series; }
+    public void setSeries(List<String> series) {
+        this.series.clear();
+        if (series == null) {
+            return;
+        }
+        Set<String> uniqueSeries = new LinkedHashSet<>(series);
+        this.series.addAll(uniqueSeries);
+    }
     public String getArtworkSize() { return artworkSize; }
     public void setArtworkSize(String artworkSize) { this.artworkSize = artworkSize; }
     public BigDecimal getPrice() { return price; }

@@ -6,7 +6,7 @@ export default async function ArtworksPage({ searchParams }) {
 
   return (
     <main>
-      <ArtworkGrid type={type} />
+      <ArtworkGrid key={type ?? "all"} type={type} />
     </main>
   );
 }

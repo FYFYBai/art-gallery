@@ -12,6 +12,8 @@ import com.artgallery.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +48,18 @@ public class AuthController {
     @PostMapping("/oauth/login")
     public ResponseEntity<LoginResponse> oauthLogin(@Valid @RequestBody OAuthLoginRequest request) {
         return ResponseEntity.ok(authService.oauthLogin(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<LoginResponse> me(Authentication authentication,
+                                            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader != null && authHeader.startsWith("Bearer ")
+                ? authHeader.substring(7)
+                : "";
+        return ResponseEntity.ok(authService.currentUser(
+                java.util.UUID.fromString(authentication.getName()),
+                token
+        ));
     }
 
     @PostMapping("/verify-email")

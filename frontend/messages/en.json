@@ -51,7 +51,9 @@
     "mainNav": "Main navigation",
     "cartLabel": "Cart",
     "accountLabel": "Account",
-    "languageLabel": "Language options"
+    "languageLabel": "Language options",
+    "adminLabel": "Go to admin dashboard",
+    "profileLabel": "Go to profile"
   },
   "search": {
     "searchFor": "Search for",
@@ -132,18 +134,25 @@
     "filter": "Filter",
     "noArtworks": "No artworks in this category.",
     "artworkCount": "{count} artwork",
-    "artworkCountPlural": "{count} artworks"
+    "artworkCountPlural": "{count} artworks",
+    "loading": "Loading artworks...",
+    "loadFailed": "Could not load artworks. Please try again later.",
+    "available": "Available",
+    "sold": "Sold"
   },
   "filterPanel": {
     "title": "Filters",
     "artworkType": "Artwork Type",
-    "medium": "Medium",
     "priceRange": "Price Range",
     "year": "Year",
     "reset": "Reset",
     "apply": "Apply",
     "upTo": "Up to {price}",
-    "priceMax": "CA$10,000+"
+    "priceMax": "CA$5,000",
+    "series": "Series",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "close": "Close filters"
   },
   "mediums": {
     "canvas": "Canvas",
@@ -160,7 +169,8 @@
     "navLabel": "Footer navigation",
     "copyright": "© 2026 Art Gallery. All rights reserved.",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "refundShippingCommission": "Refund, Shipping & Commission"
   },
   "hero": {
     "ariaLabel": "Featured gallery highlights",
@@ -201,7 +211,19 @@
     "serviceHours": "Monday to Saturday 9am - 6pm EST :",
     "freeDelivery": "Free standard delivery",
     "returnsExchanges": "Returns & exchanges",
-    "shopSecurely": "Shop securely"
+    "shopSecurely": "Shop securely",
+    "loading": "Loading cart...",
+    "loadFailed": "Could not load your cart. Please try again.",
+    "removeFailed": "Could not remove this item. Please try again.",
+    "loginRequired": "Please log in to view your cart.",
+    "loginRequiredBody": "Your cart is connected to your account so selected works stay saved until you remove them.",
+    "cartTitle": "Your selected works",
+    "itemCount": "{count} item(s)",
+    "availabilityChanged": "One or more works in your cart are no longer available. Remove unavailable items before checkout.",
+    "itemUnavailable": "No longer available. Remove this item before checkout.",
+    "remove": "Remove",
+    "removing": "Removing...",
+    "subtotal": "Subtotal"
   },
   "home": {
     "shopByCategory": "Shop by Category",
@@ -491,6 +513,43 @@
     "approveRefund": "Approve refund",
     "approveRefundConfirm": "Approve this refund request? The customer will receive the refund email.",
     "refundApproved": "Refund approved. Refund email sent to the customer.",
-    "refundApproveFailed": "Could not approve this refund request. Please try again."
+    "refundApproveFailed": "Could not approve this refund request. Please try again.",
+    "chooseArtworkType": "Choose artwork type",
+    "availability": "Availability",
+    "available": "Available",
+    "sold": "Sold",
+    "logout": "Log out",
+    "submitProduct": "Submit",
+    "newProduct": "New product",
+    "editProduct": "Edit product",
+    "deleteProduct": "Delete",
+    "deleteProductConfirm": "Delete this product? It will be hidden from public artwork pages.",
+    "productDeleted": "Product deleted.",
+    "productDeleteFailed": "Could not delete product."
+  },
+  "artworkDetail": {
+    "loading": "Loading artwork...",
+    "loadFailed": "Could not load this artwork. Please try again later.",
+    "backToArtworks": "Back to artworks",
+    "oilByline": "Original oil painting by Sylvaine",
+    "charcoalByline": "Original charcoal drawing by Sylvaine",
+    "uniquePiece": "Original work - unique piece",
+    "price": "Price",
+    "size": "Size",
+    "year": "Year",
+    "notAvailable": "N/A",
+    "available": "Available",
+    "sold": "Sold",
+    "artworkType": "Artwork type",
+    "series": "Series"
+  },
+  "artworkActions": {
+    "addToCart": "Add to cart",
+    "adding": "Adding...",
+    "added": "Added to cart.",
+    "alreadyInCart": "Already in cart.",
+    "loginRequired": "Please log in before adding artwork to cart.",
+    "sold": "Sold",
+    "failed": "Could not add to cart. Please try again."
   }
 }

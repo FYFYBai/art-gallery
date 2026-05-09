@@ -54,7 +54,9 @@ public class SecurityConfig {
                                 "/api/auth/resend-verification-email",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
-                                "/api/analytics/page-view"
+                                "/api/analytics/page-view",
+                                "/api/artworks",
+                                "/api/artworks/*"
                         ).permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()

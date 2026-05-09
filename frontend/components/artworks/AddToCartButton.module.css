@@ -1,0 +1,61 @@
+.wrap {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #1f1a16;
+  background: transparent;
+  color: #1f1a16;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+  color: var(--white);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.message {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.detail {
+  max-width: 320px;
+  margin-top: 24px;
+}
+
+.detail .button {
+  width: 100%;
+  min-height: 48px;
+}

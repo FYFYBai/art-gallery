@@ -11,13 +11,28 @@ const API_BASE_URL =
 const emptyArtworkForm = {
   imageUrl: "",
   artworkType: "",
-  series: "",
+  series: [],
   description: "",
   name: "",
   price: "",
   size: "",
   year: "2026",
+  soldOut: false,
 };
+
+const ARTWORK_TYPE_OPTIONS = [
+  { value: "oil-paintings", labelKey: "oilPaintings" },
+  { value: "watercolors", labelKey: "watercolors" },
+  { value: "drawings", labelKey: "drawings" },
+  { value: "charcoal", labelKey: "charcoal" },
+];
+
+const SERIES_OPTIONS = [
+  { value: "impressionism", labelKey: "impressionism" },
+  { value: "abstraction", labelKey: "abstraction" },
+  { value: "landscapes", labelKey: "landscapes" },
+  { value: "portraits", labelKey: "portraits" },
+];
 
 const sampleDashboard = {
   userCount: 24,
@@ -148,6 +163,15 @@ function readStoredAuth() {
   }
 }
 
+function clearStoredAuth() {
+  try {
+    window.localStorage.removeItem("auth");
+    window.dispatchEvent(new StorageEvent("storage", { key: "auth", newValue: null }));
+  } catch {
+    // ignore storage errors
+  }
+}
+
 function formatCurrency(value, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", {
     style: "currency",
@@ -160,6 +184,22 @@ function formatShortDate(value) {
   const parts = String(value || "").split("-");
   if (parts.length !== 3) return value;
   return `${parts[1]}/${parts[2]}`;
+}
+
+function imageSrc(imageUrl) {
+  if (!imageUrl) return "";
+  if (/^https?:\/\//.test(imageUrl)) return imageUrl;
+  if (imageUrl.startsWith("/uploads/")) return `${API_BASE_URL}${imageUrl}`;
+  return imageUrl;
+}
+
+function normalizeSeries(series) {
+  if (Array.isArray(series)) return series;
+  if (!series) return [];
+  return String(series)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function buildWeeklyViews(dailyViews) {
@@ -186,6 +226,8 @@ function buildWeeklyViews(dailyViews) {
 
 export default function AdminPage() {
   const t = useTranslations("admin");
+  const tTypes = useTranslations("artworkTypes");
+  const tSeriesOptions = useTranslations("series");
   const router = useRouter();
   const { locale } = useParams();
   const [auth, setAuth] = useState(null);
@@ -238,6 +280,7 @@ export default function AdminPage() {
     });
 
     if (response.status === 401 || response.status === 403) {
+      clearStoredAuth();
       router.replace(`/${locale}`);
       throw new Error("Not authorised");
     }
@@ -252,6 +295,11 @@ export default function AdminPage() {
 
     try {
       const dashboardResponse = await apiFetch("/api/admin/dashboard");
+      if (!dashboardResponse.ok) {
+        clearStoredAuth();
+        router.replace(`/${locale}`);
+        throw new Error("Not authorised");
+      }
       const dashboardResult = await dashboardResponse.json();
       setAccessVerified(true);
 
@@ -302,8 +350,7 @@ export default function AdminPage() {
       const storedAuth = readStoredAuth();
 
       if (!storedAuth || storedAuth.role !== "ADMIN") {
-        window.localStorage.removeItem("auth");
-        window.dispatchEvent(new StorageEvent("storage", { key: "auth", newValue: null }));
+        clearStoredAuth();
         router.replace(`/${locale}`);
         return;
       }
@@ -482,12 +529,13 @@ export default function AdminPage() {
     setArtworkForm({
       imageUrl: artwork.imageUrl || "",
       artworkType: artwork.artworkType || "",
-      series: artwork.series || "",
+      series: normalizeSeries(artwork.series),
       description: artwork.description || "",
       name: artwork.name || "",
       price: artwork.price || "",
       size: artwork.size || "",
       year: artwork.year || "",
+      soldOut: Boolean(artwork.soldOut),
     });
   };
 
@@ -528,6 +576,18 @@ export default function AdminPage() {
     }
   };
 
+  const toggleArtworkSeries = (series) => {
+    setArtworkForm((current) => {
+      const currentSeries = normalizeSeries(current.series);
+      return {
+        ...current,
+        series: currentSeries.includes(series)
+          ? currentSeries.filter((item) => item !== series)
+          : [...currentSeries, series],
+      };
+    });
+  };
+
   const submitArtwork = async (event) => {
     event.preventDefault();
     if (!auth) return;
@@ -536,6 +596,7 @@ export default function AdminPage() {
       ...artworkForm,
       price: Number(artworkForm.price),
       year: artworkForm.year ? Number(artworkForm.year) : null,
+      soldOut: editingArtworkId ? Boolean(artworkForm.soldOut) : false,
     };
 
     try {
@@ -563,6 +624,48 @@ export default function AdminPage() {
     }
   };
 
+  const deleteArtwork = async (artwork) => {
+    if (!auth || artwork.id.startsWith("sample")) return;
+
+    if (!window.confirm(t("deleteProductConfirm"))) {
+      return;
+    }
+
+    try {
+      await apiFetch(`/api/admin/artworks/${artwork.id}`, {
+        method: "DELETE",
+      });
+      setArtworks((current) => current.filter((item) => item.id !== artwork.id));
+      if (editingArtworkId === artwork.id) {
+        setEditingArtworkId(null);
+        setArtworkForm(emptyArtworkForm);
+        setShowProductForm(false);
+      }
+      setNotice(t("productDeleted"));
+      await loadAdminData();
+    } catch {
+      setNotice(t("productDeleteFailed"));
+    }
+  };
+
+  const handleLogout = async () => {
+    const token = auth?.token;
+    clearStoredAuth();
+    setAuth(null);
+    router.replace(`/${locale}`);
+
+    if (token) {
+      try {
+        await fetch(`${API_BASE_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        // Local logout already happened.
+      }
+    }
+  };
+
   if (!auth || !accessVerified) return null;
 
   return (
@@ -577,6 +680,9 @@ export default function AdminPage() {
           <span>{t("signedIn")}</span>
           <strong>{auth.email}</strong>
           <small>{loading ? t("syncing") : t("synced")}</small>
+          <button type="button" className={styles.logoutButton} onClick={handleLogout}>
+            {t("logout")}
+          </button>
         </div>
       </section>
 
@@ -802,25 +908,13 @@ export default function AdminPage() {
 
           {showProductForm && (
             <form className={styles.productForm} onSubmit={submitArtwork}>
-              <div className={styles.uploadField}>
-                <span>{t("image")}</span>
-                <input id="admin-product-image" type="file" accept="image/*" onChange={handleImageUpload} />
-                <label htmlFor="admin-product-image">
-                  {isUploadingImage ? t("uploadingImage") : t("uploadImage")}
-                </label>
-                {artworkForm.imageUrl && <small>{artworkForm.imageUrl}</small>}
-              </div>
-              <label>{t("artworkType")}<input required value={artworkForm.artworkType} onChange={(event) => setArtworkForm((current) => ({ ...current, artworkType: event.target.value }))} /></label>
-              <label>{t("series")}<input value={artworkForm.series} onChange={(event) => setArtworkForm((current) => ({ ...current, series: event.target.value }))} /></label>
-              <label>{t("name")}<input required value={artworkForm.name} onChange={(event) => setArtworkForm((current) => ({ ...current, name: event.target.value }))} /></label>
-              <label>{t("price")}<input required type="number" min="0.01" step="0.01" value={artworkForm.price} onChange={(event) => setArtworkForm((current) => ({ ...current, price: event.target.value }))} /></label>
-              <label>{t("size")}<input value={artworkForm.size} onChange={(event) => setArtworkForm((current) => ({ ...current, size: event.target.value }))} /></label>
-              <label>{t("year")}<input type="number" min="1900" max="2100" value={artworkForm.year} onChange={(event) => setArtworkForm((current) => ({ ...current, year: event.target.value }))} /></label>
-              <label className={styles.descriptionField}>{t("description")}<textarea value={artworkForm.description} onChange={(event) => setArtworkForm((current) => ({ ...current, description: event.target.value }))} /></label>
-              <div className={styles.formActions}>
-                <button type="submit" disabled={!artworkForm.imageUrl || isUploadingImage}>
-                  {editingArtworkId ? t("updateProduct") : t("saveProduct")}
-                </button>
+              <div className={styles.productFormHeader}>
+                <div>
+                  <p className={styles.panelEyebrow}>
+                    {editingArtworkId ? t("editProduct") : t("newProduct")}
+                  </p>
+                  <h3>{editingArtworkId ? artworkForm.name : t("addProduct")}</h3>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
@@ -832,24 +926,84 @@ export default function AdminPage() {
                   {t("cancel")}
                 </button>
               </div>
+              <div className={styles.uploadField}>
+                <span>{t("image")}</span>
+                {artworkForm.imageUrl ? (
+                  <img src={imageSrc(artworkForm.imageUrl)} alt="" className={styles.uploadPreview} />
+                ) : (
+                  <div className={styles.uploadPreviewPlaceholder}>{t("image")}</div>
+                )}
+                <input id="admin-product-image" type="file" accept="image/*" onChange={handleImageUpload} />
+                <label htmlFor="admin-product-image">
+                  {isUploadingImage ? t("uploadingImage") : t("uploadImage")}
+                </label>
+                {artworkForm.imageUrl && <small>{artworkForm.imageUrl}</small>}
+              </div>
+
+              <div className={styles.formMainFields}>
+                <label>
+                  {t("artworkType")}
+                  <select required value={artworkForm.artworkType} onChange={(event) => setArtworkForm((current) => ({ ...current, artworkType: event.target.value }))}>
+                    <option value="">{t("chooseArtworkType")}</option>
+                    {ARTWORK_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>{tTypes(option.labelKey)}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>{t("name")}<input required value={artworkForm.name} onChange={(event) => setArtworkForm((current) => ({ ...current, name: event.target.value }))} /></label>
+                <div className={styles.compactFields}>
+                  <label>{t("price")}<input required type="number" min="0.01" step="0.01" value={artworkForm.price} onChange={(event) => setArtworkForm((current) => ({ ...current, price: event.target.value }))} /></label>
+                  <label>{t("size")}<input value={artworkForm.size} onChange={(event) => setArtworkForm((current) => ({ ...current, size: event.target.value }))} /></label>
+                  <label>{t("year")}<input type="number" min="1900" max="2100" value={artworkForm.year} onChange={(event) => setArtworkForm((current) => ({ ...current, year: event.target.value }))} /></label>
+                </div>
+              </div>
+
+              <div className={styles.seriesField}>
+                <span>{t("series")}</span>
+                <div className={styles.seriesChecks}>
+                  {SERIES_OPTIONS.map((option) => (
+                    <label key={option.value}>
+                      <input
+                        type="checkbox"
+                        checked={normalizeSeries(artworkForm.series).includes(option.value)}
+                        onChange={() => toggleArtworkSeries(option.value)}
+                      />
+                      <span>{tSeriesOptions(option.labelKey)}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <label className={styles.descriptionField}>{t("description")}<textarea value={artworkForm.description} onChange={(event) => setArtworkForm((current) => ({ ...current, description: event.target.value }))} /></label>
+              <div className={styles.formActions}>
+                <button type="submit" disabled={!artworkForm.imageUrl || isUploadingImage}>
+                  {t("submitProduct")}
+                </button>
+              </div>
             </form>
           )}
 
           <div className={styles.productGrid}>
             {artworks.map((artwork) => (
               <article key={artwork.id} className={styles.productCard}>
-                {artwork.imageUrl && <img src={artwork.imageUrl} alt={artwork.name} />}
+                {artwork.imageUrl && <img src={imageSrc(artwork.imageUrl)} alt={artwork.name} />}
                 <div>
                   <strong>{artwork.name}</strong>
                   <span>
-                    {artwork.artworkType} / {artwork.series || t("noSeries")}
+                    {artwork.artworkType} / {normalizeSeries(artwork.series).join(", ") || t("noSeries")}
                   </span>
                   <small>
                     {formatCurrency(artwork.price, artwork.currency)} / {artwork.size || t("noSize")} / {artwork.year || t("noYear")}
                   </small>
-                  <button type="button" onClick={() => editArtwork(artwork)}>
-                    {t("edit")}
-                  </button>
+                  <small>{artwork.soldOut ? t("sold") : t("available")}</small>
+                  <div className={styles.productActions}>
+                    <button type="button" onClick={() => editArtwork(artwork)}>
+                      {t("edit")}
+                    </button>
+                    <button type="button" className={styles.dangerButton} onClick={() => deleteArtwork(artwork)}>
+                      {t("deleteProduct")}
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

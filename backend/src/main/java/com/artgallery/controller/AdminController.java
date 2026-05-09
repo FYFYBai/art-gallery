@@ -120,6 +120,11 @@ public class AdminController {
         return adminService.updateArtwork(artworkId, request);
     }
 
+    @DeleteMapping("/artworks/{artworkId}")
+    public void deleteArtwork(@PathVariable UUID artworkId) {
+        adminService.deleteArtwork(artworkId);
+    }
+
     @PostMapping("/artworks/image")
     public AdminImageUploadResponse uploadArtworkImage(@RequestParam("image") MultipartFile image) {
         return adminService.uploadArtworkImage(image);

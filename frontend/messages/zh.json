@@ -51,7 +51,9 @@
     "mainNav": "主导航",
     "cartLabel": "购物车",
     "accountLabel": "账户",
-    "languageLabel": "语言选项"
+    "languageLabel": "语言选项",
+    "adminLabel": "??????",
+    "profileLabel": "??????"
   },
   "search": {
     "searchFor": "搜索",
@@ -132,18 +134,25 @@
     "filter": "筛选",
     "noArtworks": "该类别暂无作品。",
     "artworkCount": "{count} 件作品",
-    "artworkCountPlural": "{count} 件作品"
+    "artworkCountPlural": "{count} 件作品",
+    "loading": "正在加载作品...",
+    "loadFailed": "无法加载作品，请稍后再试。",
+    "available": "可购买",
+    "sold": "已售出"
   },
   "filterPanel": {
     "title": "筛选",
     "artworkType": "作品类型",
-    "medium": "媒介",
     "priceRange": "价格区间",
     "year": "年份",
     "reset": "重置",
     "apply": "应用",
     "upTo": "最高 {price}",
-    "priceMax": "CA$10,000+"
+    "priceMax": "CA$5,000",
+    "series": "系列",
+    "minPrice": "最低",
+    "maxPrice": "最高",
+    "close": "关闭筛选"
   },
   "mediums": {
     "canvas": "画布",
@@ -160,7 +169,8 @@
     "navLabel": "页脚导航",
     "copyright": "© 2026 Art Gallery. 保留所有权利。",
     "privacy": "隐私政策",
-    "terms": "使用条款"
+    "terms": "使用条款",
+    "refundShippingCommission": "退款、配送与委托创作"
   },
   "hero": {
     "ariaLabel": "精选画廊作品",
@@ -201,7 +211,19 @@
     "serviceHours": "周一至周六 上午9点 - 下午6点 EST：",
     "freeDelivery": "免费标准配送",
     "returnsExchanges": "退换货",
-    "shopSecurely": "安全购物"
+    "shopSecurely": "安全购物",
+    "loading": "???????...",
+    "loadFailed": "??????????????",
+    "removeFailed": "?????????????",
+    "loginRequired": "???????????",
+    "loginRequiredBody": "??????????????????????????????",
+    "cartTitle": "??????",
+    "itemCount": "{count} ???",
+    "availabilityChanged": "??????????????????????????????",
+    "itemUnavailable": "?????????????????????",
+    "remove": "??",
+    "removing": "????...",
+    "subtotal": "??"
   },
   "home": {
     "shopByCategory": "按类别购买",
@@ -491,6 +513,43 @@
     "approveRefund": "批准退款",
     "approveRefundConfirm": "批准此退款请求吗？客户将收到退款邮件。",
     "refundApproved": "退款已批准，退款邮件已发送给客户。",
-    "refundApproveFailed": "无法批准此退款请求。请重试。"
+    "refundApproveFailed": "无法批准此退款请求。请重试。",
+    "chooseArtworkType": "选择作品类型",
+    "availability": "库存状态",
+    "available": "可购买",
+    "sold": "已售出",
+    "logout": "????",
+    "submitProduct": "??",
+    "newProduct": "????",
+    "editProduct": "????",
+    "deleteProduct": "??",
+    "deleteProductConfirm": "??????????????????????",
+    "productDeleted": "??????",
+    "productDeleteFailed": "???????"
+  },
+  "artworkDetail": {
+    "loading": "正在加载作品...",
+    "loadFailed": "无法加载此作品，请稍后再试。",
+    "backToArtworks": "返回作品列表",
+    "oilByline": "Sylvaine 原创油画",
+    "charcoalByline": "Sylvaine 原创炭笔画",
+    "uniquePiece": "???? - ????",
+    "price": "价格",
+    "size": "尺寸",
+    "year": "年份",
+    "notAvailable": "暂无",
+    "available": "可购买",
+    "sold": "已售出",
+    "artworkType": "????",
+    "series": "??"
+  },
+  "artworkActions": {
+    "addToCart": "加入购物车",
+    "adding": "正在加入...",
+    "added": "已加入购物车。",
+    "alreadyInCart": "已在购物车中。",
+    "loginRequired": "请先登录再加入购物车。",
+    "sold": "已售出",
+    "failed": "无法加入购物车，请重试。"
   }
 }

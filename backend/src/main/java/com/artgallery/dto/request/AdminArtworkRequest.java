@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminArtworkRequest {
 
@@ -16,8 +18,7 @@ public class AdminArtworkRequest {
     @Size(max = 50, message = "Artwork type is too long")
     private String artworkType;
 
-    @Size(max = 100, message = "Series is too long")
-    private String series;
+    private List<@Size(max = 100, message = "Series is too long") String> series = new ArrayList<>();
 
     @Size(max = 5000, message = "Description is too long")
     private String description;
@@ -35,6 +36,8 @@ public class AdminArtworkRequest {
 
     private Short year;
 
+    private boolean soldOut;
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -51,11 +54,11 @@ public class AdminArtworkRequest {
         this.artworkType = artworkType;
     }
 
-    public String getSeries() {
+    public List<String> getSeries() {
         return series;
     }
 
-    public void setSeries(String series) {
+    public void setSeries(List<String> series) {
         this.series = series;
     }
 
@@ -97,5 +100,13 @@ public class AdminArtworkRequest {
 
     public void setYear(Short year) {
         this.year = year;
+    }
+
+    public boolean isSoldOut() {
+        return soldOut;
+    }
+
+    public void setSoldOut(boolean soldOut) {
+        this.soldOut = soldOut;
     }
 }

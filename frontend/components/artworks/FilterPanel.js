@@ -4,19 +4,32 @@ import { useState } from "react";
 import { useTranslations } from "../../i18n/IntlContext";
 import styles from "./FilterPanel.module.css";
 
-const ARTWORK_TYPE_KEYS = ["oilPaintings", "watercolors", "drawings", "charcoal"];
-const MEDIUM_KEYS       = ["canvas", "paper", "woodPanel", "mixedMedia"];
-const YEARS             = [2024, 2025, 2026];
+const ARTWORK_TYPES = [
+  { value: "oil-paintings", labelKey: "oilPaintings" },
+  { value: "watercolors", labelKey: "watercolors" },
+  { value: "drawings", labelKey: "drawings" },
+  { value: "charcoal", labelKey: "charcoal" },
+];
+const SERIES_KEYS = ["impressionism", "abstraction", "landscapes", "portraits"];
+const YEARS = [2024, 2025, 2026];
+const MIN_PRICE = 0;
+const MAX_PRICE = 5000;
+const PRICE_STEP = 50;
 
-export default function FilterPanel({ isOpen, onClose, onApply }) {
-  const t       = useTranslations("filterPanel");
-  const tTypes  = useTranslations("artworkTypes");
-  const tMediums = useTranslations("mediums");
+function formatCad(value) {
+  return `CA$${value.toLocaleString("en-CA")}`;
+}
 
-  const [selectedTypes,   setSelectedTypes]   = useState([]);
-  const [selectedMediums, setSelectedMediums] = useState([]);
-  const [maxPrice,        setMaxPrice]        = useState(5000);
-  const [selectedYears,   setSelectedYears]   = useState([]);
+export default function FilterPanel({ isOpen, filters, onClose, onApply }) {
+  const t = useTranslations("filterPanel");
+  const tTypes = useTranslations("artworkTypes");
+  const tSeries = useTranslations("series");
+
+  const [selectedTypes, setSelectedTypes] = useState(filters?.selectedTypes ?? []);
+  const [selectedSeries, setSelectedSeries] = useState(filters?.selectedSeries ?? []);
+  const [minPrice, setMinPrice] = useState(filters?.priceRange?.[0] ?? MIN_PRICE);
+  const [maxPrice, setMaxPrice] = useState(filters?.priceRange?.[1] ?? MAX_PRICE);
+  const [selectedYears, setSelectedYears] = useState(filters?.selectedYears ?? []);
 
   const toggleItem = (setList, value) => {
     setList((prev) =>
@@ -24,15 +37,31 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
     );
   };
 
+  const updateMinPrice = (value) => {
+    const nextValue = Math.min(Number(value), maxPrice - PRICE_STEP);
+    setMinPrice(Math.max(MIN_PRICE, nextValue));
+  };
+
+  const updateMaxPrice = (value) => {
+    const nextValue = Math.max(Number(value), minPrice + PRICE_STEP);
+    setMaxPrice(Math.min(MAX_PRICE, nextValue));
+  };
+
   const handleReset = () => {
     setSelectedTypes([]);
-    setSelectedMediums([]);
-    setMaxPrice(5000);
+    setSelectedSeries([]);
+    setMinPrice(MIN_PRICE);
+    setMaxPrice(MAX_PRICE);
     setSelectedYears([]);
   };
 
   const handleApply = () => {
-    onApply({ selectedTypes, selectedMediums, maxPrice, selectedYears });
+    onApply({
+      selectedTypes,
+      selectedSeries,
+      priceRange: [minPrice, maxPrice],
+      selectedYears,
+    });
     onClose();
   };
 
@@ -53,81 +82,113 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
           <button
             type="button"
             className={styles.closeButton}
-            aria-label={t("title")}
+            aria-label={t("close")}
             onClick={onClose}
           >
-            ×
+            x
           </button>
         </div>
 
         <div className={styles.panelBody}>
-
-          {/* Artwork Type */}
           <section className={styles.filterSection}>
             <h3 className={styles.sectionTitle}>{t("artworkType")}</h3>
             <ul className={styles.checkList}>
-              {ARTWORK_TYPE_KEYS.map((key) => (
-                <li key={key}>
+              {ARTWORK_TYPES.map((type) => (
+                <li key={type.value}>
                   <label className={styles.checkLabel}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
-                      checked={selectedTypes.includes(key)}
-                      onChange={() => toggleItem(setSelectedTypes, key)}
+                      checked={selectedTypes.includes(type.value)}
+                      onChange={() => toggleItem(setSelectedTypes, type.value)}
                     />
-                    {tTypes(key)}
+                    {tTypes(type.labelKey)}
                   </label>
                 </li>
               ))}
             </ul>
           </section>
 
-          {/* Medium */}
           <section className={styles.filterSection}>
-            <h3 className={styles.sectionTitle}>{t("medium")}</h3>
+            <h3 className={styles.sectionTitle}>{t("series")}</h3>
             <ul className={styles.checkList}>
-              {MEDIUM_KEYS.map((key) => (
+              {SERIES_KEYS.map((key) => (
                 <li key={key}>
                   <label className={styles.checkLabel}>
                     <input
                       type="checkbox"
                       className={styles.checkbox}
-                      checked={selectedMediums.includes(key)}
-                      onChange={() => toggleItem(setSelectedMediums, key)}
+                      checked={selectedSeries.includes(key)}
+                      onChange={() => toggleItem(setSelectedSeries, key)}
                     />
-                    {tMediums(key)}
+                    {tSeries(key)}
                   </label>
                 </li>
               ))}
             </ul>
           </section>
 
-          {/* Price Range */}
           <section className={styles.filterSection}>
             <h3 className={styles.sectionTitle}>{t("priceRange")}</h3>
-            <div className={styles.sliderWrap}>
+            <div className={styles.rangeWrap}>
+              <div
+                className={styles.rangeTrack}
+                style={{
+                  "--range-start": `${(minPrice / MAX_PRICE) * 100}%`,
+                  "--range-end": `${(maxPrice / MAX_PRICE) * 100}%`,
+                }}
+              />
               <input
                 type="range"
-                min={0}
-                max={10000}
-                step={50}
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className={styles.slider}
-                aria-label={t("priceRange")}
+                min={MIN_PRICE}
+                max={MAX_PRICE}
+                step={PRICE_STEP}
+                value={minPrice}
+                onChange={(event) => updateMinPrice(event.target.value)}
+                className={styles.rangeInput}
+                aria-label={t("minPrice")}
               />
-              <div className={styles.sliderLabels}>
-                <span>CA$0</span>
-                <span>
-                  {maxPrice === 10000
-                    ? t("priceMax")
-                    : `CA$${maxPrice.toLocaleString("en-CA")}`}
-                </span>
-              </div>
+              <input
+                type="range"
+                min={MIN_PRICE}
+                max={MAX_PRICE}
+                step={PRICE_STEP}
+                value={maxPrice}
+                onChange={(event) => updateMaxPrice(event.target.value)}
+                className={styles.rangeInput}
+                aria-label={t("maxPrice")}
+              />
+            </div>
+            <div className={styles.priceFields}>
+              <label>
+                {t("minPrice")}
+                <input
+                  type="number"
+                  min={MIN_PRICE}
+                  max={maxPrice - PRICE_STEP}
+                  step={PRICE_STEP}
+                  value={minPrice}
+                  onChange={(event) => updateMinPrice(event.target.value)}
+                />
+              </label>
+              <label>
+                {t("maxPrice")}
+                <input
+                  type="number"
+                  min={minPrice + PRICE_STEP}
+                  max={MAX_PRICE}
+                  step={PRICE_STEP}
+                  value={maxPrice}
+                  onChange={(event) => updateMaxPrice(event.target.value)}
+                />
+              </label>
+            </div>
+            <div className={styles.sliderLabels}>
+              <span>{formatCad(minPrice)}</span>
+              <span>{formatCad(maxPrice)}</span>
             </div>
           </section>
 
-          {/* Year */}
           <section className={styles.filterSection}>
             <h3 className={styles.sectionTitle}>{t("year")}</h3>
             <ul className={styles.checkList}>
@@ -146,7 +207,6 @@ export default function FilterPanel({ isOpen, onClose, onApply }) {
               ))}
             </ul>
           </section>
-
         </div>
 
         <div className={styles.panelFooter}>

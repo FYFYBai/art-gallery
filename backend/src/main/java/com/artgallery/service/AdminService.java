@@ -29,9 +29,11 @@ import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -281,7 +283,7 @@ public class AdminService {
     public List<AdminArtworkResponse> searchArtworks(String query) {
         String normalizedQuery = normalizeQuery(query);
         List<Artwork> artworks = normalizedQuery.isBlank()
-                ? artworkRepository.findAll()
+                ? artworkRepository.findByActiveTrueOrderByCreatedAtDesc()
                 : artworkRepository.searchAdminArtworks(normalizedQuery);
 
         return artworks.stream()
@@ -306,6 +308,13 @@ public class AdminService {
         applyArtworkRequest(artwork, request);
         replacePrimaryImage(artwork, request.getImageUrl());
         return AdminArtworkResponse.from(artwork);
+    }
+
+    @Transactional
+    public void deleteArtwork(UUID artworkId) {
+        Artwork artwork = artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new EntityNotFoundException("Artwork was not found"));
+        artwork.setActive(false);
     }
 
     public AdminImageUploadResponse uploadArtworkImage(MultipartFile file) {
@@ -341,13 +350,15 @@ public class AdminService {
 
     private void applyArtworkRequest(Artwork artwork, AdminArtworkRequest request) {
         artwork.setTitle(request.getName().trim());
+        artwork.setSlug(uniqueSlugForTitle(request.getName().trim(), artwork.getId()));
         artwork.setDescription(blankToNull(request.getDescription()));
         artwork.setArtworkType(request.getArtworkType().trim());
-        artwork.setSeries(blankToNull(request.getSeries()));
+        artwork.setSeries(normalizeSeries(request.getSeries()));
         artwork.setArtworkSize(blankToNull(request.getSize()));
         artwork.setArtworkYear(request.getYear());
         artwork.setPrice(request.getPrice());
         artwork.setCurrency("CAD");
+        artwork.setSoldOut(request.isSoldOut());
         artwork.setActive(true);
     }
 
@@ -405,6 +416,47 @@ public class AdminService {
             return null;
         }
         return value.trim();
+    }
+
+    private List<String> normalizeSeries(List<String> series) {
+        if (series == null) {
+            return List.of();
+        }
+
+        return series.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .collect(java.util.stream.Collectors.collectingAndThen(
+                        java.util.stream.Collectors.toCollection(LinkedHashSet::new),
+                        List::copyOf
+                ));
+    }
+
+    private String uniqueSlugForTitle(String title, UUID currentArtworkId) {
+        String baseSlug = slugify(title);
+        String candidate = baseSlug;
+        int suffix = 2;
+
+        while (true) {
+            java.util.Optional<Artwork> existing = artworkRepository.findBySlug(candidate);
+            if (existing.isEmpty() || existing.get().getId().equals(currentArtworkId)) {
+                return candidate;
+            }
+            candidate = baseSlug + "-" + suffix;
+            suffix++;
+        }
+    }
+
+    private String slugify(String value) {
+        String normalized = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(java.util.Locale.ROOT)
+                .replace("’", "")
+                .replace("'", "")
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        return normalized.isBlank() ? "artwork" : normalized;
     }
 
     private String formatRefundAmount(Order order) {
