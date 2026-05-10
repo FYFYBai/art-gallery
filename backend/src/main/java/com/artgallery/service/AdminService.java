@@ -20,6 +20,7 @@ import com.artgallery.repository.OrderRepository;
 import com.artgallery.repository.RefundRequestRepository;
 import com.artgallery.repository.UserRepository;
 import com.artgallery.service.payment.StripePaymentClient;
+import com.artgallery.service.payment.StripeRefundResult;
 import com.stripe.exception.StripeException;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
@@ -244,8 +245,9 @@ public class AdminService {
             throw new IllegalArgumentException("Only paid, shipped or delivered orders can be refunded");
         }
 
-        refundStripePayment(order);
+        applyStripeRefund(order);
         order.setOrderStatus(OrderStatus.REFUNDED);
+        order.setRefundedAt(OffsetDateTime.now(ZoneOffset.UTC));
         unlockOrderArtworks(order);
         AdminOrderResponse response = AdminOrderResponse.from(order);
         emailService.sendOrderRefundedEmail(
@@ -269,13 +271,18 @@ public class AdminService {
         RefundRequestEntity refundRequest = refundRequestRepository.findById(refundRequestId)
                 .orElseThrow(() -> new EntityNotFoundException("Refund request was not found"));
 
+        if (refundRequest.getStatus() != RefundRequestStatus.PENDING) {
+            throw new IllegalArgumentException("Only pending refund requests can be approved");
+        }
+
         Order order = refundRequest.getOrder();
         if (order.getOrderStatus() == OrderStatus.PENDING || order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new IllegalArgumentException("Only paid, shipped or delivered orders can be refunded");
         }
 
-        refundStripePayment(order);
+        applyStripeRefund(order);
         order.setOrderStatus(OrderStatus.REFUNDED);
+        order.setRefundedAt(OffsetDateTime.now(ZoneOffset.UTC));
         unlockOrderArtworks(order);
         refundRequest.setStatus(RefundRequestStatus.APPROVED);
         refundRequest.setApprovedAt(OffsetDateTime.now(ZoneOffset.UTC));
@@ -284,6 +291,32 @@ public class AdminService {
                 order.getUser().getEmail(),
                 order.getOrderNumber(),
                 formatRefundAmount(order)
+        );
+        return AdminRefundRequestResponse.from(refundRequest);
+    }
+
+    @Transactional
+    public AdminRefundRequestResponse rejectRefundRequest(UUID refundRequestId, String reason) {
+        RefundRequestEntity refundRequest = refundRequestRepository.findById(refundRequestId)
+                .orElseThrow(() -> new EntityNotFoundException("Refund request was not found"));
+
+        if (refundRequest.getStatus() != RefundRequestStatus.PENDING) {
+            throw new IllegalArgumentException("Only pending refund requests can be rejected");
+        }
+
+        String normalizedReason = reason == null ? "" : reason.trim();
+        if (normalizedReason.isBlank()) {
+            throw new IllegalArgumentException("Rejection reason is required");
+        }
+
+        refundRequest.setStatus(RefundRequestStatus.REJECTED);
+        refundRequest.setRejectedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        refundRequest.setRejectionReason(normalizedReason);
+
+        emailService.sendRefundRequestRejectedEmail(
+                refundRequest.getUser().getEmail(),
+                refundRequest.getOrder().getOrderNumber(),
+                normalizedReason
         );
         return AdminRefundRequestResponse.from(refundRequest);
     }
@@ -474,17 +507,19 @@ public class AdminService {
         return amount.toPlainString() + " " + currency;
     }
 
-    private void refundStripePayment(Order order) {
+    private void applyStripeRefund(Order order) {
         if (order.getStripePaymentIntentId() == null || order.getStripePaymentIntentId().isBlank()) {
             throw new IllegalArgumentException("This order has no Stripe payment to refund");
         }
 
         try {
-            stripePaymentClient.refundPayment(
+            StripeRefundResult refund = stripePaymentClient.refundPayment(
                     order.getStripePaymentIntentId(),
                     order.getTotalAmount(),
                     order.getCurrency()
             );
+            order.setStripeRefundId(refund.id());
+            order.setStripeRefundStatus(refund.status());
         } catch (StripeException ex) {
             throw new IllegalArgumentException("Stripe refund failed");
         }

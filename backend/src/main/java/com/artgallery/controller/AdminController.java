@@ -2,6 +2,7 @@ package com.artgallery.controller;
 
 import com.artgallery.dto.request.AdminArtworkRequest;
 import com.artgallery.dto.request.AdminOrderStatusRequest;
+import com.artgallery.dto.request.AdminRefundRejectRequest;
 import com.artgallery.dto.request.AdminShipOrderRequest;
 import com.artgallery.dto.request.AdminUserActiveRequest;
 import com.artgallery.dto.response.AdminArtworkResponse;
@@ -100,6 +101,14 @@ public class AdminController {
     @PatchMapping("/refund-requests/{refundRequestId}/approve")
     public AdminRefundRequestResponse approveRefundRequest(@PathVariable UUID refundRequestId) {
         return adminService.approveRefundRequest(refundRequestId);
+    }
+
+    @PatchMapping("/refund-requests/{refundRequestId}/reject")
+    public AdminRefundRequestResponse rejectRefundRequest(
+            @PathVariable UUID refundRequestId,
+            @Valid @RequestBody AdminRefundRejectRequest request
+    ) {
+        return adminService.rejectRefundRequest(refundRequestId, request.getReason());
     }
 
     @GetMapping("/artworks")

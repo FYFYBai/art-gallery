@@ -339,6 +339,12 @@
   overflow-wrap: anywhere;
 }
 
+.paymentMeta {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
 .statusPill {
   width: fit-content;
   border: 1px solid var(--line-mid);
@@ -376,7 +382,8 @@
 }
 
 .statusCANCELLED,
-.statusREFUNDED {
+.statusREFUNDED,
+.statusREJECTED {
   border-color: rgba(154, 74, 58, 0.35);
   background: rgba(154, 74, 58, 0.1);
   color: #7c382c;
@@ -602,6 +609,85 @@
   padding: 8px 0 0 !important;
 }
 
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(78, 67, 56, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: adminOverlayIn 0.24s ease both;
+}
+
+.refundRejectModal {
+  width: min(460px, 100%);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--white);
+  padding: 26px;
+  box-shadow: 0 22px 70px rgba(53, 43, 31, 0.24);
+  display: grid;
+  gap: 14px;
+  animation: adminModalIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.modalCloseButton {
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.refundRejectModal label {
+  display: grid;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.refundRejectModal textarea {
+  width: 100%;
+  min-height: 132px;
+  border: 1px solid var(--line-mid);
+  border-radius: 8px;
+  background: rgba(245, 240, 230, 0.46);
+  color: var(--text-main);
+  padding: 12px;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+}
+
+.refundRejectModal textarea:focus {
+  background: var(--white);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(184, 155, 114, 0.16);
+}
+
 @keyframes adminNoticeIn {
   from {
     opacity: 0;
@@ -611,6 +697,28 @@
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+@keyframes adminOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes adminModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 

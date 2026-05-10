@@ -33,15 +33,6 @@ public record ProfileOrderResponse(
                 order.getShippingAddress().getProvinceState(),
                 order.getShippingAddress().getPostalCode()
         );
-        String payment = order.getPaymentMethod() == null
-                ? "Stripe Checkout"
-                : order.getPaymentMethod().getCardBrand() == null
-                    ? order.getPaymentMethod().getPaymentType().name()
-                    : "%s ending in %s".formatted(
-                            order.getPaymentMethod().getCardBrand(),
-                            order.getPaymentMethod().getCardLast4()
-                    );
-
         return new ProfileOrderResponse(
                 order.getId(),
                 order.getOrderNumber(),
@@ -49,7 +40,7 @@ public record ProfileOrderResponse(
                 order.getTotalAmount(),
                 order.getCurrency(),
                 address,
-                payment,
+                "Stripe Checkout",
                 order.getTrackingLink(),
                 order.getCreatedAt(),
                 order.getShippedAt(),

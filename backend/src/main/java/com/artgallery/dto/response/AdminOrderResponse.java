@@ -17,6 +17,9 @@ public record AdminOrderResponse(
         int itemCount,
         List<String> productNames,
         String trackingLink,
+        String stripePaymentIntentId,
+        String stripeRefundId,
+        String stripeRefundStatus,
         OffsetDateTime createdAt
 ) {
     public static AdminOrderResponse from(Order order) {
@@ -37,6 +40,9 @@ public record AdminOrderResponse(
                 itemCount,
                 productNames,
                 order.getTrackingLink(),
+                order.getStripePaymentIntentId(),
+                order.getStripeRefundId(),
+                order.getStripeRefundStatus(),
                 order.getCreatedAt()
         );
     }

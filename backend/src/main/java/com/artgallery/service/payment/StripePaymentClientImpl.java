@@ -64,13 +64,14 @@ public class StripePaymentClientImpl implements StripePaymentClient {
     }
 
     @Override
-    public void refundPayment(String paymentIntentId, BigDecimal amount, String currency) throws StripeException {
-        Refund.create(
+    public StripeRefundResult refundPayment(String paymentIntentId, BigDecimal amount, String currency) throws StripeException {
+        Refund refund = Refund.create(
                 RefundCreateParams.builder()
                         .setPaymentIntent(paymentIntentId)
                         .setAmount(toCents(amount))
                         .build()
         );
+        return new StripeRefundResult(refund.getId(), refund.getStatus());
     }
 
     private long toCents(BigDecimal amount) {

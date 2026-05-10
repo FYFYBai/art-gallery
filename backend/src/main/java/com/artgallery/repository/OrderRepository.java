@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-    @EntityGraph(attributePaths = {"shippingAddress", "paymentMethod", "items"})
+    @EntityGraph(attributePaths = {"shippingAddress", "items"})
     List<Order> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
     @EntityGraph(attributePaths = {"user", "items"})
@@ -30,6 +30,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     @EntityGraph(attributePaths = {"user", "items", "items.artwork"})
     Optional<Order> findByStripeCheckoutSessionId(String stripeCheckoutSessionId);
+
+    @EntityGraph(attributePaths = {"items", "items.artwork"})
+    Optional<Order> findByStripeRefundId(String stripeRefundId);
 
     @EntityGraph(attributePaths = {"items", "items.artwork"})
     List<Order> findByOrderStatusAndCheckoutExpiresAtBefore(OrderStatus status, OffsetDateTime cutoff);

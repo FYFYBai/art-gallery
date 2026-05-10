@@ -17,15 +17,21 @@
 
 .content {
   position: absolute;
-  left: clamp(250px, 30.5vw, 500px);
-  top: 46%;
+  left: clamp(188px, 22.9vw, 375px);
+  top: 0;
   width: clamp(330px, 31vw, 530px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   color: #000000;
-  transform: translateY(-50%);
+  padding: clamp(20px, 2.2vw, 34px);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(250, 247, 240, 0.58);
+  box-shadow: 0 18px 52px rgba(67, 55, 42, 0.12);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transform: none;
 }
 
 .title {
@@ -97,7 +103,7 @@
   }
 
   .content {
-    left: clamp(430px, 31vw, 570px);
+    left: clamp(322px, 23.25vw, 428px);
     width: 530px;
   }
 }
@@ -114,7 +120,7 @@
   }
 
   .content {
-    left: clamp(235px, 30vw, 410px);
+    left: clamp(176px, 22.5vw, 308px);
     width: clamp(330px, 33vw, 460px);
   }
 
@@ -135,7 +141,7 @@
   }
 
   .content {
-    left: clamp(250px, 28vw, 330px);
+    left: clamp(188px, 21vw, 248px);
     width: clamp(310px, 34vw, 400px);
   }
 
@@ -157,7 +163,7 @@
 
   .content {
     left: 32px;
-    top: 45%;
+    top: 0;
     width: min(360px, calc(100% - 64px));
     align-items: flex-start;
     text-align: left;
@@ -187,7 +193,7 @@
 
   .content {
     left: 18px;
-    top: 35%;
+    top: 0;
     width: min(242px, calc(100% - 36px));
   }
 
@@ -224,7 +230,7 @@
   }
 
   .content {
-    top: 34%;
+    top: 0;
     width: min(236px, calc(100% - 36px));
   }
 }

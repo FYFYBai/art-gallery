@@ -1,33 +1,22 @@
 package com.artgallery.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.artgallery.domain.email.EmailOutboxMessage;
+import com.artgallery.repository.EmailOutboxRepository;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-
-import java.util.Map;
 
 @Service
 public class ResendEmailService implements EmailService {
 
-    private final RestClient restClient;
-    private final String apiKey;
-    private final String fromEmail;
+    private final EmailOutboxRepository emailOutboxRepository;
 
-    public ResendEmailService(@Value("${app.email.resend.api-key}") String apiKey,
-                              @Value("${app.email.from}") String fromEmail) {
-        this.apiKey = apiKey;
-        this.fromEmail = fromEmail;
-        this.restClient = RestClient.builder()
-                .baseUrl("https://api.resend.com")
-                .build();
+    public ResendEmailService(EmailOutboxRepository emailOutboxRepository) {
+        this.emailOutboxRepository = emailOutboxRepository;
     }
 
     @Override
     public void sendVerificationEmail(String recipientEmail, String verificationLink) {
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("RESEND_API_KEY is required to send verification email");
-        }
-
         String text = """
                 Welcome to Sylvaine Art.
 
@@ -44,26 +33,11 @@ public class ResendEmailService implements EmailService {
                 <p>This link expires in 24 hours.</p>
                 """.formatted(verificationLink);
 
-        restClient.post()
-                .uri("/emails")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(Map.of(
-                        "from", fromEmail,
-                        "to", recipientEmail,
-                        "subject", "Verify your Sylvaine Art account",
-                        "text", text,
-                        "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
+        enqueue(recipientEmail, "Verify your Sylvaine Art account", text, html);
     }
 
     @Override
     public void sendPasswordResetEmail(String recipientEmail, String resetLink) {
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("RESEND_API_KEY is required to send password reset email");
-        }
-
         String text = """
                 You requested a password reset for your Sylvaine Art account.
 
@@ -80,26 +54,30 @@ public class ResendEmailService implements EmailService {
                 <p>This link expires in 1 hour. If you did not request this, you can ignore this email.</p>
                 """.formatted(resetLink);
 
-        restClient.post()
-                .uri("/emails")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(Map.of(
-                        "from", fromEmail,
-                        "to", recipientEmail,
-                        "subject", "Reset your Sylvaine Art password",
-                        "text", text,
-                        "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
+        enqueue(recipientEmail, "Reset your Sylvaine Art password", text, html);
+    }
+
+    @Override
+    public void sendOrderReceiptEmail(String recipientEmail, String orderNumber, String totalAmount) {
+        String text = """
+                Thank you for your Sylvaine Art order %s.
+
+                We have received your payment of %s.
+
+                We will prepare your artwork and contact you when it is ready to ship.
+                """.formatted(orderNumber, totalAmount);
+
+        String html = """
+                <p>Thank you for your Sylvaine Art order <strong>%s</strong>.</p>
+                <p>We have received your payment of <strong>%s</strong>.</p>
+                <p>We will prepare your artwork and contact you when it is ready to ship.</p>
+                """.formatted(orderNumber, totalAmount);
+
+        enqueue(recipientEmail, "Your Sylvaine Art order receipt", text, html);
     }
 
     @Override
     public void sendOrderShippedEmail(String recipientEmail, String orderNumber, String trackingLink) {
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("RESEND_API_KEY is required to send shipment email");
-        }
-
         String text = """
                 Your Sylvaine Art order %s has shipped.
 
@@ -116,26 +94,11 @@ public class ResendEmailService implements EmailService {
                 <p>We will mark the order as delivered once the shipment is complete.</p>
                 """.formatted(orderNumber, trackingLink);
 
-        restClient.post()
-                .uri("/emails")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(Map.of(
-                        "from", fromEmail,
-                        "to", recipientEmail,
-                        "subject", "Your Sylvaine Art order has shipped",
-                        "text", text,
-                        "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
+        enqueue(recipientEmail, "Your Sylvaine Art order has shipped", text, html);
     }
 
     @Override
     public void sendOrderDeliveredEmail(String recipientEmail, String orderNumber) {
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("RESEND_API_KEY is required to send delivery email");
-        }
-
         String text = """
                 Your Sylvaine Art order %s has been marked as delivered.
 
@@ -147,26 +110,11 @@ public class ResendEmailService implements EmailService {
                 <p>Thank you for supporting us and for giving the artwork a place in your home.</p>
                 """.formatted(orderNumber);
 
-        restClient.post()
-                .uri("/emails")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(Map.of(
-                        "from", fromEmail,
-                        "to", recipientEmail,
-                        "subject", "Your Sylvaine Art order was delivered",
-                        "text", text,
-                        "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
+        enqueue(recipientEmail, "Your Sylvaine Art order was delivered", text, html);
     }
 
     @Override
     public void sendOrderRefundedEmail(String recipientEmail, String orderNumber, String refundAmount) {
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("RESEND_API_KEY is required to send refund email");
-        }
-
         String text = """
                 We are sorry to hear that you are unsatisfied with your Sylvaine Art order %s.
 
@@ -178,18 +126,49 @@ public class ResendEmailService implements EmailService {
                 <p>Your refund of <strong>%s</strong> will be sent to you in 5 business days.</p>
                 """.formatted(orderNumber, refundAmount);
 
-        restClient.post()
-                .uri("/emails")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(Map.of(
-                        "from", fromEmail,
-                        "to", recipientEmail,
-                        "subject", "Your Sylvaine Art refund is being processed",
-                        "text", text,
-                        "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
+        enqueue(recipientEmail, "Your Sylvaine Art refund is being processed", text, html);
     }
 
+    @Override
+    public void sendRefundRequestRejectedEmail(String recipientEmail, String orderNumber, String reason) {
+        String text = """
+                We reviewed your refund request for Sylvaine Art order %s.
+
+                We are unable to approve this refund request for the following reason:
+                %s
+
+                If you have additional information, please reply to this email and we will review it.
+                """.formatted(orderNumber, reason);
+
+        String html = """
+                <p>We reviewed your refund request for Sylvaine Art order <strong>%s</strong>.</p>
+                <p>We are unable to approve this refund request for the following reason:</p>
+                <p>%s</p>
+                <p>If you have additional information, please reply to this email and we will review it.</p>
+                """.formatted(orderNumber, escapeHtml(reason));
+
+        enqueue(recipientEmail, "Update on your Sylvaine Art refund request", text, html);
+    }
+
+    private void enqueue(String recipientEmail, String subject, String text, String html) {
+        EmailOutboxMessage message = new EmailOutboxMessage();
+        message.setRecipient(recipientEmail);
+        message.setSubject(subject);
+        message.setTextBody(text);
+        message.setHtmlBody(html);
+        message.setNextAttemptAt(OffsetDateTime.now(ZoneOffset.UTC));
+        emailOutboxRepository.save(message);
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+    }
 }

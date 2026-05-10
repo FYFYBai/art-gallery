@@ -34,123 +34,17 @@ const SERIES_OPTIONS = [
   { value: "portraits", labelKey: "portraits" },
 ];
 
-const sampleDashboard = {
-  userCount: 24,
-  orderCount: 18,
-  deliveryQueueCount: 4,
-  artworkCount: 36,
-  revenueTotal: 28420,
-  monthlyTransactions: [
-    { month: "2026-01", orderCount: 2, totalAmount: 2140 },
-    { month: "2026-02", orderCount: 3, totalAmount: 4180 },
-    { month: "2026-03", orderCount: 5, totalAmount: 7600 },
-    { month: "2026-04", orderCount: 4, totalAmount: 6400 },
-    { month: "2026-05", orderCount: 4, totalAmount: 8100 },
-  ],
-  viewsLast40Days: Array.from({ length: 40 }, (_, index) => ({
-    date: `D-${39 - index}`,
-    views: 42 + ((index * 17) % 38),
-  })),
-  deliveryQueue: [
-    {
-      id: "sample-order-1",
-      orderNumber: "SA-014",
-      customerEmail: "collector@example.com",
-      orderStatus: "PAID",
-      totalAmount: 1280,
-      currency: "CAD",
-      itemCount: 1,
-      productNames: ["Paysage ouvert"],
-      createdAt: "2026-05-04T10:00:00Z",
-    },
-  ],
-  shippedOrders: [
-    {
-      id: "sample-order-3",
-      orderNumber: "SA-011",
-      customerEmail: "collector@example.com",
-      orderStatus: "SHIPPED",
-      totalAmount: 1460,
-      currency: "CAD",
-      itemCount: 1,
-      productNames: ["Présence urbaine"],
-      trackingLink: "https://tracking.example.com/SA-011",
-      createdAt: "2026-05-01T10:00:00Z",
-    },
-  ],
-  refundRequests: [
-    {
-      id: "sample-refund-1",
-      orderId: "sample-order-2",
-      orderNumber: "SA-009",
-      customerEmail: "privatebuyer@example.com",
-      reason: "The color does not work in the intended room.",
-      contactInfo: "privatebuyer@example.com",
-      status: "PENDING",
-      totalAmount: 760,
-      currency: "CAD",
-      productNames: ["Silence nocturne"],
-      createdAt: "2026-05-07T10:00:00Z",
-    },
-  ],
+const emptyDashboard = {
+  userCount: 0,
+  orderCount: 0,
+  deliveryQueueCount: 0,
+  artworkCount: 0,
+  revenueTotal: 0,
+  monthlyTransactions: [],
+  viewsLast40Days: [],
+  deliveryQueue: [],
+  shippedOrders: [],
 };
-
-const sampleUsers = [
-  {
-    id: "sample-user-1",
-    email: "collector@example.com",
-    firstName: "Claire",
-    lastName: "Martin",
-    active: true,
-    emailVerified: true,
-    role: "USER",
-    createdAt: "2026-04-14T10:00:00Z",
-  },
-  {
-    id: "sample-user-2",
-    email: "privatebuyer@example.com",
-    firstName: "Daniel",
-    lastName: "Lee",
-    active: true,
-    emailVerified: false,
-    role: "USER",
-    createdAt: "2026-05-02T10:00:00Z",
-  },
-];
-
-const sampleOrders = [
-  ...sampleDashboard.deliveryQueue,
-  ...sampleDashboard.shippedOrders,
-  {
-    id: "sample-order-2",
-    orderNumber: "SA-009",
-    customerEmail: "privatebuyer@example.com",
-    orderStatus: "DELIVERED",
-    totalAmount: 760,
-    currency: "CAD",
-    itemCount: 1,
-    productNames: ["Silence nocturne"],
-    createdAt: "2026-03-16T10:00:00Z",
-  },
-];
-
-const sampleArtworks = [
-  {
-    id: "sample-artwork-1",
-    imageUrl: "/images/curator-favorites/2.jpg",
-    artworkType: "Oil painting",
-    series: "Paysages",
-    description: "A quiet blue landscape study for the admin product preview.",
-    name: "Paysage ouvert",
-    price: 980,
-    currency: "CAD",
-    size: "40 x 50 cm",
-    year: 2026,
-    active: true,
-    soldOut: false,
-    createdAt: "2026-04-20T10:00:00Z",
-  },
-];
 
 function readStoredAuth() {
   if (typeof window === "undefined") return null;
@@ -231,12 +125,12 @@ export default function AdminPage() {
   const router = useRouter();
   const { locale } = useParams();
   const [auth, setAuth] = useState(null);
-  const [dashboard, setDashboard] = useState(sampleDashboard);
-  const [users, setUsers] = useState(sampleUsers);
-  const [orders, setOrders] = useState(sampleOrders);
-  const [shippedOrders, setShippedOrders] = useState(sampleDashboard.shippedOrders);
-  const [refundRequests, setRefundRequests] = useState(sampleDashboard.refundRequests);
-  const [artworks, setArtworks] = useState(sampleArtworks);
+  const [dashboard, setDashboard] = useState(emptyDashboard);
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [shippedOrders, setShippedOrders] = useState([]);
+  const [refundRequests, setRefundRequests] = useState([]);
+  const [artworks, setArtworks] = useState([]);
   const [userQuery, setUserQuery] = useState("");
   const [orderQuery, setOrderQuery] = useState("");
   const [shippedOrderQuery, setShippedOrderQuery] = useState("");
@@ -248,6 +142,9 @@ export default function AdminPage() {
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
   const [accessVerified, setAccessVerified] = useState(false);
+  const [rejectingRefundRequest, setRejectingRefundRequest] = useState(null);
+  const [refundRejectionReason, setRefundRejectionReason] = useState("");
+  const [refundRejectionSubmitting, setRefundRejectionSubmitting] = useState(false);
 
   const maxMonthlyValue = useMemo(
     () =>
@@ -319,7 +216,7 @@ export default function AdminPage() {
       setRefundRequests(await refundRequestsResponse.json());
     } catch (error) {
       if (error.message !== "Not authorised") {
-        setNotice(t("sampleFallback"));
+        setNotice(t("loadFailed"));
       }
     } finally {
       setLoading(false);
@@ -440,7 +337,7 @@ export default function AdminPage() {
   };
 
   const updateUserActive = async (user) => {
-    if (!auth || user.id.startsWith("sample")) return;
+    if (!auth) return;
 
     if (user.active && !window.confirm(t("banUserConfirm"))) {
       return;
@@ -461,7 +358,7 @@ export default function AdminPage() {
   };
 
   const deleteUserForDevelopment = async (user) => {
-    if (!auth || user.id.startsWith("sample")) return;
+    if (!auth) return;
 
     if (!window.confirm(t("deleteUserConfirm"))) {
       return;
@@ -480,7 +377,7 @@ export default function AdminPage() {
   };
 
   const shipOrder = async (order) => {
-    if (!auth || order.id.startsWith("sample")) return;
+    if (!auth) return;
 
     const trackingLink = window.prompt(t("trackingLinkPrompt"));
     if (!trackingLink) return;
@@ -498,7 +395,7 @@ export default function AdminPage() {
   };
 
   const markOrderDelivered = async (order) => {
-    if (!auth || order.id.startsWith("sample")) return;
+    if (!auth) return;
 
     if (!window.confirm(t("markDeliveredConfirm"))) {
       return;
@@ -516,7 +413,7 @@ export default function AdminPage() {
   };
 
   const approveRefundRequest = async (refundRequest) => {
-    if (!auth || refundRequest.id.startsWith("sample")) return;
+    if (!auth) return;
 
     if (!window.confirm(t("approveRefundConfirm"))) {
       return;
@@ -530,6 +427,38 @@ export default function AdminPage() {
       await refreshOrderData();
     } catch {
       setNotice(t("refundApproveFailed"));
+    }
+  };
+
+  const openRejectRefundRequest = (refundRequest) => {
+    setRejectingRefundRequest(refundRequest);
+    setRefundRejectionReason("");
+  };
+
+  const closeRejectRefundRequest = () => {
+    if (refundRejectionSubmitting) return;
+    setRejectingRefundRequest(null);
+    setRefundRejectionReason("");
+  };
+
+  const rejectRefundRequest = async (event) => {
+    event.preventDefault();
+    if (!auth || !rejectingRefundRequest || !refundRejectionReason.trim()) return;
+
+    setRefundRejectionSubmitting(true);
+    try {
+      await apiFetch(`/api/admin/refund-requests/${rejectingRefundRequest.id}/reject`, {
+        method: "PATCH",
+        body: JSON.stringify({ reason: refundRejectionReason }),
+      });
+      setNotice(t("refundRejected"));
+      setRejectingRefundRequest(null);
+      setRefundRejectionReason("");
+      await refreshOrderData();
+    } catch {
+      setNotice(t("refundRejectFailed"));
+    } finally {
+      setRefundRejectionSubmitting(false);
     }
   };
 
@@ -635,7 +564,7 @@ export default function AdminPage() {
   };
 
   const deleteArtwork = async (artwork) => {
-    if (!auth || artwork.id.startsWith("sample")) return;
+    if (!auth) return;
 
     if (!window.confirm(t("deleteProductConfirm"))) {
       return;
@@ -806,6 +735,15 @@ export default function AdminPage() {
                     {order.customerEmail} / {order.productNames.join(", ")}
                   </span>
                   <small>{formatCurrency(order.totalAmount, order.currency)}</small>
+                  {order.stripePaymentIntentId && (
+                    <small className={styles.paymentMeta}>{t("paymentIntent")}: {order.stripePaymentIntentId}</small>
+                  )}
+                  {order.stripeRefundId && (
+                    <small className={styles.paymentMeta}>{t("refundId")}: {order.stripeRefundId}</small>
+                  )}
+                  {order.stripeRefundStatus && (
+                    <small className={styles.paymentMeta}>{t("refundStatus")}: {order.stripeRefundStatus}</small>
+                  )}
                 </div>
                 <StatusPill status={order.orderStatus} />
               </article>
@@ -828,11 +766,20 @@ export default function AdminPage() {
                     <small>{formatCurrency(refundRequest.totalAmount, refundRequest.currency)}</small>
                     <small>{t("refundReasonLabel")}: {refundRequest.reason}</small>
                     <small>{t("refundContactLabel")}: {refundRequest.contactInfo}</small>
+                    {refundRequest.stripeRefundId && (
+                      <small className={styles.paymentMeta}>{t("refundId")}: {refundRequest.stripeRefundId}</small>
+                    )}
+                    {refundRequest.stripeRefundStatus && (
+                      <small className={styles.paymentMeta}>{t("refundStatus")}: {refundRequest.stripeRefundStatus}</small>
+                    )}
                   </div>
                   <div className={styles.rowActions}>
                     <StatusPill status={refundRequest.status} />
                     <button type="button" onClick={() => approveRefundRequest(refundRequest)}>
                       {t("approveRefund")}
+                    </button>
+                    <button type="button" className={styles.dangerButton} onClick={() => openRejectRefundRequest(refundRequest)}>
+                      {t("rejectRefund")}
                     </button>
                   </div>
                 </article>
@@ -1020,6 +967,38 @@ export default function AdminPage() {
           </div>
         </Panel>
       </section>
+      {rejectingRefundRequest && (
+        <div className={styles.modalOverlay} role="presentation" onClick={closeRejectRefundRequest}>
+          <form className={styles.refundRejectModal} onSubmit={rejectRefundRequest} onClick={(event) => event.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div>
+                <p className={styles.panelEyebrow}>{t("rejectRefundEyebrow")}</p>
+                <h3>{rejectingRefundRequest.orderNumber}</h3>
+              </div>
+              <button type="button" className={styles.modalCloseButton} onClick={closeRejectRefundRequest}>
+                {t("cancel")}
+              </button>
+            </div>
+            <p className={styles.emptyText}>{t("rejectRefundDescription")}</p>
+            <label>
+              {t("rejectRefundReason")}
+              <textarea
+                required
+                value={refundRejectionReason}
+                onChange={(event) => setRefundRejectionReason(event.target.value)}
+              />
+            </label>
+            <div className={styles.formActions}>
+              <button type="submit" disabled={refundRejectionSubmitting || !refundRejectionReason.trim()}>
+                {refundRejectionSubmitting ? t("rejectingRefund") : t("submitRefundRejection")}
+              </button>
+              <button type="button" onClick={closeRejectRefundRequest}>
+                {t("cancel")}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </main>
   );
 }

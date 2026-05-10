@@ -22,68 +22,6 @@ const emptyAddressDraft = {
 
 const provinces = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
 
-const fallbackAddresses = [
-  {
-    id: "sample-primary",
-    addressLine1: "248 Rue Saint-Paul Ouest",
-    addressLine2: "",
-    city: "Montreal",
-    provinceState: "QC",
-    postalCode: "H2Y 1Z9",
-    country: "Canada",
-    primary: true,
-  },
-  {
-    id: "sample-other",
-    addressLine1: "31 Avenue Laurier Est",
-    addressLine2: "Studio 4",
-    city: "Montreal",
-    provinceState: "QC",
-    postalCode: "H2T 1E4",
-    country: "Canada",
-    primary: false,
-  },
-];
-
-const fallbackOrders = [
-  {
-    id: "SA-2026-014",
-    date: "April 28, 2026",
-    status: "Preparing",
-    total: "C$1,280",
-    delivery: "Estimated May 10, 2026",
-    shippingAddress: "248 Rue Saint-Paul Ouest, Montreal",
-    payment: "Stripe Checkout",
-    items: [
-      { title: "Paysage ouvert", detail: "Original oil painting, 40 x 50 cm", price: "C$980" },
-      { title: "Framing service", detail: "Natural oak frame", price: "C$300" },
-    ],
-    timeline: ["Order received", "Payment confirmed", "Preparing artwork"],
-  },
-  {
-    id: "SA-2026-009",
-    date: "March 16, 2026",
-    status: "Delivered",
-    total: "C$760",
-    delivery: "Delivered March 23, 2026",
-    shippingAddress: "31 Avenue Laurier Est, Montreal",
-    payment: "Stripe Checkout",
-    items: [{ title: "Silence nocturne", detail: "Study on paper, 24 x 32 cm", price: "C$760" }],
-    timeline: ["Order received", "Shipped", "Delivered"],
-  },
-  {
-    id: "SA-2026-003",
-    date: "January 9, 2026",
-    status: "Completed",
-    total: "C$2,140",
-    delivery: "Delivered January 18, 2026",
-    shippingAddress: "248 Rue Saint-Paul Ouest, Montreal",
-    payment: "Stripe Checkout",
-    items: [{ title: "Lumiere apaisante", detail: "Original painting, 60 x 80 cm", price: "C$2,140" }],
-    timeline: ["Order received", "Shipped", "Delivered"],
-  },
-];
-
 function readStoredAuth() {
   if (typeof window === "undefined") return null;
   try {
@@ -195,7 +133,7 @@ export default function ProfilePage() {
   const t = useTranslations("profile");
   const [user, setUser] = useState(readStoredAuth);
   const [activeSection, setActiveSection] = useState("overview");
-  const [selectedOrderId, setSelectedOrderId] = useState(fallbackOrders[0].id);
+  const [selectedOrderId, setSelectedOrderId] = useState("");
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState("");
@@ -219,12 +157,12 @@ export default function ProfilePage() {
   const [securityMessage, setSecurityMessage] = useState(null);
   const [securitySubmitting, setSecuritySubmitting] = useState(false);
 
-  const visibleOrders = orders.length > 0 ? orders : fallbackOrders;
+  const visibleOrders = orders;
   const selectedOrder = useMemo(
     () => visibleOrders.find((order) => order.id === selectedOrderId) || visibleOrders[0],
     [selectedOrderId, visibleOrders],
   );
-  const visibleAddresses = addresses.length > 0 ? addresses : fallbackAddresses;
+  const visibleAddresses = addresses;
   const primaryAddress = visibleAddresses.find((address) => address.primary);
   const otherAddresses = visibleAddresses.filter((address) => !address.primary);
   const securityPasswordInvalid = securityPassword.length > 0 && !isStrongPassword(securityPassword);
@@ -290,7 +228,7 @@ export default function ProfilePage() {
       const result = await response.json();
       const nextOrders = result.map(normalizeOrder);
       setOrders(nextOrders);
-      setSelectedOrderId((current) => nextOrders.find((order) => order.id === current)?.id || nextOrders[0]?.id || fallbackOrders[0].id);
+      setSelectedOrderId((current) => nextOrders.find((order) => order.id === current)?.id || nextOrders[0]?.id || "");
     } catch (error) {
       if (error.message !== "Session expired") {
         setOrdersError(t("ordersLoadFailed"));
@@ -564,7 +502,11 @@ export default function ProfilePage() {
                 <Metric label={t("ordersThisYear")} value={String(visibleOrders.length)} />
               </div>
               <div className={styles.previewGrid}>
-                <SummaryBlock title={t("nextDelivery")} body={`${visibleOrders[0].id} - ${visibleOrders[0].delivery}`} action={t("viewOrder")} onClick={() => { setSelectedOrderId(visibleOrders[0].id); setActiveSection("orders"); }} />
+                {visibleOrders[0] ? (
+                  <SummaryBlock title={t("nextDelivery")} body={`${visibleOrders[0].id} - ${visibleOrders[0].delivery}`} action={t("viewOrder")} onClick={() => { setSelectedOrderId(visibleOrders[0].id); setActiveSection("orders"); }} />
+                ) : (
+                  <EmptyState title={t("noOrdersTitle")} body={t("noOrdersBody")} />
+                )}
                 <SummaryBlock title={t("primaryAddress")} body={primaryAddress ? formatAddress(primaryAddress) : t("noPrimaryAddress")} action={t("manageAddresses")} onClick={() => setActiveSection("addresses")} />
               </div>
             </div>
@@ -593,7 +535,7 @@ export default function ProfilePage() {
               <div className={styles.addressSection}>
                 <p className={styles.groupTitle}>{t("primaryAddressLabel")}</p>
                 {primaryAddress ? (
-                  <AddressCard address={primaryAddress} sample={primaryAddress.id.startsWith("sample")} actions={<><button type="button" onClick={() => startEditAddress(primaryAddress)} disabled={primaryAddress.id.startsWith("sample")}>{t("update")}</button><button type="button" onClick={() => removeAddress(primaryAddress.id)} disabled={primaryAddress.id.startsWith("sample")}>{t("remove")}</button></>} />
+                  <AddressCard address={primaryAddress} actions={<><button type="button" onClick={() => startEditAddress(primaryAddress)}>{t("update")}</button><button type="button" onClick={() => removeAddress(primaryAddress.id)}>{t("remove")}</button></>} />
                 ) : (
                   <EmptyState title={t("noPrimaryAddress")} body={t("noAddressBody")} />
                 )}
@@ -604,7 +546,7 @@ export default function ProfilePage() {
                 {otherAddresses.length > 0 ? (
                   <div className={styles.addressGrid}>
                     {otherAddresses.map((address) => (
-                      <AddressCard key={address.id} address={address} sample={address.id.startsWith("sample")} actions={<><button type="button" onClick={() => makePrimaryAddress(address.id)} disabled={address.id.startsWith("sample")}>{t("makePrimary")}</button><button type="button" onClick={() => startEditAddress(address)} disabled={address.id.startsWith("sample")}>{t("update")}</button><button type="button" onClick={() => removeAddress(address.id)} disabled={address.id.startsWith("sample")}>{t("remove")}</button></>} />
+                      <AddressCard key={address.id} address={address} actions={<><button type="button" onClick={() => makePrimaryAddress(address.id)}>{t("makePrimary")}</button><button type="button" onClick={() => startEditAddress(address)}>{t("update")}</button><button type="button" onClick={() => removeAddress(address.id)}>{t("remove")}</button></>} />
                     ))}
                   </div>
                 ) : (
@@ -642,15 +584,23 @@ export default function ProfilePage() {
                 {ordersLoading && <p className={styles.mutedText}>{t("loadingOrders")}</p>}
                 {ordersError && <p className={styles.panelError}>{ordersError}</p>}
                 <div className={styles.listStack}>
-                  {visibleOrders.map((order) => (
-                    <button key={order.id} type="button" className={`${styles.orderButton} ${selectedOrderId === order.id ? styles.selectedOrder : ""}`} onClick={() => setSelectedOrderId(order.id)}>
-                      <span><strong>{order.id}</strong><small>{order.date}</small></span>
-                      <span>{order.total}</span>
-                    </button>
-                  ))}
+                  {visibleOrders.length === 0 ? (
+                    <EmptyState title={t("noOrdersTitle")} body={t("noOrdersBody")} />
+                  ) : (
+                    visibleOrders.map((order) => (
+                      <button key={order.id} type="button" className={`${styles.orderButton} ${selectedOrderId === order.id ? styles.selectedOrder : ""}`} onClick={() => setSelectedOrderId(order.id)}>
+                        <span><strong>{order.id}</strong><small>{order.date}</small></span>
+                        <span>{order.total}</span>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
-              <OrderDetail order={selectedOrder} t={t} onRefundRequest={openRefundModal} />
+              {selectedOrder ? (
+                <OrderDetail order={selectedOrder} t={t} onRefundRequest={openRefundModal} />
+              ) : (
+                <EmptyState title={t("noOrdersTitle")} body={t("noOrdersBody")} />
+              )}
             </div>
           )}
         </section>
@@ -709,10 +659,10 @@ function AddressForm({ draft, provinces, t, editing, submitting, postalInvalid, 
   );
 }
 
-function AddressCard({ address, actions, sample }) {
+function AddressCard({ address, actions }) {
   return (
     <article className={styles.addressBlock}>
-      <p className={styles.rowTitle}>{sample ? `${address.addressLine1} (${address.primary ? "sample primary" : "sample"})` : address.addressLine1}</p>
+      <p className={styles.rowTitle}>{address.addressLine1}</p>
       {address.addressLine2 && <p>{address.addressLine2}</p>}
       <p>{address.city}, {address.provinceState} {address.postalCode}</p>
       <p>{address.country}</p>

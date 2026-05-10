@@ -1,7 +1,6 @@
 package com.artgallery.domain.order;
 
 import com.artgallery.domain.BaseEntity;
-import com.artgallery.domain.user.PaymentMethod;
 import com.artgallery.domain.user.User;
 import com.artgallery.domain.user.UserAddress;
 import jakarta.persistence.*;
@@ -25,10 +24,6 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billing_address_id", nullable = false)
     private UserAddress billingAddress;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_method_id")
-    private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false, length = 20)
@@ -70,8 +65,17 @@ public class Order extends BaseEntity {
     @Column(name = "stripe_payment_status", length = 50)
     private String stripePaymentStatus;
 
+    @Column(name = "stripe_refund_id", length = 255)
+    private String stripeRefundId;
+
+    @Column(name = "stripe_refund_status", length = 50)
+    private String stripeRefundStatus;
+
     @Column(name = "paid_at")
     private OffsetDateTime paidAt;
+
+    @Column(name = "refunded_at")
+    private OffsetDateTime refundedAt;
 
     @Column(name = "checkout_expires_at")
     private OffsetDateTime checkoutExpiresAt;
@@ -85,8 +89,6 @@ public class Order extends BaseEntity {
     public void setShippingAddress(UserAddress shippingAddress) { this.shippingAddress = shippingAddress; }
     public UserAddress getBillingAddress() { return billingAddress; }
     public void setBillingAddress(UserAddress billingAddress) { this.billingAddress = billingAddress; }
-    public PaymentMethod getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
     public OrderStatus getOrderStatus() { return orderStatus; }
     public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
     public String getOrderNumber() { return orderNumber; }
@@ -112,8 +114,14 @@ public class Order extends BaseEntity {
     public void setStripePaymentIntentId(String stripePaymentIntentId) { this.stripePaymentIntentId = stripePaymentIntentId; }
     public String getStripePaymentStatus() { return stripePaymentStatus; }
     public void setStripePaymentStatus(String stripePaymentStatus) { this.stripePaymentStatus = stripePaymentStatus; }
+    public String getStripeRefundId() { return stripeRefundId; }
+    public void setStripeRefundId(String stripeRefundId) { this.stripeRefundId = stripeRefundId; }
+    public String getStripeRefundStatus() { return stripeRefundStatus; }
+    public void setStripeRefundStatus(String stripeRefundStatus) { this.stripeRefundStatus = stripeRefundStatus; }
     public OffsetDateTime getPaidAt() { return paidAt; }
     public void setPaidAt(OffsetDateTime paidAt) { this.paidAt = paidAt; }
+    public OffsetDateTime getRefundedAt() { return refundedAt; }
+    public void setRefundedAt(OffsetDateTime refundedAt) { this.refundedAt = refundedAt; }
     public OffsetDateTime getCheckoutExpiresAt() { return checkoutExpiresAt; }
     public void setCheckoutExpiresAt(OffsetDateTime checkoutExpiresAt) { this.checkoutExpiresAt = checkoutExpiresAt; }
     public List<OrderItem> getItems() { return items; }

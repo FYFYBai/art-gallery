@@ -39,9 +39,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> addresses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentMethod> paymentMethods = new ArrayList<>();
-
     // Getters and setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -61,5 +58,4 @@ public class User extends BaseEntity {
     public void setRole(Role role) { this.role = role; }
     public List<UserAuthProvider> getAuthProviders() { return authProviders; }
     public List<UserAddress> getAddresses() { return addresses; }
-    public List<PaymentMethod> getPaymentMethods() { return paymentMethods; }
 }

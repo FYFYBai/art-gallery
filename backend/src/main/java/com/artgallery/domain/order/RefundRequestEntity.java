@@ -30,6 +30,12 @@ public class RefundRequestEntity extends BaseEntity {
     @Column(name = "approved_at")
     private OffsetDateTime approvedAt;
 
+    @Column(name = "rejected_at")
+    private OffsetDateTime rejectedAt;
+
+    @Column(name = "rejection_reason", length = 2000)
+    private String rejectionReason;
+
     public Order getOrder() { return order; }
     public void setOrder(Order order) { this.order = order; }
     public User getUser() { return user; }
@@ -42,4 +48,8 @@ public class RefundRequestEntity extends BaseEntity {
     public void setStatus(RefundRequestStatus status) { this.status = status; }
     public OffsetDateTime getApprovedAt() { return approvedAt; }
     public void setApprovedAt(OffsetDateTime approvedAt) { this.approvedAt = approvedAt; }
+    public OffsetDateTime getRejectedAt() { return rejectedAt; }
+    public void setRejectedAt(OffsetDateTime rejectedAt) { this.rejectedAt = rejectedAt; }
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }

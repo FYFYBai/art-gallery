@@ -16,5 +16,5 @@ public interface StripePaymentClient {
 
     void expireCheckoutSession(String sessionId) throws StripeException;
 
-    void refundPayment(String paymentIntentId, BigDecimal amount, String currency) throws StripeException;
+    StripeRefundResult refundPayment(String paymentIntentId, BigDecimal amount, String currency) throws StripeException;
 }

@@ -136,6 +136,7 @@ export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [visibleDropdown, setVisibleDropdown] = useState(null);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountMode, setAccountMode] = useState("login");
@@ -236,6 +237,7 @@ export default function Header() {
       if (event.key === "Escape") {
         setLanguageOpen(false);
         setAccountOpen(false);
+        setMobileMenuOpen(false);
         setActiveDropdown(null);
         setVisibleDropdown(null);
         setIsDropdownClosing(false);
@@ -800,7 +802,20 @@ export default function Header() {
     setIsResendingVerification(false);
     resendSubmittingRef.current = false;
     forgotPasswordSubmittingRef.current = false;
+    setMobileMenuOpen(false);
   }, [pathname]);
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = (event) => {
+    event.stopPropagation();
+    setMobileMenuOpen((open) => !open);
+    setLanguageOpen(false);
+    setAccountOpen(false);
+    hideDropdown();
+  };
 
   return (
     <>
@@ -823,6 +838,23 @@ export default function Header() {
           </Link>
 
           <div className={styles.headerRight}>
+            <button
+              type="button"
+              className={`${styles.mobileMenuButton} ${
+                mobileMenuOpen ? styles.mobileMenuButtonOpen : ""
+              }`}
+              aria-label={
+                mobileMenuOpen ? t("header.closeMenu") : t("header.openMenu")
+              }
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-main-navigation"
+              onClick={toggleMobileMenu}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+
             <nav className={styles.mainNav} aria-label={t("header.mainNav")}>
               <ul className={styles.navList}>
                 {navItems.map((item) => {
@@ -988,6 +1020,62 @@ export default function Header() {
             </div>
           </div>
         </div>
+
+        <nav
+          id="mobile-main-navigation"
+          className={`${styles.mobileMenuPanel} ${
+            mobileMenuOpen ? styles.mobileMenuPanelOpen : ""
+          }`}
+          aria-label={t("header.mainNav")}
+          aria-hidden={!mobileMenuOpen}
+        >
+          <div className={styles.mobileMenuInner}>
+            {navItems.map((item) => {
+              const hasDropdown = Boolean(item.columns);
+              return (
+                <div key={item.labelKey} className={styles.mobileMenuGroup}>
+                  <Link
+                    href={getLocalizedHref(item.link, locale)}
+                    className={styles.mobileMenuPrimary}
+                    onClick={closeMobileMenu}
+                  >
+                    {item.label}
+                  </Link>
+
+                  {hasDropdown && (
+                    <div className={styles.mobileMenuSubgrid}>
+                      {item.columns.map((column) => (
+                        <div
+                          key={column.title}
+                          className={styles.mobileMenuColumn}
+                        >
+                          <p className={styles.mobileMenuColumnTitle}>
+                            {column.title}
+                          </p>
+                          <div className={styles.mobileMenuSublist}>
+                            {column.items.map((subItem) => (
+                              <Link
+                                key={subItem.slug}
+                                href={getLocalizedHref(
+                                  `/artworks?type=${subItem.slug}`,
+                                  locale,
+                                )}
+                                className={styles.mobileMenuSubitem}
+                                onClick={closeMobileMenu}
+                              >
+                                {subItem.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </nav>
 
         {/* Mega dropdown */}
         {activeItem && (

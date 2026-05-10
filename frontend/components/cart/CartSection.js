@@ -528,7 +528,7 @@ export default function CartSection() {
         </div>
 
         {auth?.token && !loading && items.length > 0 && (
-          <div className={styles.demoFlowControls}>
+          <div className={styles.checkoutFlowControls}>
             {currentStep === 2 && (
               <button type="button" className={styles.backButton} onClick={() => setCurrentStep(1)}>
                 {t("backToCart")}
