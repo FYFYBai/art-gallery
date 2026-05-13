@@ -17,7 +17,7 @@ const linkLabels = {
     policies: "Refund, Shipping, and Commission",
   },
   fr: {
-    privacy: "Politique de confidentialite",
+    privacy: "Politique de confidentialité",
     terms: "Conditions d'utilisation",
     policies: "Remboursement, livraison et commissions",
   },

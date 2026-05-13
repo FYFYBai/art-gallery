@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "../../../i18n/IntlContext";
+import { useLocale, useTranslations } from "../../../i18n/IntlContext";
 import styles from "./CuratorFavoritesSection.module.css";
 
 const DESKTOP_ITEMS_PER_VIEW = 5;
@@ -17,6 +18,7 @@ const curatorItems = [
     titleKey: "curatorFavorite1Title",
     descriptionKey: "curatorFavorite1Description",
     image: "/images/curator-favorites/1.jpg",
+    artworkSlug: "vieux-port-de-montreal-hiver",
   },
   {
     id: "paysage-ouvert",
@@ -24,12 +26,14 @@ const curatorItems = [
     descriptionKey: "curatorFavorite2Description",
     image: "/images/curator-favorites/2.jpg",
     imagePosition: "center 3%",
+    artworkSlug: "montreal-automne-reflet",
   },
   {
     id: "interiorite",
     titleKey: "curatorFavorite3Title",
     descriptionKey: "curatorFavorite3Description",
     image: "/images/curator-favorites/3.jpg",
+    artworkSlug: "fragment-interieur-metamorphose",
   },
   {
     id: "lumiere-vibrante",
@@ -37,18 +41,21 @@ const curatorItems = [
     descriptionKey: "curatorFavorite4Description",
     image: "/images/curator-favorites/4.jpg",
     imagePosition: "center 12%",
+    artworkSlug: "montreal-automne",
   },
   {
     id: "silence-nocturne",
     titleKey: "curatorFavorite5Title",
     descriptionKey: "curatorFavorite5Description",
     image: "/images/curator-favorites/5.png",
+    artworkSlug: "montreal-la-nuit-eclats-de-lumiere",
   },
   {
     id: "lumiere-apaisante",
     titleKey: "curatorFavorite6Title",
     descriptionKey: "curatorFavorite6Description",
     image: "/images/curator-favorites/6.png",
+    artworkSlug: "voile-au-crepuscule-lumiere-en-derive",
   },
 ];
 
@@ -110,6 +117,7 @@ function getPageOffsets(itemCount, itemsPerView) {
 
 export default function CuratorFavoritesSection() {
   const t = useTranslations("home");
+  const locale = useLocale();
   const [pageIndex, setPageIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(DESKTOP_ITEMS_PER_VIEW);
   const [slideDistance, setSlideDistance] = useState(0);
@@ -253,7 +261,11 @@ export default function CuratorFavoritesSection() {
           >
             {curatorItems.map((item) => (
               <article key={item.id} className={styles.card} data-curator-card>
-                <a href="#" className={styles.imageLink}>
+                <Link
+                  href={`/${locale}/artworks/${item.artworkSlug}`}
+                  className={styles.imageLink}
+                  aria-label={t(item.titleKey)}
+                >
                   <div className={styles.imageWrap}>
                     <img
                       src={item.image}
@@ -266,11 +278,14 @@ export default function CuratorFavoritesSection() {
                       }
                     />
                   </div>
-                </a>
+                </Link>
 
-                <a href="#" className={styles.cardTitleLink}>
+                <Link
+                  href={`/${locale}/artworks/${item.artworkSlug}`}
+                  className={styles.cardTitleLink}
+                >
                   {t(item.titleKey)}
-                </a>
+                </Link>
                 <p className={styles.cardDescription}>
                   {t(item.descriptionKey)}
                 </p>

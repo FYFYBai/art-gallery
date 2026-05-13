@@ -12,11 +12,13 @@ const API_BASE_URL =
 
 const ARTWORK_TYPE_SLUGS = ["oil-paintings", "watercolors", "drawings", "charcoal"];
 const SERIES_SLUGS = ["impressionism", "abstraction", "landscapes", "portraits"];
+const ITEMS_PER_PAGE = 15;
 const DEFAULT_FILTERS = {
   selectedTypes: [],
   selectedSeries: [],
   priceRange: [0, 5000],
   selectedYears: [],
+  hideSold: false,
 };
 
 function filtersFromType(type) {
@@ -38,13 +40,16 @@ function imageSrc(imageUrl) {
   return imageUrl;
 }
 
-function buildArtworkQuery(filters) {
+function buildArtworkQuery(filters, page) {
   const params = new URLSearchParams();
   filters.selectedTypes.forEach((type) => params.append("artworkTypes", type));
   filters.selectedSeries.forEach((series) => params.append("series", series));
   filters.selectedYears.forEach((year) => params.append("years", String(year)));
   params.set("minPrice", String(filters.priceRange[0]));
   params.set("maxPrice", String(filters.priceRange[1]));
+  params.set("hideSold", String(filters.hideSold));
+  params.set("page", String(page));
+  params.set("size", String(ITEMS_PER_PAGE));
   return params.toString();
 }
 
@@ -56,8 +61,11 @@ export default function ArtworkGrid({ type }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(() => filtersFromType(type));
   const [artworks, setArtworks] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -67,7 +75,7 @@ export default function ArtworkGrid({ type }) {
       setError("");
 
       try {
-        const query = buildArtworkQuery(activeFilters);
+        const query = buildArtworkQuery(activeFilters, currentPage);
         const response = await fetch(`${API_BASE_URL}/api/artworks?${query}`, {
           signal: controller.signal,
         });
@@ -76,11 +84,16 @@ export default function ArtworkGrid({ type }) {
           throw new Error("Could not load artworks");
         }
 
-        setArtworks(await response.json());
+        const payload = await response.json();
+        setArtworks(payload.items ?? []);
+        setTotalItems(payload.totalItems ?? 0);
+        setTotalPages(Math.max(1, payload.totalPages ?? 1));
       } catch (loadError) {
         if (loadError.name !== "AbortError") {
           setError("loadFailed");
           setArtworks([]);
+          setTotalItems(0);
+          setTotalPages(1);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -91,7 +104,14 @@ export default function ArtworkGrid({ type }) {
 
     loadArtworks();
     return () => controller.abort();
-  }, [activeFilters]);
+  }, [activeFilters, currentPage]);
+
+  const displayPage = Math.min(currentPage, totalPages);
+
+  const handleApplyFilters = (filters) => {
+    setCurrentPage(1);
+    setActiveFilters(filters);
+  };
 
   const heading = useMemo(() => {
     if (!type) return t("allArtworks");
@@ -112,9 +132,9 @@ export default function ArtworkGrid({ type }) {
           <div className={styles.headerLeft}>
             <h1 className={styles.heading}>{heading}</h1>
             <p className={styles.count}>
-              {artworks.length === 1
-                ? t("artworkCount").replace("{count}", artworks.length)
-                : t("artworkCountPlural").replace("{count}", artworks.length)}
+              {totalItems === 1
+                ? t("artworkCount").replace("{count}", totalItems)
+                : t("artworkCountPlural").replace("{count}", totalItems)}
             </p>
           </div>
           <button type="button" className={styles.filterButton} onClick={() => setFilterOpen(true)}>
@@ -139,39 +159,75 @@ export default function ArtworkGrid({ type }) {
         ) : artworks.length === 0 ? (
           <p className={styles.empty}>{t("noArtworks")}</p>
         ) : (
-          <ul className={styles.grid}>
-            {artworks.map((artwork) => (
-              <li key={artwork.id} className={styles.card}>
-                <Link href={`/${locale}/artworks/${artwork.slug}`} className={styles.cardLink}>
-                  <div className={styles.imageWrap}>
-                    {artwork.imageUrl ? (
-                      <img
-                        src={imageSrc(artwork.imageUrl)}
-                        alt={artwork.title}
-                        className={styles.image}
-                      />
-                    ) : (
-                      <div className={styles.imagePlaceholder} aria-hidden="true" />
-                    )}
-                  </div>
+          <>
+            <ul className={styles.grid}>
+              {artworks.map((artwork) => (
+                <li key={artwork.id} className={styles.card}>
+                  <Link href={`/${locale}/artworks/${artwork.slug}`} className={styles.cardLink}>
+                    <div className={styles.imageWrap}>
+                      {artwork.imageUrl ? (
+                        <img
+                          src={imageSrc(artwork.imageUrl)}
+                          alt={artwork.title}
+                          className={styles.image}
+                        />
+                      ) : (
+                        <div className={styles.imagePlaceholder} aria-hidden="true" />
+                      )}
+                    </div>
 
-                  <div className={styles.info}>
-                    <p className={styles.title}>{artwork.title}</p>
-                    <p className={`${styles.status} ${artwork.soldOut ? styles.soldStatus : ""}`}>
-                      {artwork.soldOut ? t("sold") : t("available")}
-                    </p>
-                    <p className={styles.price}>
-                      {Number(artwork.price || 0).toLocaleString("en-CA", {
-                        style: "currency",
-                        currency: artwork.currency || "CAD",
-                      })}
-                    </p>
-                  </div>
-                </Link>
-                <AddToCartButton artworkId={artwork.id} soldOut={artwork.soldOut} />
-              </li>
-            ))}
-          </ul>
+                    <div className={styles.info}>
+                      <p className={styles.title}>{artwork.title}</p>
+                      <p className={`${styles.status} ${artwork.soldOut ? styles.soldStatus : ""}`}>
+                        {artwork.soldOut ? t("sold") : t("available")}
+                      </p>
+                      <p className={styles.price}>
+                        {Number(artwork.price || 0).toLocaleString("en-CA", {
+                          style: "currency",
+                          currency: artwork.currency || "CAD",
+                        })}
+                      </p>
+                    </div>
+                  </Link>
+                  <AddToCartButton artworkId={artwork.id} soldOut={artwork.soldOut} />
+                </li>
+              ))}
+            </ul>
+
+            {totalPages > 1 && (
+              <nav className={styles.pagination} aria-label={t("paginationLabel")}>
+                <button
+                  type="button"
+                  className={styles.pageButton}
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={displayPage === 1}
+                >
+                  {t("previousPage")}
+                </button>
+                <div className={styles.pageNumbers}>
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={`${styles.pageNumber} ${page === displayPage ? styles.activePage : ""}`}
+                      onClick={() => setCurrentPage(page)}
+                      aria-current={page === displayPage ? "page" : undefined}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className={styles.pageButton}
+                  onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                  disabled={displayPage === totalPages}
+                >
+                  {t("nextPage")}
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </section>
 
@@ -180,7 +236,7 @@ export default function ArtworkGrid({ type }) {
         isOpen={filterOpen}
         filters={activeFilters}
         onClose={() => setFilterOpen(false)}
-        onApply={setActiveFilters}
+        onApply={handleApplyFilters}
       />
     </>
   );

@@ -1,5 +1,6 @@
 package com.artgallery.controller;
 
+import com.artgallery.dto.response.ArtworkPageResponse;
 import com.artgallery.dto.response.ArtworkResponse;
 import com.artgallery.service.ArtworkService;
 import java.math.BigDecimal;
@@ -21,14 +22,17 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public List<ArtworkResponse> artworks(
+    public ArtworkPageResponse artworks(
             @RequestParam(required = false) List<String> artworkTypes,
             @RequestParam(required = false) List<String> series,
             @RequestParam(required = false) List<Short> years,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "false") boolean hideSold,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "15") int size
     ) {
-        return artworkService.listArtworks(artworkTypes, series, years, minPrice, maxPrice);
+        return artworkService.listArtworks(artworkTypes, series, years, minPrice, maxPrice, hideSold, page, size);
     }
 
     @GetMapping("/{slug}")

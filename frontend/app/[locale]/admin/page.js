@@ -182,6 +182,15 @@ export default function AdminPage() {
       throw new Error("Not authorised");
     }
 
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      const message =
+        errorBody?.errors?.[0] ||
+        errorBody?.message ||
+        `Request failed with status ${response.status}`;
+      throw new Error(message);
+    }
+
     return response;
   };
 
@@ -382,10 +391,16 @@ export default function AdminPage() {
     const trackingLink = window.prompt(t("trackingLinkPrompt"));
     if (!trackingLink) return;
 
+    const normalizedTrackingLink = trackingLink.trim();
+    if (!/^https?:\/\/.+/.test(normalizedTrackingLink)) {
+      setNotice(t("trackingLinkInvalid"));
+      return;
+    }
+
     try {
       await apiFetch(`/api/admin/orders/${order.id}/ship`, {
         method: "PATCH",
-        body: JSON.stringify({ trackingLink }),
+        body: JSON.stringify({ trackingLink: normalizedTrackingLink }),
       });
       setNotice(t("orderShipped"));
       await refreshOrderData();

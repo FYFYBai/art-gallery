@@ -140,7 +140,10 @@
     "loading": "Loading artworks...",
     "loadFailed": "Could not load artworks. Please try again later.",
     "available": "Available",
-    "sold": "Sold"
+    "sold": "Sold",
+    "paginationLabel": "Artwork pagination",
+    "previousPage": "Previous",
+    "nextPage": "Next"
   },
   "filterPanel": {
     "title": "Filters",
@@ -154,7 +157,8 @@
     "series": "Series",
     "minPrice": "Min",
     "maxPrice": "Max",
-    "close": "Close filters"
+    "close": "Close filters",
+    "hideSoldArtworks": "Hide sold artworks"
   },
   "mediums": {
     "canvas": "Canvas",
@@ -525,6 +529,7 @@
     "markShipped": "Mark shipped",
     "markDelivered": "Mark delivered",
     "trackingLinkPrompt": "Paste the tracking link for this order. The customer will receive it by email.",
+    "trackingLinkInvalid": "Tracking link must start with http:// or https://.",
     "orderShipped": "Order marked as shipped. Tracking email sent to the customer.",
     "orderShipFailed": "Could not mark this order as shipped. Check the tracking link and try again.",
     "orderDelivered": "Order marked as delivered.",

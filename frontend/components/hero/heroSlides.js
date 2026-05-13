@@ -21,7 +21,7 @@ const heroSlides = [
     eyebrowKey: "slideEyebrow",
     titleKey: "slide3Title",
     linkTextKey: "slideWorksCta",
-    linkHref: "#",
+    linkHref: "/artworks",
   },
 ];
 

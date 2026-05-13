@@ -8,7 +8,7 @@ Codex-only handoff. Keep compact. Do not treat this as user-facing documentation
 - User usually works directly on `main`.
 - Secrets are ignored in `.env`, `backend/.env`, and `frontend/.env.local`. Do not commit API keys.
 - `frontend/proxy.js` replaces deprecated Next middleware and keeps locale redirects/cookies.
-- Keep visible text based on French first, then translate to English and Chinese. Message key parity was verified after the refund rejection/profile cleanup.
+- Keep visible text based on French first, then translate to English and Chinese. Message key parity was verified after the refund rejection/profile cleanup and after the French/Chinese encoding repair.
 
 ## Verification
 
@@ -106,9 +106,12 @@ frontend/app/[locale]/refund-shipping-commission/page.js
 - Backend admin controller is protected by `@PreAuthorize("hasRole('ADMIN')")`.
 - Frontend admin also checks local role and confirms against backend dashboard endpoint.
 - Admin functions: account lookup, ban, dev-only delete, order search, delivery queue, shipped orders, refund requests, product CRUD/upload, dashboard metrics.
+- Admin frontend API routes were checked against `AdminController` after the mark-shipped fix. Current admin paths in use match backend mappings.
+- Admin API helper now throws on non-OK responses; this prevents false success notices when backend validation rejects an action.
+- Mark shipped requires a tracking URL beginning with `http://` or `https://`; frontend validates before calling backend, and backend validation is covered by `AdminShipOrderRequestValidationTest`.
 - `ADMIN_DEV_ACCOUNT_DELETE_ENABLED` currently defaults to `true` for local registration testing. Before production, set it to `false` in production env/config and verify the admin delete-account button cannot remove accounts.
 - Admin sample fallback records were removed. API failures show an error notice instead.
-- Admin notifications use fixed top toasts.
+- Admin notifications use fixed top pill toasts styled like login success.
 - Product upload stores files under `/uploads/products/...`.
 
 ## Email

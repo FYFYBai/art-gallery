@@ -30,6 +30,7 @@ export default function FilterPanel({ isOpen, filters, onClose, onApply }) {
   const [minPrice, setMinPrice] = useState(filters?.priceRange?.[0] ?? MIN_PRICE);
   const [maxPrice, setMaxPrice] = useState(filters?.priceRange?.[1] ?? MAX_PRICE);
   const [selectedYears, setSelectedYears] = useState(filters?.selectedYears ?? []);
+  const [hideSold, setHideSold] = useState(filters?.hideSold ?? false);
 
   const toggleItem = (setList, value) => {
     setList((prev) =>
@@ -53,6 +54,7 @@ export default function FilterPanel({ isOpen, filters, onClose, onApply }) {
     setMinPrice(MIN_PRICE);
     setMaxPrice(MAX_PRICE);
     setSelectedYears([]);
+    setHideSold(false);
   };
 
   const handleApply = () => {
@@ -61,6 +63,7 @@ export default function FilterPanel({ isOpen, filters, onClose, onApply }) {
       selectedSeries,
       priceRange: [minPrice, maxPrice],
       selectedYears,
+      hideSold,
     });
     onClose();
   };
@@ -90,6 +93,18 @@ export default function FilterPanel({ isOpen, filters, onClose, onApply }) {
         </div>
 
         <div className={styles.panelBody}>
+          <section className={styles.filterSection}>
+            <label className={styles.checkLabel}>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={hideSold}
+                onChange={(event) => setHideSold(event.target.checked)}
+              />
+              {t("hideSoldArtworks")}
+            </label>
+          </section>
+
           <section className={styles.filterSection}>
             <h3 className={styles.sectionTitle}>{t("artworkType")}</h3>
             <ul className={styles.checkList}>

@@ -1,11 +1,15 @@
 package com.artgallery.service;
 
 import com.artgallery.domain.artwork.Artwork;
+import com.artgallery.dto.response.ArtworkPageResponse;
 import com.artgallery.dto.response.ArtworkResponse;
 import com.artgallery.repository.ArtworkRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +23,15 @@ public class ArtworkService {
     }
 
     @Transactional(readOnly = true)
-    public List<ArtworkResponse> listArtworks(
+    public ArtworkPageResponse listArtworks(
             List<String> artworkTypes,
             List<String> series,
             List<Short> years,
             BigDecimal minPrice,
-            BigDecimal maxPrice
+            BigDecimal maxPrice,
+            boolean hideSold,
+            int page,
+            int size
     ) {
         List<String> normalizedTypes = normalizeList(artworkTypes);
         List<String> normalizedSeries = normalizeList(series);
@@ -33,17 +40,38 @@ public class ArtworkService {
                 .toList();
         BigDecimal min = minPrice == null ? BigDecimal.ZERO : minPrice;
         BigDecimal max = maxPrice == null ? new BigDecimal("5000") : maxPrice;
+        int safePage = Math.max(1, page);
+        int safeSize = Math.min(Math.max(1, size), 60);
+        PageRequest pageRequest = PageRequest.of(
+                safePage - 1,
+                safeSize,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
 
-        return artworkRepository.findByActiveTrueOrderByCreatedAtDesc()
-                .stream()
-                .filter(artwork -> normalizedTypes.isEmpty() || normalizedTypes.contains(artwork.getArtworkType()))
-                .filter(artwork -> normalizedSeries.isEmpty() || artwork.getSeries().stream().anyMatch(normalizedSeries::contains))
-                .filter(artwork -> normalizedYears.isEmpty() || normalizedYears.contains(artwork.getArtworkYear()))
-                .filter(artwork -> artwork.getPrice() != null
-                        && artwork.getPrice().compareTo(min) >= 0
-                        && artwork.getPrice().compareTo(max) <= 0)
+        Page<Artwork> artworkPage = artworkRepository.searchPublicArtworks(
+                normalizedTypes.isEmpty() ? List.of("__no_artwork_type__") : normalizedTypes,
+                !normalizedTypes.isEmpty(),
+                normalizedSeries.isEmpty() ? List.of("__no_series__") : normalizedSeries,
+                !normalizedSeries.isEmpty(),
+                normalizedYears.isEmpty() ? List.of((short) -1) : normalizedYears,
+                !normalizedYears.isEmpty(),
+                min,
+                max,
+                hideSold,
+                pageRequest
+        );
+
+        List<ArtworkResponse> items = artworkPage.getContent().stream()
                 .map(ArtworkResponse::from)
                 .toList();
+
+        return new ArtworkPageResponse(
+                items,
+                artworkPage.getNumber() + 1,
+                artworkPage.getSize(),
+                artworkPage.getTotalElements(),
+                artworkPage.getTotalPages()
+        );
     }
 
     @Transactional(readOnly = true)

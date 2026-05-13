@@ -182,15 +182,15 @@ const french = {
     eyebrow: "Confidentialité",
     title: "Politique de confidentialité",
     updated: "Dernière mise à jour : mai 2026",
-    intro: `${brandName} respecte votre vie privée et s’engage à protéger vos renseignements personnels conformément aux lois applicables, dont la LPRPDE et, le cas échéant, le RGPD.`,
+    intro: `${brandName} respecte votre vie privée et s'engage à protéger vos renseignements personnels conformément aux lois applicables, dont la LPRPDE et, le cas échéant, le RGPD.`,
     sections: [
       {
         title: "Renseignements recueillis",
         body: [
-          "Nous pouvons recueillir des renseignements de compte, comme le nom, l’adresse email, le mot de passe chiffré, l’état de vérification et l’activité de connexion.",
-          "Nous pouvons recueillir des renseignements de contact et de commande, comme l’adresse de livraison, l’historique des commandes, les détails de demandes de remboursement et les communications liées aux commandes.",
+          "Nous pouvons recueillir des renseignements de compte, comme le nom, l'adresse email, le mot de passe chiffré, l'état de vérification et l'activité de connexion.",
+          "Nous pouvons recueillir des renseignements de contact et de commande, comme l'adresse de livraison, l'historique des commandes, les détails de demandes de remboursement et les communications liées aux commandes.",
           "Les paiements sont traités par Stripe Checkout. Nous ne stockons pas les détails complets des cartes bancaires.",
-          "Nous pouvons recueillir des données techniques et d’utilisation, comme l’adresse IP, le type de navigateur, l’appareil, les pages consultées et les interactions.",
+          "Nous pouvons recueillir des données techniques et d'utilisation, comme l'adresse IP, le type de navigateur, l'appareil, les pages consultées et les interactions.",
         ],
       },
       {
@@ -203,21 +203,21 @@ const french = {
         title: "Paiements",
         body: [
           "Les paiements sont traités par Stripe. Stripe traite les détails de paiement selon ses propres pratiques de confidentialité et de sécurité.",
-          "Nous conservons des références Stripe limitées, comme les identifiants de session de paiement, d’intention de paiement et de remboursement, afin de rapprocher commandes et remboursements.",
+          "Nous conservons des références Stripe limitées, comme les identifiants de session de paiement, d'intention de paiement et de remboursement, afin de rapprocher commandes et remboursements.",
         ],
       },
       {
         title: "Partage des renseignements",
         body: [
           "Nous ne vendons, louons ni échangeons les données personnelles.",
-          "Nous pouvons partager des renseignements avec des tiers de confiance seulement lorsque nécessaire, notamment les processeurs de paiement, fournisseurs d’email, transporteurs, hébergeurs et fournisseurs d’infrastructure.",
+          "Nous pouvons partager des renseignements avec des tiers de confiance seulement lorsque nécessaire, notamment les processeurs de paiement, fournisseurs d'email, transporteurs, hébergeurs et fournisseurs d'infrastructure.",
         ],
       },
       {
         title: "Cookies et statistiques",
         body: [
-          "Nous utilisons des cookies et technologies similaires pour maintenir les sessions de connexion, améliorer l’expérience utilisateur et analyser la performance du site.",
-          "Les vues de pages sont conservées sous forme agrégée afin d’éviter la collecte inutile de données brutes de suivi.",
+          "Nous utilisons des cookies et technologies similaires pour maintenir les sessions de connexion, améliorer l'expérience utilisateur et analyser la performance du site.",
+          "Les vues de pages sont conservées sous forme agrégée afin d'éviter la collecte inutile de données brutes de suivi.",
         ],
       },
       {
@@ -230,7 +230,7 @@ const french = {
       {
         title: "Vos droits et contact",
         body: [
-          "Selon votre lieu de résidence, vous pouvez avoir le droit d’accéder à vos données, de les corriger, de les supprimer ou de retirer votre consentement.",
+          "Selon votre lieu de résidence, vous pouvez avoir le droit d'accéder à vos données, de les corriger, de les supprimer ou de retirer votre consentement.",
           contact.fr,
         ],
       },
@@ -238,21 +238,21 @@ const french = {
   },
   terms: {
     eyebrow: "Conditions",
-    title: "Conditions d’utilisation",
+    title: "Conditions d'utilisation",
     updated: "Dernière mise à jour : mai 2026",
-    intro: `En consultant ou en achetant sur ${brandName}, vous acceptez ces conditions d’utilisation.`,
+    intro: `En consultant ou en achetant sur ${brandName}, vous acceptez ces conditions d'utilisation.`,
     sections: [
       {
         title: "Aperçu",
         body: [
-          `Ce site est exploité par ${brandName}. Ces conditions s’appliquent aux visiteurs, clients et titulaires de compte.`,
+          `Ce site est exploité par ${brandName}. Ces conditions s'appliquent aux visiteurs, clients et titulaires de compte.`,
         ],
       },
       {
         title: "Produits et œuvres",
         body: [
-          "Les œuvres vendues sur ce site sont des pièces originales ou limitées créées par l’artiste et offertes selon disponibilité.",
-          "Les couleurs peuvent varier légèrement selon les réglages d’écran. Chaque œuvre est unique et peut présenter des variations naturelles.",
+          "Les œuvres vendues sur ce site sont des pièces originales ou limitées créées par l'artiste et offertes selon disponibilité.",
+          "Les couleurs peuvent varier légèrement selon les réglages d'écran. Chaque œuvre est unique et peut présenter des variations naturelles.",
         ],
       },
       {
@@ -260,43 +260,43 @@ const french = {
         body: [
           "Les paiements sont acceptés par Stripe Checkout.",
           "Les commandes sont confirmées seulement après confirmation du paiement.",
-          "Nous nous réservons le droit de refuser ou d’annuler une commande en cas de fraude, d’erreur ou de problème de disponibilité.",
+          "Nous nous réservons le droit de refuser ou d'annuler une commande en cas de fraude, d'erreur ou de problème de disponibilité.",
         ],
       },
       {
         title: "Comptes",
         body: [
-          "En créant un compte, vous acceptez de fournir des renseignements exacts, de protéger vos identifiants et d’être responsable de l’activité liée à votre compte.",
-          "Nous nous réservons le droit de suspendre un compte en cas d’utilisation abusive.",
+          "En créant un compte, vous acceptez de fournir des renseignements exacts, de protéger vos identifiants et d'être responsable de l'activité liée à votre compte.",
+          "Nous nous réservons le droit de suspendre un compte en cas d'utilisation abusive.",
         ],
       },
       {
         title: "Livraison",
         body: [
-          "Les commandes sont expédiées à l’adresse fournie au paiement. Les délais varient selon la destination.",
-          "Le client est responsable de fournir des renseignements de livraison exacts. Nous ne sommes pas responsables des retards de transporteur ni des colis perdus en raison d’une adresse incorrecte.",
+          "Les commandes sont expédiées à l'adresse fournie au paiement. Les délais varient selon la destination.",
+          "Le client est responsable de fournir des renseignements de livraison exacts. Nous ne sommes pas responsables des retards de transporteur ni des colis perdus en raison d'une adresse incorrecte.",
         ],
       },
       {
         title: "Retours et remboursements",
         body: [
-          "En raison de la nature des œuvres originales, toutes les ventes sont finales, sauf si l’œuvre arrive endommagée ou si nous approuvons une demande de remboursement à notre discrétion.",
-          "Si une œuvre arrive endommagée, contactez-nous dans les 48 heures avec des photos de l’œuvre et de l’emballage.",
-          "Les demandes de remboursement soumises depuis le compte sont examinées manuellement. L’approbation n’est pas automatique.",
+          "En raison de la nature des œuvres originales, toutes les ventes sont finales, sauf si l'œuvre arrive endommagée ou si nous approuvons une demande de remboursement à notre discrétion.",
+          "Si une œuvre arrive endommagée, contactez-nous dans les 48 heures avec des photos de l'œuvre et de l'emballage.",
+          "Les demandes de remboursement soumises depuis le compte sont examinées manuellement. L'approbation n'est pas automatique.",
         ],
       },
       {
         title: "Propriété intellectuelle",
         body: [
-          "Toutes les œuvres, images et contenus du site demeurent la propriété intellectuelle de l’artiste ou du titulaire des droits.",
-          "L’achat d’une œuvre n’accorde aucun droit de reproduction, d’usage commercial, de distribution, de création de NFT, de modification ou d’œuvre dérivée, sauf accord écrit.",
+          "Toutes les œuvres, images et contenus du site demeurent la propriété intellectuelle de l'artiste ou du titulaire des droits.",
+          "L'achat d'une œuvre n'accorde aucun droit de reproduction, d'usage commercial, de distribution, de création de NFT, de modification ou d'œuvre dérivée, sauf accord écrit.",
         ],
       },
       {
         title: "Droit applicable et contact",
         body: [
           "Ces conditions sont régies par les lois du Canada et les lois applicables du Québec.",
-          "Nous pouvons mettre ces conditions à jour à tout moment. Les changements prennent effet lorsqu’ils sont publiés.",
+          "Nous pouvons mettre ces conditions à jour à tout moment. Les changements prennent effet lorsqu'ils sont publiés.",
           contact.fr,
         ],
       },
@@ -312,11 +312,11 @@ const french = {
         title: "Politique de remboursement",
         body: [
           "Chaque œuvre est créée et manipulée avec soin.",
-          "En raison de la nature des œuvres originales, toutes les ventes sont finales. Les retours ou échanges ne sont pas acceptés, sauf si l’article arrive endommagé ou si une demande de remboursement est approuvée à notre discrétion.",
-          "Si une œuvre arrive endommagée, contactez-nous dans les 48 heures suivant la livraison et fournissez des photos de l’œuvre et de l’emballage.",
+          "En raison de la nature des œuvres originales, toutes les ventes sont finales. Les retours ou échanges ne sont pas acceptés, sauf si l'article arrive endommagé ou si une demande de remboursement est approuvée à notre discrétion.",
+          "Si une œuvre arrive endommagée, contactez-nous dans les 48 heures suivant la livraison et fournissez des photos de l'œuvre et de l'emballage.",
           "Après examen, nous pouvons offrir un remplacement si possible, un remboursement partiel ou un remboursement complet.",
           "Les œuvres originales, pièces en édition limitée et commandes personnalisées ne sont pas retournables, sauf accord écrit.",
-          "Les légères variations de couleur causées par les écrans ne sont pas considérées comme des défauts. L’acheteur est responsable de fournir la bonne adresse de livraison.",
+          "Les légères variations de couleur causées par les écrans ne sont pas considérées comme des défauts. L'acheteur est responsable de fournir la bonne adresse de livraison.",
         ],
       },
       {
@@ -324,10 +324,10 @@ const french = {
         body: [
           "Les commandes sont expédiées depuis le Canada.",
           "Les commandes sont habituellement traitées dans les 3 à 7 jours ouvrables suivant la confirmation du paiement.",
-          "Le délai estimé est de 2 à 7 jours au Canada, 5 à 10 jours aux États-Unis et 7 à 21 jours à l’international. Ces estimations ne sont pas garanties.",
+          "Le délai estimé est de 2 à 7 jours au Canada, 5 à 10 jours aux États-Unis et 7 à 21 jours à l'international. Ces estimations ne sont pas garanties.",
           "Les frais de livraison ne sont pas encore finalisés et doivent être confirmés avant la mise en production du paiement.",
           "Les informations de suivi seront fournies lorsque la commande sera expédiée.",
-          "Les clients internationaux sont responsables des taxes d’importation et droits de douane.",
+          "Les clients internationaux sont responsables des taxes d'importation et droits de douane.",
           "Nous ne sommes pas responsables des retards de transporteur, des retards douaniers ni des colis perdus après expédition.",
         ],
       },
@@ -335,13 +335,13 @@ const french = {
         title: "Conditions de commission",
         body: [
           "Des œuvres personnalisées peuvent être offertes sur demande.",
-          "Le processus habituel comprend la demande, la discussion du concept, l’accord sur le prix, le paiement, la création et la livraison.",
+          "Le processus habituel comprend la demande, la discussion du concept, l'accord sur le prix, le paiement, la création et la livraison.",
           "Un paiement complet ou un dépôt peut être exigé avant le début du travail.",
-          "Des révisions limitées peuvent être offertes à l’étape de croquis. Des changements majeurs après achèvement peuvent entraîner des frais supplémentaires.",
+          "Des révisions limitées peuvent être offertes à l'étape de croquis. Des changements majeurs après achèvement peuvent entraîner des frais supplémentaires.",
           "Le calendrier dépend de la complexité du projet et sera estimé avant le début du travail.",
           "Les œuvres commandées sont non remboursables et non retournables, sauf accord écrit.",
-          "L’artiste conserve le contrôle créatif tout en respectant la direction convenue.",
-          "L’artiste conserve les droits d’auteur de l’œuvre commandée, sauf accord écrit contraire.",
+          "L'artiste conserve le contrôle créatif tout en respectant la direction convenue.",
+          "L'artiste conserve les droits d'auteur de l'œuvre commandée, sauf accord écrit contraire.",
         ],
       },
     ],

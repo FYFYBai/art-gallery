@@ -46,11 +46,11 @@
 }
 
 .content {
-  max-width: 1180px;
+  max-width: 1320px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(180px, 250px) minmax(0, 1fr);
-  gap: 42px;
+  grid-template-columns: minmax(190px, 1fr) minmax(0, 760px) minmax(190px, 1fr);
+  gap: 32px;
   align-items: start;
 }
 
@@ -85,6 +85,7 @@
 }
 
 .document {
+  grid-column: 2;
   padding: 42px;
   border: 1px solid rgba(216, 203, 184, 0.76);
   border-radius: 8px;
@@ -101,8 +102,8 @@
 .section h2 {
   margin: 0 0 14px;
   font-family: var(--font-display), var(--font-title), serif;
-  font-size: clamp(1.45rem, 2vw, 2.1rem);
-  line-height: 1.18;
+  font-size: clamp(1.18rem, 1.35vw, 1.48rem);
+  line-height: 1.24;
   font-weight: 400;
   color: #211d19;
 }
@@ -136,6 +137,7 @@
   }
 
   .document {
+    grid-column: auto;
     padding: 30px 24px;
   }
 }

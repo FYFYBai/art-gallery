@@ -97,12 +97,19 @@
   position: fixed;
   top: 18px;
   left: 50%;
-  z-index: 1200;
-  width: min(calc(100vw - 32px), 460px);
+  z-index: 2600;
+  min-width: min(340px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
   padding: 12px 18px;
-  color: var(--text-main);
+  border-color: rgba(75, 125, 92, 0.34);
+  border-radius: 999px;
+  background: rgba(245, 250, 246, 0.96);
+  color: #315c3e;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.35;
   text-align: center;
-  box-shadow: 0 16px 44px rgba(53, 43, 31, 0.16);
+  box-shadow: 0 14px 34px rgba(78, 67, 56, 0.16);
   pointer-events: none;
   transform: translateX(-50%);
   animation: adminNoticeIn 0.24s ease both;
@@ -757,6 +764,12 @@
 @media (max-width: 680px) {
   .adminPage {
     padding: 46px 16px 72px;
+  }
+
+  .notice {
+    top: 12px;
+    padding: 11px 14px;
+    font-size: 0.86rem;
   }
 
   .metricGrid,
