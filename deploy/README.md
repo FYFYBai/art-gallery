@@ -1,64 +1,158 @@
 # VPS Deployment Notes
 
-This repo can run frontend, backend, PostgreSQL, and uploaded product images on one small VPS.
+This project is deployed on one Ubuntu VPS running the frontend, backend, PostgreSQL, uploaded product images, and Caddy HTTPS reverse proxy.
 
-Current development commands are unchanged:
-
-- Database only: `docker compose up -d postgres`
-- Backend: `cd backend && mvn spring-boot:run`
-- Frontend: `cd frontend && npm run dev`
-
-Production-oriented files added here are optional until a domain/VPS is ready:
-
-- `docker-compose.prod.yml` builds and runs PostgreSQL, Spring Boot, and Next.js.
-- `.env.production.example` lists the required production environment variables.
-- `backend/Dockerfile` builds the Spring Boot jar.
-- `frontend/Dockerfile` builds and starts the Next.js app.
-
-Before production, confirm dev-only account deletion is disabled:
+## Current VPS
 
 ```txt
-ADMIN_DEV_ACCOUNT_DELETE_ENABLED=false
+OS: Ubuntu 24.04.4 LTS
+User: deploy
+Firewall: 22/tcp, 80/tcp, 443/tcp
+Runtime: Java 24, Node 24, Maven, PostgreSQL 16, Caddy
+Swap: 3 GiB total
 ```
 
-This is intentionally enabled by default in local development so registration workflows can be retested with the same email. It must stay disabled on the VPS.
-
-Uploads are stored on the VPS filesystem at `./uploads/products` and mounted into the backend container at `/app/uploads/products`. Back this directory up together with the PostgreSQL volume.
-
-A reverse proxy such as Caddy or Nginx still needs to be added after the domain is known. It should terminate HTTPS, route `/api/**` and `/uploads/**` to the backend, and route everything else to the frontend.
-
-## Current VPS Plan
-
-The current target is a single Ubuntu 24.04 VPS:
-
-- App checkout: `/opt/art-gallery/app`
-- Production env files: `/opt/art-gallery/env`
-- Product uploads: `/opt/art-gallery/uploads`
-- App logs: `/var/log/art-gallery`
-
-The backend must receive:
+Important paths:
 
 ```txt
-APP_UPLOAD_DIR=/opt/art-gallery/uploads
-APP_FRONTEND_BASE_URL=https://sylvaineart.ca
-CORS_ALLOWED_ORIGINS=https://sylvaineart.ca,https://www.sylvaineart.ca
-ADMIN_DEV_ACCOUNT_DELETE_ENABLED=false
+/opt/art-gallery/app       cloned Git repo
+/opt/art-gallery/env       backend/frontend/db env files
+/opt/art-gallery/uploads   persistent uploaded product images
+/var/log/art-gallery       app logs
 ```
 
-The frontend must receive:
+Services:
 
 ```txt
-NEXT_PUBLIC_API_BASE_URL=https://sylvaineart.ca
+art-gallery-backend
+art-gallery-frontend
+caddy
+postgresql
 ```
 
-These `NEXT_PUBLIC_*` values must be present during `npm run build` because Next.js inlines them into the client bundle.
-
-Expected public routing:
+## Public Routing
 
 ```txt
-https://sylvaineart.ca          -> frontend on localhost:3000
-https://sylvaineart.ca/api/...  -> backend on localhost:8080
+https://sylvaineart.ca          -> frontend on 127.0.0.1:3000
+https://sylvaineart.ca/api/...  -> backend on 127.0.0.1:8080
 https://sylvaineart.ca/uploads/ -> backend static upload handler
 ```
 
-Before switching Stripe to live mode, deploy with test keys and test registration, email verification, password reset, checkout, webhook payment confirmation, refund approval/rejection, shipping, delivered, and uploaded product images.
+Caddy config template:
+
+```txt
+deploy/Caddyfile.example
+```
+
+Systemd templates:
+
+```txt
+deploy/art-gallery-backend.service.example
+deploy/art-gallery-frontend.service.example
+```
+
+Env templates:
+
+```txt
+deploy/backend.env.example
+deploy/frontend.env.example
+```
+
+Real env files live only on the VPS and should not be committed.
+
+## Required Backend Env
+
+```txt
+DB_URL=jdbc:postgresql://localhost:5432/artgallery
+DB_USERNAME=artgallery
+DB_PASSWORD=...
+JWT_SECRET=...
+CORS_ALLOWED_ORIGINS=https://sylvaineart.ca,https://www.sylvaineart.ca
+APP_FRONTEND_BASE_URL=https://sylvaineart.ca
+APP_UPLOAD_DIR=/opt/art-gallery/uploads
+RESEND_FROM_EMAIL=studio@sylvaineart.ca
+RESEND_API_KEY=...
+STRIPE_SECRET_KEY=...
+STRIPE_WEBHOOK_SECRET=...
+ADMIN_DEV_ACCOUNT_DELETE_ENABLED=false
+```
+
+## Required Frontend Env
+
+```txt
+NEXT_PUBLIC_API_BASE_URL=https://sylvaineart.ca
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=...
+```
+
+`NEXT_PUBLIC_*` values must be present during `npm run build`; setting them only when starting the service is too late.
+
+## Update Workflow
+
+Push changes locally first:
+
+```powershell
+git add .
+git commit -m "Describe change"
+git push origin main
+```
+
+Then on the VPS:
+
+```bash
+cd /opt/art-gallery/app
+git pull --ff-only origin main
+```
+
+Backend rebuild:
+
+```bash
+cd /opt/art-gallery/app/backend
+mvn -B -DskipTests package
+sudo systemctl restart art-gallery-backend
+```
+
+Frontend rebuild:
+
+```bash
+cd /opt/art-gallery/app/frontend
+set -a
+. /opt/art-gallery/env/frontend.env
+set +a
+npm ci
+npm run build
+sudo systemctl restart art-gallery-frontend
+```
+
+Health checks:
+
+```bash
+systemctl is-active art-gallery-backend art-gallery-frontend caddy postgresql
+curl -I https://sylvaineart.ca/en
+curl "https://sylvaineart.ca/api/artworks?page=1&size=1"
+```
+
+## Current Production Data
+
+Initial deployed DB state after Flyway:
+
+```txt
+users: 1 admin user
+artworks: 6 real artworks
+orders/carts/refunds/email_outbox: empty
+```
+
+The seeded product image files are copied to:
+
+```txt
+/opt/art-gallery/uploads/products
+```
+
+## Remaining Production Tasks
+
+- Confirm Cloudflare SSL/TLS mode is Full (strict).
+- Test Resend live-domain emails.
+- Test Stripe test-mode checkout and webhook delivery.
+- Replace the seeded admin credentials with a strong admin account before real use.
+- Add backup automation for PostgreSQL and `/opt/art-gallery/uploads`.
+- Decide shipping fees and Canada/Quebec tax rules before enabling live Stripe payments.
+- Later harden SSH by disabling root login and optionally restricting SSH by source IP.

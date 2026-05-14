@@ -7,6 +7,7 @@ Codex-only handoff. Keep compact. Do not treat this as user-facing documentation
 - Locale-based Next.js frontend (`fr`, `en`, `zh`, default `fr`) plus Spring Boot backend, PostgreSQL, Flyway.
 - User usually works directly on `main`.
 - Secrets are ignored in `.env`, `backend/.env`, and `frontend/.env.local`. Do not commit API keys.
+- Live VPS production deployment exists at `https://sylvaineart.ca`.
 - `frontend/proxy.js` replaces deprecated Next middleware and keeps locale redirects/cookies.
 - Keep visible text based on French first, then translate to English and Chinese. Message key parity was verified after the refund rejection/profile cleanup and after the French/Chinese encoding repair.
 
@@ -151,17 +152,30 @@ Email sending now uses DB outbox table `email_outbox`. Service methods enqueue m
   - `deploy/frontend.env.example`
 - Intended small-site deployment: one VPS running frontend, backend, PostgreSQL, and local uploaded product images.
 - Current VPS: Ubuntu 24.04.4 LTS, non-root `deploy` user, UFW allows 22/80/443, app paths are `/opt/art-gallery/app`, `/opt/art-gallery/uploads`, `/opt/art-gallery/env`, `/var/log/art-gallery`.
+- Installed on VPS: Java 24, Node 24, Maven, PostgreSQL 16, Caddy. Swap was increased to 3 GiB for builds.
+- Production services: `art-gallery-backend`, `art-gallery-frontend`, `caddy`, `postgresql`; all were active after deployment.
+- Live routes verified after deployment:
+  - `https://sylvaineart.ca/en` returns 200.
+  - `https://sylvaineart.ca/api/artworks?page=1&size=1` returns DB artwork data.
+  - `https://sylvaineart.ca/uploads/products/vieux-port-de-montreal-hiver.jpg` returns 200.
+- Live DB currently contains one verified admin user (`admin`, role `ADMIN`) and six real artworks/images/series; no orders, carts, refund requests, or email outbox rows yet.
 - Uploads should be backed by persistent VPS storage at `/opt/art-gallery/uploads`; configure backend with `APP_UPLOAD_DIR=/opt/art-gallery/uploads`.
 - Use Caddy for HTTPS/reverse proxy. Route `/api/**` and `/uploads/**` to backend `127.0.0.1:8080`; route everything else to Next `127.0.0.1:3000`.
 - `NEXT_PUBLIC_*` variables must be present during `npm run build`; setting them only in the runtime systemd service is too late for client-side code.
+- Normal update flow: change locally -> test -> commit/push `main` -> SSH as `deploy` -> `cd /opt/art-gallery/app && git pull --ff-only origin main` -> rebuild/restart backend and/or frontend.
+- Local ignored `.env.production` exists as a deployment values source. Do not commit it.
 - Minimum backup: nightly `pg_dump`, archive/copy uploads, keep at least one backup outside the VPS.
 
 ## Near-Term TODOs
 
-- Before production, disable dev account deletion: set `ADMIN_DEV_ACCOUNT_DELETE_ENABLED=false` and test that admin delete-account requests are rejected.
+- Confirm Cloudflare SSL/TLS is set to Full (strict).
+- Test live Resend flows now that domain DNS is configured: registration verification, password reset, receipt, shipping, delivered, refund approval/rejection.
+- Test live Stripe test-mode checkout and webhook at `https://sylvaineart.ca/api/stripe/webhook`; current deployed Stripe keys are test mode.
+- Create/replace the production admin with a strong admin account before any real usage; do not rely on `admin/admin`.
+- Later harden SSH: disable root login and optionally restrict SSH to the user's IP after deployment is fully validated.
+- Keep `ADMIN_DEV_ACCOUNT_DELETE_ENABLED=false` on VPS and test that admin delete-account requests are rejected.
 - Decide shipping fee and Canada/Quebec tax behavior before live Stripe checkout.
 - Replace `soldOut` reservation semantics with explicit availability state.
 - Verify official Stripe receipts later.
-- Finish production reverse proxy once domain/VPS are available.
 - Replace raw `<img>` with `next/image` or document why local/VPS images stay raw.
 - Implement real OAuth provider verification only if social login is resumed.
