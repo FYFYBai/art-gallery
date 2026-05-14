@@ -112,7 +112,8 @@ frontend/app/[locale]/refund-shipping-commission/page.js
 - `ADMIN_DEV_ACCOUNT_DELETE_ENABLED` currently defaults to `true` for local registration testing. Before production, set it to `false` in production env/config and verify the admin delete-account button cannot remove accounts.
 - Admin sample fallback records were removed. API failures show an error notice instead.
 - Admin notifications use fixed top pill toasts styled like login success.
-- Product upload stores files under `/uploads/products/...`.
+- Product upload returns public URLs under `/uploads/products/...`.
+- Physical upload storage is environment-driven by `APP_UPLOAD_DIR` via `app.upload.dir`; use `/opt/art-gallery/uploads` on the VPS. Do not store uploads inside the repo, `.next`, or `target`.
 
 ## Email
 
@@ -143,9 +144,16 @@ Email sending now uses DB outbox table `email_outbox`. Service methods enqueue m
   - `docker-compose.prod.yml`
   - `.env.production.example`
   - `deploy/README.md`
+  - `deploy/Caddyfile.example`
+  - `deploy/art-gallery-backend.service.example`
+  - `deploy/art-gallery-frontend.service.example`
+  - `deploy/backend.env.example`
+  - `deploy/frontend.env.example`
 - Intended small-site deployment: one VPS running frontend, backend, PostgreSQL, and local uploaded product images.
-- Uploads should be backed by persistent VPS storage such as `/srv/art-gallery/uploads/products`, mounted to backend `/app/uploads/products`.
-- Add Caddy/Nginx after domain is known. Route `/api/**` and `/uploads/**` to backend, frontend routes to Next.
+- Current VPS: Ubuntu 24.04.4 LTS, non-root `deploy` user, UFW allows 22/80/443, app paths are `/opt/art-gallery/app`, `/opt/art-gallery/uploads`, `/opt/art-gallery/env`, `/var/log/art-gallery`.
+- Uploads should be backed by persistent VPS storage at `/opt/art-gallery/uploads`; configure backend with `APP_UPLOAD_DIR=/opt/art-gallery/uploads`.
+- Use Caddy for HTTPS/reverse proxy. Route `/api/**` and `/uploads/**` to backend `127.0.0.1:8080`; route everything else to Next `127.0.0.1:3000`.
+- `NEXT_PUBLIC_*` variables must be present during `npm run build`; setting them only in the runtime systemd service is too late for client-side code.
 - Minimum backup: nightly `pg_dump`, archive/copy uploads, keep at least one backup outside the VPS.
 
 ## Near-Term TODOs

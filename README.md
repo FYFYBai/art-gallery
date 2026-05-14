@@ -84,5 +84,8 @@ For the intended small VPS deployment, use one server for frontend, backend, Pos
 - `docker-compose.prod.yml`
 - `.env.production.example`
 - `deploy/README.md`
+- `deploy/Caddyfile.example`
+- `deploy/*.service.example`
+- `deploy/*.env.example`
 
-A reverse proxy such as Caddy or Nginx should be added after the domain is available.
+For the current VPS plan, use Caddy as the reverse proxy and systemd services for the backend/frontend. `NEXT_PUBLIC_*` frontend values must be present when running `npm run build`, not only when starting the already-built Next.js server.

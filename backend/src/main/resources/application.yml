@@ -78,6 +78,9 @@ app:
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
 
+  upload:
+    dir: ${APP_UPLOAD_DIR:uploads}
+
 server:
   port: 8080
 

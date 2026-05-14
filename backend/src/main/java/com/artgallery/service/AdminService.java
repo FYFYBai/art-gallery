@@ -59,6 +59,7 @@ public class AdminService {
     private final EmailService emailService;
     private final StripePaymentClient stripePaymentClient;
     private final boolean devAccountDeleteEnabled;
+    private final Path uploadRoot;
 
     public AdminService(UserRepository userRepository,
                         OrderRepository orderRepository,
@@ -67,7 +68,8 @@ public class AdminService {
                         RefundRequestRepository refundRequestRepository,
                         EmailService emailService,
                         StripePaymentClient stripePaymentClient,
-                        @Value("${app.admin.dev-account-delete-enabled:false}") boolean devAccountDeleteEnabled) {
+                        @Value("${app.admin.dev-account-delete-enabled:false}") boolean devAccountDeleteEnabled,
+                        @Value("${app.upload.dir}") String uploadDir) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.artworkRepository = artworkRepository;
@@ -76,6 +78,7 @@ public class AdminService {
         this.emailService = emailService;
         this.stripePaymentClient = stripePaymentClient;
         this.devAccountDeleteEnabled = devAccountDeleteEnabled;
+        this.uploadRoot = Path.of(uploadDir).toAbsolutePath().normalize();
     }
 
     @Transactional(readOnly = true)
@@ -377,8 +380,12 @@ public class AdminService {
         }
 
         String fileName = UUID.randomUUID() + extension;
-        Path uploadDir = Path.of("uploads", "products").toAbsolutePath().normalize();
+        Path uploadDir = uploadRoot.resolve("products").normalize();
         Path target = uploadDir.resolve(fileName).normalize();
+
+        if (!target.startsWith(uploadDir)) {
+            throw new IllegalArgumentException("Invalid image path");
+        }
 
         try {
             Files.createDirectories(uploadDir);
