@@ -113,16 +113,19 @@ export default function ArtworkDetailPage() {
       <section className={styles.detail}>
         <div className={styles.imageGallery}>
           {artwork.imageUrl ? (
-            <figure className={styles.imageFrame}>
+            <figure className={`${styles.imageFrame} ${artwork.secondaryImageUrl ? styles.hasSecondaryImage : ""}`}>
               <img src={imageSrc(artwork.imageUrl)} alt={artwork.title} className={styles.image} />
+              {artwork.secondaryImageUrl && (
+                <img
+                  src={imageSrc(artwork.secondaryImageUrl)}
+                  alt=""
+                  aria-hidden="true"
+                  className={`${styles.image} ${styles.hoverImage}`}
+                />
+              )}
             </figure>
           ) : (
             <div className={styles.imagePlaceholder} aria-hidden="true" />
-          )}
-          {artwork.secondaryImageUrl && (
-            <figure className={`${styles.imageFrame} ${styles.secondaryImageFrame}`}>
-              <img src={imageSrc(artwork.secondaryImageUrl)} alt={artwork.title} className={styles.image} />
-            </figure>
           )}
         </div>
 
