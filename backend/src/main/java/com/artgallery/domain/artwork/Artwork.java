@@ -21,6 +21,12 @@ public class Artwork extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "description_en", columnDefinition = "TEXT")
+    private String descriptionEn;
+
+    @Column(name = "description_zh", columnDefinition = "TEXT")
+    private String descriptionZh;
+
     @Column(name = "artwork_type", length = 50)
     private String artworkType;
 
@@ -61,6 +67,10 @@ public class Artwork extends BaseEntity {
     public void setSlug(String slug) { this.slug = slug; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getDescriptionEn() { return descriptionEn; }
+    public void setDescriptionEn(String descriptionEn) { this.descriptionEn = descriptionEn; }
+    public String getDescriptionZh() { return descriptionZh; }
+    public void setDescriptionZh(String descriptionZh) { this.descriptionZh = descriptionZh; }
     public String getArtworkType() { return artworkType; }
     public void setArtworkType(String artworkType) { this.artworkType = artworkType; }
     public List<String> getSeries() { return series; }

@@ -14,14 +14,23 @@ public class AdminArtworkRequest {
     @Size(max = 2048, message = "Image URL is too long")
     private String imageUrl;
 
+    @Size(max = 2048, message = "Second image URL is too long")
+    private String secondaryImageUrl;
+
     @NotBlank(message = "Artwork type is required")
     @Size(max = 50, message = "Artwork type is too long")
     private String artworkType;
 
     private List<@Size(max = 100, message = "Series is too long") String> series = new ArrayList<>();
 
-    @Size(max = 5000, message = "Description is too long")
+    @Size(max = 10000, message = "Description is too long")
     private String description;
+
+    @Size(max = 10000, message = "English description is too long")
+    private String descriptionEn;
+
+    @Size(max = 10000, message = "Chinese description is too long")
+    private String descriptionZh;
 
     @NotBlank(message = "Name is required")
     @Size(max = 255, message = "Name is too long")
@@ -46,6 +55,14 @@ public class AdminArtworkRequest {
         this.imageUrl = imageUrl;
     }
 
+    public String getSecondaryImageUrl() {
+        return secondaryImageUrl;
+    }
+
+    public void setSecondaryImageUrl(String secondaryImageUrl) {
+        this.secondaryImageUrl = secondaryImageUrl;
+    }
+
     public String getArtworkType() {
         return artworkType;
     }
@@ -68,6 +85,22 @@ public class AdminArtworkRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDescriptionEn() {
+        return descriptionEn;
+    }
+
+    public void setDescriptionEn(String descriptionEn) {
+        this.descriptionEn = descriptionEn;
+    }
+
+    public String getDescriptionZh() {
+        return descriptionZh;
+    }
+
+    public void setDescriptionZh(String descriptionZh) {
+        this.descriptionZh = descriptionZh;
     }
 
     public String getName() {

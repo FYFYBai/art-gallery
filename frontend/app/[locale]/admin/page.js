@@ -10,9 +10,12 @@ const API_BASE_URL =
 
 const emptyArtworkForm = {
   imageUrl: "",
+  secondaryImageUrl: "",
   artworkType: "",
   series: [],
   description: "",
+  descriptionEn: "",
+  descriptionZh: "",
   name: "",
   price: "",
   size: "",
@@ -138,7 +141,7 @@ export default function AdminPage() {
   const [artworkForm, setArtworkForm] = useState(emptyArtworkForm);
   const [editingArtworkId, setEditingArtworkId] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadingImageSlot, setUploadingImageSlot] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
   const [accessVerified, setAccessVerified] = useState(false);
@@ -482,9 +485,12 @@ export default function AdminPage() {
     setShowProductForm(true);
     setArtworkForm({
       imageUrl: artwork.imageUrl || "",
+      secondaryImageUrl: artwork.secondaryImageUrl || "",
       artworkType: artwork.artworkType || "",
       series: normalizeSeries(artwork.series),
       description: artwork.description || "",
+      descriptionEn: artwork.descriptionEn || "",
+      descriptionZh: artwork.descriptionZh || "",
       name: artwork.name || "",
       price: artwork.price || "",
       size: artwork.size || "",
@@ -499,13 +505,13 @@ export default function AdminPage() {
     setShowProductForm(true);
   };
 
-  const handleImageUpload = async (event) => {
+  const handleImageUpload = async (slot, event) => {
     const file = event.target.files?.[0];
     if (!file || !auth) return;
 
     const formData = new FormData();
     formData.append("image", file);
-    setIsUploadingImage(true);
+    setUploadingImageSlot(slot);
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/artworks/image`, {
@@ -521,11 +527,11 @@ export default function AdminPage() {
       }
 
       const result = await response.json();
-      setArtworkForm((current) => ({ ...current, imageUrl: result.imageUrl }));
+      setArtworkForm((current) => ({ ...current, [slot]: result.imageUrl }));
     } catch {
       setNotice(t("imageUploadFailed"));
     } finally {
-      setIsUploadingImage(false);
+      setUploadingImageSlot("");
       event.target.value = "";
     }
   };
@@ -898,18 +904,44 @@ export default function AdminPage() {
                   {t("cancel")}
                 </button>
               </div>
-              <div className={styles.uploadField}>
-                <span>{t("image")}</span>
-                {artworkForm.imageUrl ? (
-                  <img src={imageSrc(artworkForm.imageUrl)} alt="" className={styles.uploadPreview} />
-                ) : (
-                  <div className={styles.uploadPreviewPlaceholder}>{t("image")}</div>
-                )}
-                <input id="admin-product-image" type="file" accept="image/*" onChange={handleImageUpload} />
-                <label htmlFor="admin-product-image">
-                  {isUploadingImage ? t("uploadingImage") : t("uploadImage")}
-                </label>
-                {artworkForm.imageUrl && <small>{artworkForm.imageUrl}</small>}
+              <div className={styles.uploadFields}>
+                <div className={styles.uploadField}>
+                  <span>{t("primaryImage")}</span>
+                  {artworkForm.imageUrl ? (
+                    <img src={imageSrc(artworkForm.imageUrl)} alt="" className={styles.uploadPreview} />
+                  ) : (
+                    <div className={styles.uploadPreviewPlaceholder}>{t("primaryImage")}</div>
+                  )}
+                  <input id="admin-product-image-primary" type="file" accept="image/*" onChange={(event) => handleImageUpload("imageUrl", event)} />
+                  <label htmlFor="admin-product-image-primary">
+                    {uploadingImageSlot === "imageUrl" ? t("uploadingImage") : t("uploadImage")}
+                  </label>
+                  {artworkForm.imageUrl && <small>{artworkForm.imageUrl}</small>}
+                </div>
+                <div className={styles.uploadField}>
+                  <span>{t("secondaryImage")}</span>
+                  {artworkForm.secondaryImageUrl ? (
+                    <img src={imageSrc(artworkForm.secondaryImageUrl)} alt="" className={styles.uploadPreview} />
+                  ) : (
+                    <div className={styles.uploadPreviewPlaceholder}>{t("secondaryImageOptional")}</div>
+                  )}
+                  <input id="admin-product-image-secondary" type="file" accept="image/*" onChange={(event) => handleImageUpload("secondaryImageUrl", event)} />
+                  <label htmlFor="admin-product-image-secondary">
+                    {uploadingImageSlot === "secondaryImageUrl" ? t("uploadingImage") : t("uploadImage")}
+                  </label>
+                  {artworkForm.secondaryImageUrl && (
+                    <>
+                      <small>{artworkForm.secondaryImageUrl}</small>
+                      <button
+                        type="button"
+                        className={styles.removeImageButton}
+                        onClick={() => setArtworkForm((current) => ({ ...current, secondaryImageUrl: "" }))}
+                      >
+                        {t("removeSecondImage")}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className={styles.formMainFields}>
@@ -946,9 +978,13 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <label className={styles.descriptionField}>{t("description")}<textarea value={artworkForm.description} onChange={(event) => setArtworkForm((current) => ({ ...current, description: event.target.value }))} /></label>
+              <div className={styles.descriptionGrid}>
+                <label>{t("descriptionFr")}<textarea required value={artworkForm.description} onChange={(event) => setArtworkForm((current) => ({ ...current, description: event.target.value }))} /></label>
+                <label>{t("descriptionEn")}<textarea value={artworkForm.descriptionEn} onChange={(event) => setArtworkForm((current) => ({ ...current, descriptionEn: event.target.value }))} /></label>
+                <label>{t("descriptionZh")}<textarea value={artworkForm.descriptionZh} onChange={(event) => setArtworkForm((current) => ({ ...current, descriptionZh: event.target.value }))} /></label>
+              </div>
               <div className={styles.formActions}>
-                <button type="submit" disabled={!artworkForm.imageUrl || isUploadingImage}>
+                <button type="submit" disabled={!artworkForm.imageUrl || Boolean(uploadingImageSlot)}>
                   {t("submitProduct")}
                 </button>
               </div>
@@ -958,8 +994,11 @@ export default function AdminPage() {
           <div className={styles.productGrid}>
             {artworks.map((artwork) => (
               <article key={artwork.id} className={styles.productCard}>
-                {artwork.imageUrl && <img src={imageSrc(artwork.imageUrl)} alt={artwork.name} />}
-                <div>
+                <div className={styles.productThumb}>
+                  {artwork.imageUrl && <img src={imageSrc(artwork.imageUrl)} alt={artwork.name} />}
+                  {artwork.secondaryImageUrl && <img src={imageSrc(artwork.secondaryImageUrl)} alt="" aria-hidden="true" />}
+                </div>
+                <div className={styles.productCardBody}>
                   <strong>{artwork.name}</strong>
                   <span>
                     {artwork.artworkType} / {normalizeSeries(artwork.series).join(", ") || t("noSeries")}

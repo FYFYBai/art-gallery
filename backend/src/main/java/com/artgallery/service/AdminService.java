@@ -41,6 +41,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -342,7 +344,7 @@ public class AdminService {
     public AdminArtworkResponse createArtwork(AdminArtworkRequest request) {
         Artwork artwork = new Artwork();
         applyArtworkRequest(artwork, request);
-        replacePrimaryImage(artwork, request.getImageUrl());
+        replaceArtworkImages(artwork, request.getImageUrl(), request.getSecondaryImageUrl());
         return AdminArtworkResponse.from(artworkRepository.save(artwork));
     }
 
@@ -351,7 +353,7 @@ public class AdminService {
         Artwork artwork = artworkRepository.findById(artworkId)
                 .orElseThrow(() -> new EntityNotFoundException("Artwork was not found"));
         applyArtworkRequest(artwork, request);
-        replacePrimaryImage(artwork, request.getImageUrl());
+        replaceArtworkImages(artwork, request.getImageUrl(), request.getSecondaryImageUrl());
         return AdminArtworkResponse.from(artwork);
     }
 
@@ -401,6 +403,8 @@ public class AdminService {
         artwork.setTitle(request.getName().trim());
         artwork.setSlug(uniqueSlugForTitle(request.getName().trim(), artwork.getId()));
         artwork.setDescription(blankToNull(request.getDescription()));
+        artwork.setDescriptionEn(blankToNull(request.getDescriptionEn()));
+        artwork.setDescriptionZh(blankToNull(request.getDescriptionZh()));
         artwork.setArtworkType(request.getArtworkType().trim());
         artwork.setSeries(normalizeSeries(request.getSeries()));
         artwork.setArtworkSize(blankToNull(request.getSize()));
@@ -411,15 +415,74 @@ public class AdminService {
         artwork.setActive(true);
     }
 
-    private void replacePrimaryImage(Artwork artwork, String imageUrl) {
+    private void replaceArtworkImages(Artwork artwork, String imageUrl, String secondaryImageUrl) {
+        List<String> nextImageUrls = java.util.stream.Stream.of(imageUrl, secondaryImageUrl)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(value -> !value.isBlank())
+                .collect(java.util.stream.Collectors.collectingAndThen(
+                        java.util.stream.Collectors.toCollection(LinkedHashSet::new),
+                        List::copyOf
+                ));
+
+        if (nextImageUrls.isEmpty()) {
+            throw new IllegalArgumentException("Image is required");
+        }
+
+        List<String> oldImageUrls = artwork.getImages().stream()
+                .map(ArtworkImage::getImageUrl)
+                .filter(Objects::nonNull)
+                .filter(value -> !nextImageUrls.contains(value))
+                .toList();
+
         artwork.getImages().clear();
-        ArtworkImage image = new ArtworkImage();
-        image.setArtwork(artwork);
-        image.setImageUrl(imageUrl.trim());
-        image.setAltText(artwork.getTitle());
-        image.setPrimary(true);
-        image.setDisplayOrder(0);
-        artwork.getImages().add(image);
+
+        for (int index = 0; index < nextImageUrls.size(); index++) {
+            ArtworkImage image = new ArtworkImage();
+            image.setArtwork(artwork);
+            image.setImageUrl(nextImageUrls.get(index));
+            image.setAltText(artwork.getTitle());
+            image.setPrimary(index == 0);
+            image.setDisplayOrder(index);
+            artwork.getImages().add(image);
+        }
+
+        deleteLocalUploadsAfterCommit(oldImageUrls);
+    }
+
+    private void deleteLocalUploadsAfterCommit(List<String> imageUrls) {
+        if (imageUrls.isEmpty()) {
+            return;
+        }
+
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            imageUrls.forEach(this::deleteLocalUpload);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                imageUrls.forEach(AdminService.this::deleteLocalUpload);
+            }
+        });
+    }
+
+    private void deleteLocalUpload(String imageUrl) {
+        if (imageUrl == null || !imageUrl.startsWith("/uploads/")) {
+            return;
+        }
+
+        Path uploadPath = uploadRoot.resolve(imageUrl.substring("/uploads/".length())).normalize();
+        if (!uploadPath.startsWith(uploadRoot.normalize())) {
+            return;
+        }
+
+        try {
+            Files.deleteIfExists(uploadPath);
+        } catch (IOException ignored) {
+            // The database update should not fail because an old local file was already missing.
+        }
     }
 
     private List<AdminDashboardResponse.MonthlyTransaction> buildMonthlyTransactions(List<Order> orders) {

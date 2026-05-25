@@ -69,6 +69,8 @@ frontend/app/[locale]/refund-shipping-commission/page.js
 - Artworks list/detail fetch from DB. No hardcoded product grid.
 - Filters: artwork type, series, year, two-sided CAD price range. No `medium`.
 - Artwork has one type, multiple series, size, year, price, long description, active flag, and `soldOut` boolean.
+- Artwork descriptions now support French/base `description`, optional `descriptionEn`, and optional `descriptionZh`. Public detail pages select by locale and fall back to French when the localized field is empty.
+- Artwork images now support a primary image plus optional secondary image through `artwork_images`. Public product cards crossfade to the secondary image on hover when present; detail pages show both images with full image proportions (`object-fit: contain`).
 - Current availability model is still `soldOut`; recommended next refactor is explicit `AVAILABLE`, `RESERVED`, `SOLD`.
 - Add-to-cart uses backend cart and top toasts. Cart persists per account.
 - Cart checks current artwork availability on access; unavailable items block checkout.
@@ -115,6 +117,8 @@ frontend/app/[locale]/refund-shipping-commission/page.js
 - Admin notifications use fixed top pill toasts styled like login success.
 - Product upload returns public URLs under `/uploads/products/...`.
 - Physical upload storage is environment-driven by `APP_UPLOAD_DIR` via `app.upload.dir`; use `/opt/art-gallery/uploads` on the VPS. Do not store uploads inside the repo, `.next`, or `target`.
+- Admin product form has two upload slots: primary image required, secondary image optional. On update, submitted image URLs replace the artwork's image list; removed/replaced local `/uploads/...` files are deleted after the DB transaction commits.
+- Backend multipart upload limits are explicit: `MAX_UPLOAD_FILE_SIZE` default `10MB`, `MAX_UPLOAD_REQUEST_SIZE` default `12MB`.
 
 ## Email
 

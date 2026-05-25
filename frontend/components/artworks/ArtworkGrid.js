@@ -166,11 +166,21 @@ export default function ArtworkGrid({ type }) {
                   <Link href={`/${locale}/artworks/${artwork.slug}`} className={styles.cardLink}>
                     <div className={styles.imageWrap}>
                       {artwork.imageUrl ? (
-                        <img
-                          src={imageSrc(artwork.imageUrl)}
-                          alt={artwork.title}
-                          className={styles.image}
-                        />
+                        <>
+                          <img
+                            src={imageSrc(artwork.imageUrl)}
+                            alt={artwork.title}
+                            className={styles.image}
+                          />
+                          {artwork.secondaryImageUrl && (
+                            <img
+                              src={imageSrc(artwork.secondaryImageUrl)}
+                              alt=""
+                              aria-hidden="true"
+                              className={`${styles.image} ${styles.hoverImage}`}
+                            />
+                          )}
+                        </>
                       ) : (
                         <div className={styles.imagePlaceholder} aria-hidden="true" />
                       )}

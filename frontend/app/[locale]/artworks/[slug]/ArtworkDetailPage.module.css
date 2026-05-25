@@ -41,25 +41,37 @@
 
 .detail {
   display: grid;
-  grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
   gap: clamp(34px, 5vw, 82px);
   align-items: start;
 }
 
-.imageWrap {
-  overflow: hidden;
-  background: var(--surface-muted);
+.imageGallery {
+  display: grid;
+  gap: 18px;
+}
+
+.imageFrame {
+  margin: 0;
+  border: 1px solid var(--line-soft);
+  background: rgba(252, 250, 245, 0.56);
+  padding: 10px;
+}
+
+.secondaryImageFrame {
+  width: min(72%, 360px);
 }
 
 .image,
 .imagePlaceholder {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 .imagePlaceholder {
+  aspect-ratio: 4 / 5;
   background: linear-gradient(135deg, #ece5db, #d7c9b7);
 }
 
@@ -183,14 +195,19 @@
     gap: 28px;
   }
 
-  .imageWrap {
+  .imageGallery {
     margin-left: -14px;
     margin-right: -14px;
   }
 
-  .image,
-  .imagePlaceholder {
-    aspect-ratio: 4 / 5;
+  .imageFrame {
+    border-left: none;
+    border-right: none;
+    padding: 8px 14px;
+  }
+
+  .secondaryImageFrame {
+    width: 78%;
   }
 
   .eyebrow {
@@ -247,7 +264,7 @@
     padding-right: 12px;
   }
 
-  .imageWrap {
+  .imageGallery {
     margin-left: -12px;
     margin-right: -12px;
   }

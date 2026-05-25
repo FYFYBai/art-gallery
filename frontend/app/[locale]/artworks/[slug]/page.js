@@ -29,6 +29,13 @@ function cleanTypography(value) {
     .replace(/[“”]/g, "\"");
 }
 
+function localizedDescription(artwork, locale) {
+  if (!artwork) return "";
+  if (locale === "en") return artwork.descriptionEn || artwork.description || "";
+  if (locale === "zh") return artwork.descriptionZh || artwork.description || "";
+  return artwork.description || "";
+}
+
 export default function ArtworkDetailPage() {
   const { slug } = useParams();
   const locale = useLocale();
@@ -75,11 +82,11 @@ export default function ArtworkDetailPage() {
   }, [slug]);
 
   const descriptionParagraphs = useMemo(() => {
-    return String(artwork?.description || "")
+    return String(localizedDescription(artwork, locale))
       .split(/\n+/)
       .map((paragraph) => cleanTypography(paragraph.trim()))
       .filter(Boolean);
-  }, [artwork]);
+  }, [artwork, locale]);
 
   if (loading) {
     return <main className={styles.page}><p className={styles.statusText}>{t("loading")}</p></main>;
@@ -104,11 +111,18 @@ export default function ArtworkDetailPage() {
       </Link>
 
       <section className={styles.detail}>
-        <div className={styles.imageWrap}>
+        <div className={styles.imageGallery}>
           {artwork.imageUrl ? (
-            <img src={imageSrc(artwork.imageUrl)} alt={artwork.title} className={styles.image} />
+            <figure className={styles.imageFrame}>
+              <img src={imageSrc(artwork.imageUrl)} alt={artwork.title} className={styles.image} />
+            </figure>
           ) : (
             <div className={styles.imagePlaceholder} aria-hidden="true" />
+          )}
+          {artwork.secondaryImageUrl && (
+            <figure className={`${styles.imageFrame} ${styles.secondaryImageFrame}`}>
+              <img src={imageSrc(artwork.secondaryImageUrl)} alt={artwork.title} className={styles.image} />
+            </figure>
           )}
         </div>
 
