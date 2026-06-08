@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import styles from "./DisplaySample.module.css";
-import { useTranslations } from "../../../i18n/IntlContext";
+import { useLocale, useTranslations } from "../../../i18n/IntlContext";
 
 const sampleItems = [
   {
@@ -10,6 +11,7 @@ const sampleItems = [
     descriptionKey: "displaySample1Description",
     image: "/images/display-sample/display1.png",
     altKey: "displaySample1Alt",
+    href: "/artworks",
   },
   {
     id: 2,
@@ -36,6 +38,7 @@ const sampleItems = [
 
 export default function DisplaySample() {
   const t = useTranslations("home");
+  const locale = useLocale();
 
   return (
     <section className={styles.section}>
@@ -46,7 +49,10 @@ export default function DisplaySample() {
         <div className={styles.grid}>
           {sampleItems.map((item) => (
             <article key={item.id} className={styles.card}>
-              <a href="#" className={styles.imageLink}>
+              <Link
+                href={item.href ? `/${locale}${item.href}` : "#"}
+                className={styles.imageLink}
+              >
                 <div className={styles.imageWrapper}>
                   <img
                     src={item.image}
@@ -54,18 +60,21 @@ export default function DisplaySample() {
                     className={styles.image}
                   />
                 </div>
-              </a>
+              </Link>
 
               <div className={styles.textBlock}>
                 <h3 className={styles.title}>{t(item.titleKey)}</h3>
                 <span className={styles.cardDivider} aria-hidden="true" />
                 <p className={styles.description}>{t(item.descriptionKey)}</p>
-                <a href="#" className={styles.action}>
+                <Link
+                  href={item.href ? `/${locale}${item.href}` : "#"}
+                  className={styles.action}
+                >
                   {t("displaySampleAction")}
                   <span className={styles.actionArrow} aria-hidden="true">
                     →
                   </span>
-                </a>
+                </Link>
               </div>
             </article>
           ))}
